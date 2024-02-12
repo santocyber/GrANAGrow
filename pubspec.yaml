@@ -1,35 +1,19 @@
 name: GrANAGROW
-description: Uma descrição do seu projeto
-
-# Versão do seu aplicativo
+description: Seu app de cultivo 
 version: 1.0.0
 
-# Informações sobre o autor do projeto
-author: 
-  name: Seu Nome
-  email: seu@email.com
-
-# Ambiente do SDK Flutter que o projeto requer
 environment:
   sdk: ">=2.12.0 <3.0.0"
 
-# Dependências do seu projeto
 dependencies:
   flutter:
     sdk: flutter
-  # Adicione quaisquer outras dependências do seu projeto aqui
+  webview_flutter: ^2.0.13
 
-# Dependências de desenvolvimento, como ferramentas de teste
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-# Configuração de ativos, como imagens e fontes
 flutter:
   assets:
-    - assets/imagem1.png
-    - assets/imagem2.png
-  fonts:
-    - family: NomeDaFonte
-      fonts:
-        - asset: assets/fonts/fonte.ttf
+    - assets/
