@@ -1,8 +1,19 @@
-workflows:
-  flutter_build:
-    name: Build APK
-    environment:
-      flutter: stable
-    scripts:
-      - flutter pub get
-      - flutter build apk --release
+name: GrANAGrow
+description: O aplicativo do seu cultivo 
+version: 1.0.0
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webview_flutter: ^2.0.13
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  assets:
+    - assets/
