@@ -1,34 +1,36 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.your_app_id"> <!-- Substitua com o ID do seu aplicativo -->
+    package="com.example.flutter_postgresql">
 
-    <!-- Permissões necessárias, se aplicável -->
-    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Permissão para acessar a internet -->
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:name="io.flutter.app.FlutterApplication"
-        android:label="Your App Name" <!-- Substitua com o nome do seu aplicativo -->
-        android:icon="@mipmap/ic_launcher"> <!-- Substitua com o ícone do seu aplicativo -->
-
-        <!-- Configuração da atividade principal do Flutter -->
+        android:label="Flutter + PostgreSQL"
+        android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
+            <!-- Especifica uma entrada de atividade única que representa o aplicativo Flutter padrão. -->
+            <meta-data
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme"
+                />
+            <meta-data
+                android:name="io.flutter.embedding.android.SplashScreenDrawable"
+                android:resource="@drawable/launch_background"
+                />
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <!-- Configuração para a WebView -->
-        <activity android:name="com.example.your_app_id.WebViewActivity"> <!-- Substitua com o nome da sua atividade WebView -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+        <!-- Especifica o nome da classe FlutterEngine que será usada para executar o aplicativo Flutter. -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
     </application>
 </manifest>
