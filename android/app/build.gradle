@@ -1,85 +1,32 @@
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
+// Arquivo build.gradle do projeto Flutter
+buildscript {
+    ext.kotlin_version = '1.3.50'
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
-def flutterRoot = localProperties.getProperty('flutter.sdk')
-if (flutterRoot == null) {
-    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
-}
-
-apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services' // Adicione essa linha
-
-android {
-    compileSdkVersion 31
-
-    defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.example.your_app_id"
-        minSdkVersion 16
-        targetSdkVersion 31
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
-        multiDexEnabled true // Adicione esta linha
-    }
-
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now.
-            signingConfig signingConfigs.debug
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    // Add the following block to handle multidex
-    dexOptions {
-        javaMaxHeapSize "4g"
-    }
-
-    // Add the following block to handle AAPT2 issues
-    aaptOptions {
-        // if you want to use the old 1.x AAPT
-        useNewCruncher false
-        // if you want to use the new 2.x AAPT
-        useNewCruncher true
+allprojects {
+    repositories {
+        google()
+        jcenter()
     }
 }
 
-flutter {
-    source '../..'
-    target 'lib/main.dart' // Adicione esta linha
-    // Adicione a linha abaixo para habilitar o embedding do Flutter v2
-    flavorDimensions "default"
-    mainAxisSize "default"
-    shrinkResources true
-    splitPerAbi false
-    icon "assets/flutter_icon.png"
-    ios {
-        target 'ios' // Adicione esta linha
-        bundleIdentifier 'com.example.your_app_id' // Adicione esta linha
-        iconAssets.xcassets 'ios/Runner.xcassets' // Adicione esta linha
-    }
-    android {
-        target 'android' // Adicione esta linha
-        flavorDimensions "default"
-        mainAxisSize "default"
-        shrinkResources true
-        splitPerAbi false
-        icon "assets/flutter_icon.png"
-    }
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
 }
 
-dependencies {
-    implementation 'com.google.firebase:firebase-analytics'
-    // Adicione quaisquer outras dependências que seu projeto necessitar aqui
-    implementation 'com.android.support:multidex:1.0.3' // Adicione esta linha
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }
