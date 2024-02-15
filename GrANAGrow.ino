@@ -5,10 +5,48 @@
 #include <HTTPClient.h>
 #include <ESP32Ping.h>
 
+
+#define SENSORES 1
+#include <Wire.h>  // Incluindo a biblioteca do barramento I2C
+#include <Adafruit_BMP280.h>  // Incluindo a biblioteca do sensor de pressão BMP280
+#include <Adafruit_AHTX0.h>   // Incluindo a biblioteca do sensor de temperatura e umidade AHTX0
+
+
+Adafruit_BMP280 bmp;  // Objeto do sensor BMP280
+Adafruit_AHTX0 aht;   // Objeto do sensor AHTX0
+
+
+// Configuração do certificado CA (Certificado de Autoridade) para confiar no servidor remoto
+const char* caCert = \
+ "-----BEGIN CERTIFICATE-----\n"
+  "MIICtjCCAZ4CAQAwFTETMBEGA1UEAwwKdGVzLm9ibS5wdDCCASIwDQYJKoZIhvcN\n"
+  "AQEBBQADggEPADCCAQoCggEBANvuYarL3NB+2S4uGc8IftHLctFT8qKAzAcJt3yJ\n"
+  "iFa4dixMgxNMnNZ8t1iAMEIlm0exzQ9Jbhi0i27RGwXnUDU5sS9RESqc02ca3HSd\n"
+  "DBWCc3RYxetHJTJWAIam7D7qlsHTdLBAKUKKhytHD+uFYcC0D44IHfUmXmoQva9c\n"
+  "QNSWeFZJQOywcclQyaThjSpg9xbg09Nx1/JLRV4ocKMnSm1oR9EkGu1oI8ppgeQv\n"
+  "wrEyPYniRlNY0uT7K+NvCKZ46J1naPrnWwleqxp/JGfykH63u6s4VLZEQ7ibmAI3\n"
+  "WX3hXTcGYxcz3LvwZNjpRslAX3iFLr9docf0HjSbF70zcv0CAwEAAaBcMFoGCSqG\n"
+  "SIb3DQEJDjFNMEswCQYDVR0TBAIwADALBgNVHQ8EBAMCBeAwMQYDVR0RBCowKIIK\n"
+  "dGVzLm9ibS5wdIIMKi50ZXMub2JtLnB0ggwqLnRlcy5vYm0ucHQwDQYJKoZIhvcN\n"
+  "AQELBQADggEBALYRG8PoLow3R6Z7X9ZntRvHYksRhaUsgmOqgqB/H2SjEFZ0kTvY\n"
+  "0BIG98FFfHRG8omo/jlsPBBD/el8WzrBNRWvennpvWRteBheM5eSruHjZO5tOwHd\n"
+  "b+A6i8GmMpQVAzx31oM+fNXUzUDUGtltIxxIQMsclkqiGWuT56QZ2oZEtVTOmQP9\n"
+  "NPsmirCe0CfN47LgHz73X1wjp6nd09yloR/pFO4H+gruyh+NwnKp9wP4Pq/3i6g7\n"
+  "hl0mVBvlvMs/7Jt3guvcdSHPc2yyEiarRUPUxCzrjG8RRr7HpY7xkKYRI06ROPsj\n"
+  "LOYRaRnaPslLfcSXH1MsIjXRgq077tzeHdo=\n"
+  "-----END CERTIFICATE-----\n";
+
+
 //#Bibliotecas MULTITASK
-#include <esp_task_wdt.h>
+#include <Arduino.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include "esp32-hal-psram.h"
+#include <esp_system.h>
+#include <esp_task_wdt.h>
+#include "esp32-hal.h"
+
+RTC_DATA_ATTR bool bootTriggered = false;
 
 //#Biblioteca SISTEMAS
 #include "Arduino.h"
@@ -18,47 +56,6 @@
 #include <SPIFFS.h>
 #include <stdbool.h>
 #include <stdint.h>
-
-//#Biblioteca QRCODE
-#include "qrcodegen.h"
-
-//#Biblioteca DISPLAY
-#define ILI9488_DRIVER     // WARNING: Do not connect ILI9488 display SDO to MISO if other devices share the SPI bus (TFT SDO does NOT tristate when CS is high)
-
-#define LOAD_GLCD   // Font 1. Original Adafruit 8 pixel font needs ~1820 bytes in FLASH
-#define SMOOTH_FONT
-
-#define SPI_FREQUENCY  27000000
-#define SPI_READ_FREQUENCY  20000000
-#define SPI_TOUCH_FREQUENCY  2500000
-
-#define TS_MINX 0
-#define TS_MAXX 479
-#define TS_MINY 0
-#define TS_MAXY 319
-
-#define TFT_SCLK 46
-#define TFT_MOSI 9
-#define TFT_DC 10
-#define TFT_RST -1
-#define TFT_CS 14
-#define TFT_BL 8  // LED back-light (only for ST7789 with backlight control pin)
-#define TFT_WIDTH  320
-#define TFT_HEIGHT 480
-#define TOUCH_CS 18     // Chip select pin (T_CS) of touch screen
-#define T_IRQ 21
-#define TOUCH_DO 3
-#define TOUCH_DIN 16
-
-#include <TFT_eSPI.h>
-#include "User_Setup.h"
-#include <Adafruit_GFX.h>
-#include <XPT2046_Touchscreen.h>
-XPT2046_Touchscreen ts(TOUCH_CS, T_IRQ); //XPT2046_Touchscreen ts(TOUCH_CS, T_IRQ, TOUCH_DIN, TOUCH_DO);  // Create TouchScreen instance
-
-
-// Crie um objeto tft
-TFT_eSPI tft;
 
 // Crie um objeto client
 WiFiClientSecure client;
@@ -74,17 +71,9 @@ IPAddress localIP;
 // Set your Gateway IP address
 IPAddress localGateway;
 //IPAddress localGateway(192, 168, 1, 1); //hardcoded
-IPAddress subnet(255, 255, 0, 0);
-IPAddress primaryDNS(8, 8, 8, 8); //nao nao eh opcional nao, eh obrigatorio demorei mt tempo pra perceber q o relogio e o telegram n tava funcionando por causa do dns
+IPAddress subnet(255, 255, 255, 0);
+IPAddress primaryDNS(1, 1, 1, 1); //nao nao eh opcional nao, eh obrigatorio demorei mt tempo pra perceber q o relogio e o telegram n tava funcionando por causa do dns
 
-
-//##############CONFIGURA TASKHANDLE
-
-TaskHandle_t xHandle = NULL;
-#define STACK_SIZE 10000
- // Structure that will hold the TCB of the task being created.
- StaticTask_t xTaskBuffer;
- StackType_t xStack[ STACK_SIZE ];
 
 
 //###################################CONFIGURA VARIAVIS
@@ -99,8 +88,6 @@ const int ledPin = 48;     // Pino do LED
 const int relayPin = 1; // Pino GPIO para o relé
 const int relayPin2 = 2; // Pino GPIO para o relé
 const int relayPin3 = 3; // Pino GPIO para o relé
-
-
 
 
 const char* host = "santocyber.helioho.st";
@@ -127,16 +114,6 @@ uint32_t contagrana;
 uint32_t contagrana1;
 uint32_t contagrana2;
 uint32_t contagrana3;
-
-
-
-uint32_t read_nvs_data();
-uint32_t contagrana_data();
-uint32_t contaobj_data();
-
-void save_nvs_data(uint32_t data);
-void contagrana_data(uint32_t data);
-void contaobj_data(uint32_t data);
 
 char info[30];
 
@@ -178,6 +155,8 @@ int verificacoes = 0;
 unsigned long previousMillis = 0;
 const long interval = 30000; // Intervalo de 30 segundos
 
+const long interval2 = 500;  // Intervalo desejado em milissegundos (200ms)
+const long intervalupdate = 30000;  // Intervalo desejado em milissegundos (30s)
 
 
 
@@ -293,36 +272,24 @@ bool initWiFi() {
 
 
 void setup() {
-  // Note the format for setting a serial port is as follows: Serial2.begin(baud-rate, protocol, RX pin, TX pin);
    Serial.begin(115200);
 
-  //pinMode(T_IRQ, INPUT_PULLUP);  // Set T_IRQ pin as input with pull-up resistor
 
+   // Verifica se o boot foi causado pelo watchdog
+  if (bootTriggered) {
+    Serial.println("############Reiniciado pelo RTC watchdog!");
+  }
+  // Configura o RTC watchdog para reiniciar o sistema após 60 segundos
+  esp_task_wdt_init(60, true);
+  // Reinicia o watchdog para evitar reinício imediato
+  esp_task_wdt_reset();
   
-  tft.init();
-  tft.setTextFont(0); // Configura a fonte de texto para o índice 1
-  tft.setRotation(2);
 
-  ts.begin();
-  ts.setRotation(2);
- 
-
-  tft.fillScreen(TFT_RED);  // Limpa a tela com fundo preto
-  tft.setTextColor(TFT_WHITE);  // Define a cor do texto como branco
-  tft.setTextSize(3);  // Define o tamanho do texto
-
-  // Escreve "Hello, World!" no centro da tela
-  tft.setCursor(50, 100);  // Posição do cursor na tela
-  tft.println("BEM VINDO,");
-  tft.println("ESSE EH O ROBO DE");
-  tft.println("PAGAMENTO DA ");
- 
-  tft.setTextColor(TFT_GREEN);  // Define a cor do texto como branco
-  tft.setTextSize(5);  // Define o tamanho do texto
-  tft.println("GrANANET!");
-
-
-
+  // Inicialize o barramento I2C com os pinos SDA e SCL específicos
+  Wire.begin(8, 9); // Inicializando o barramento I2C com SDA no pino 8 e SCL no pino 9
+  Wire.setClock(100000); 
+  bmp.begin();
+  aht.begin();
   
   // Configurar o pino do relé como saída
   pinMode(Button1, INPUT); // Define o pino do botão como entrada
@@ -374,47 +341,50 @@ else {
   Serial.println("ESP Setup finalizado");
   
   loadfile(estado, mensagem);
-  last_id = read_nvs_data();
-  contagrana = read_contagrana();
-  contaobj = read_contaobj();
   
-  Serial.println("VARIAVEIS ARMAZENADA NO TXT");
+  Serial.println("VARIAVEIS ARMAZENADA NO SPIFF");
   Serial.println(estado);
-  Serial.println(contagrana);
-  Serial.println(contaobj);
-  Serial.println(last_id);
+  Serial.println(mensagem);
+
 
   // Serial.setDebugOutput(true);
 //#####################################################wifi scan
   setClock();  
 
+  }
 
 
 
-//############################################ Configura LOOP TASKHANDLE
- 
- //xStack = (uint8_t*)heap_caps_calloc(1, 5000, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT | MALLOC_CAP_32BIT);
-//pxStackBuffer = (uint8_t*)heap_caps_calloc(1, 5000, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT | MALLOC_CAP_32BIT);
-  delay(200);
 
 
-     // Create the task pinned to core 0 without using any dynamic memory allocation.
-    //      xHandle = xTaskCreateStatic(
-     xHandle = xTaskCreateStaticPinnedToCore(
-                   TELE,       // Function that implements the task.
-                   "TELE",          // Text name for the task.
-                   STACK_SIZE,      // Stack size in bytes, not words.
-                   ( void * ) 1,    // Parameter passed into the task.   ( void * ) 1
-                   1,// Priority at which the task is created.
-                   xStack,          // Array to use as the task's stack.
-                   &xTaskBuffer,    // Variable to hold the task's data structure.
-                   1 );     
 
 
+
+void loop() {
+
+    // Reinicializa o watchdog a cada loop
+    esp_task_wdt_reset();
+
+
+
+    
+
+
+      telemetria();
+delay(30000);
+
+  Serial.println("SENSORES TEMPERATURA");
+  Serial.println(readDHTTemperature());
+  Serial.println(readDHTHumidity());
+  Serial.println(readDHTPressao());
+  
+  Serial.println("VARIAVEIS ARMAZENADA NO SPIFF");
+  Serial.println("ESTADO");
+  Serial.println(estado);
+  Serial.println("MENSAGEM");
+  Serial.println(mensagem);
 
 
 }
-
-
 
  
