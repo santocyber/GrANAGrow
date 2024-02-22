@@ -229,7 +229,7 @@ void setup() {
 
   // Inicialize o barramento I2C com os pinos SDA e SCL 
  //   Wire.begin(); // Inicialize a primeira porta I2C  
-    Wire.begin(I2C_MASTER_SDA1, I2C_MASTER_SCL1); // Inicialize a primeira porta I2C
+  //  Wire.begin(I2C_MASTER_SDA1, I2C_MASTER_SCL1); // Inicialize a primeira porta I2C
 //  Wire.setClock(100000); 
 
    if (aht.begin()) {
@@ -306,9 +306,9 @@ if (ssid.length() > 0 && password.length() > 0) {
     Serial.println("Geolocalização: " + geo);
     Serial.println("Usuario: " + usuario);
     
-    // Aguarda conexão por até 10 segundos
+    // Aguarda conexão por até 30 segundos
     unsigned long startTime = millis();
-    while (WiFi.status() != WL_CONNECTED && millis() - startTime < 10000) {
+    while (WiFi.status() != WL_CONNECTED && millis() - startTime < 30000) {
         delay(500);
     }
 
