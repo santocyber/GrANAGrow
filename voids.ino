@@ -1,12 +1,88 @@
 //#################################################################PING WDT
+void setClock() {
 
+  sntp_servermode_dhcp(1);    // (optional)
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer1, ntpServer2);
+}
+
+
+//##############################################################################
+
+
+
+void startAPMode() {
+    // Iniciar o modo AP
+    WiFi.mode(WIFI_AP);
+    WiFi.softAP("GRANAConfig"); // Nome da rede AP
+    IPAddress myIP = WiFi.softAPIP();
+    Serial.print("Endereço IP do AP: ");
+    Serial.println(myIP);
+
+    // Inicializa o servidor web
+    server.on("/", handleRoot);
+    server.on("/scan", HTTP_GET, handleScan);
+    server.on("/connect", handleConnect);
+    server.begin();
+    Serial.println("Servidor AP iniciado");
+}
+
+void startWebServer() {
+    // Configura o certificado CA
+    client.setCACert(caCert);
+    setClock();
+
+    // Inicializa o servidor web
+    server.on("/", handleMain);
+    server.begin();
+    Serial.println("Servidor web iniciado");
+
+    // Exibe informações sobre os servidores DNS
+    IPAddress dns1 = WiFi.dnsIP(0); // Primeiro servidor DNS
+    IPAddress dns2 = WiFi.dnsIP(1); // Segundo servidor DNS
+    Serial.print("Servidor DNS primário: ");
+    Serial.println(dns1);
+    Serial.print("Servidor DNS secundário: ");
+    Serial.println(dns2);
+}
+
+
+
+
+
+
+
+
+//##############################################################################
 
 uint32_t notConnectedCounter = 0;
 uint32_t ConnectedCounter = 0;
 
 
 
+void checkWiFiConnection() {
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("Conexão Wi-Fi perdida. Tentando reconectar...");
+        WiFi.reconnect();
+        unsigned long startTime = millis();
+        while (WiFi.status() != WL_CONNECTED) {
+            // Obtenha as configurações DNS atualmente em uso
+  IPAddress dns1 = WiFi.dnsIP(0); // Primeiro servidor DNS
+  IPAddress dns2 = WiFi.dnsIP(1); // Segundo servidor DNS
 
+  Serial.print("Servidor DNS primário: ");
+  Serial.println(dns1);
+  Serial.print("Servidor DNS secundário: ");
+  Serial.println(dns2);
+  setClock();
+            // Aguarda a reconexão por até 10 segundos
+            if (millis() - startTime > 10000) {
+                Serial.println("Falha ao reconectar ao Wi-Fi.");
+                break;
+            }
+            delay(500);
+        }
+    }
+}
 
 void ensureWiFiConnection() {
     HTTPClient http;
@@ -29,7 +105,8 @@ void pingando(){
    Serial.print("Task PING running on core ");
    Serial.println(xPortGetCoreID());
 
-    if(Ping.ping("google.com", 1)) {
+
+    if(Ping.ping("google.com", 3)) {
       ConnectedCounter++;
  Serial.println("Ping pong OK contando: ");
  Serial.println(ConnectedCounter);
@@ -47,11 +124,11 @@ void pingando(){
   size_t totalBytes = SPIFFS.totalBytes();
   size_t usedBytes = SPIFFS.usedBytes();
 
-  Serial.print("Espaço total: ");
+  Serial.print("Espaco total: ");
   Serial.print(totalBytes);
   Serial.println(" bytes");
 
-  Serial.print("Espaço restante: ");
+  Serial.print("Espaco restante: ");
   Serial.print(totalBytes - usedBytes);
   Serial.println(" bytes");
       }
@@ -69,47 +146,56 @@ else{
    }
    }
 
+
 }
 
-//##############VOID TELEGRAM
 
-void TELE(void*p){
-//portVALID_STACK_MEM(pxStackBuffer); 
-    
-    configASSERT( ( uint32_t ) p == 1UL );
-    
-  // Block for 500ms.
-const TickType_t xDelay = 60000 / portTICK_PERIOD_MS;
 
-  for( ;; )
-  {
-      // Simply toggle the LED every 500ms, blocking between each toggle.
-  readTel();
-      vTaskDelay( xDelay );
+
+//#########################SALVA INFO WIFI NO SPIFF
+
+void saveWifiCredentials(const String &ssid, const String &password, const String &nomedobot, const String &geo) {
+  File file = SPIFFS.open("/wifi_credentials.txt", "w");
+  if (!file) {
+    Serial.println("Erro ao abrir o arquivo para salvar as credenciais.");
+    return;
   }
 
+  file.println(ssid);
+  file.println(password);
+  file.println(nomedobot);
+  file.println(geo);
+  file.println(usuario);
+
+  file.close();
+}
+
+
+
+void  loadWifiCredentials(String &ssid, String &password, String &nomedobot, String &geo, String &usuario) {
+  File file = SPIFFS.open("/wifi_credentials.txt", "r");
+  if (!file) {
+    Serial.println("Arquivo de credenciais n         o encontrado.");
+    return;
   }
 
+  ssid = file.readStringUntil('\n');
+  password = file.readStringUntil('\n');
+  nomedobot = file.readStringUntil('\n');
+  geo = file.readStringUntil('\n');
+  usuario = file.readStringUntil('\n');
 
-void readTel(){
+  file.close();
+}
 
-
-
-   Serial.print("Task TELE running on core ");
-   Serial.println(xPortGetCoreID());
-
-    if (StateUpdate == "ativo") {
-
-    telemetria();
-  //  verifyActionAndExecute();
-    pingando();
-
-  }
-
-esp_get_free_heap_size();
- 
-//  vTaskDelete(NULL);
-       //   vTaskDelete(teletask);
-   // vTaskSuspend(NULL);
+  void deletewififile() {
+String ssid0 ="";
+String password0 ="";
+String nomedobot0 ="";
+String geo0 ="";
+String usuario0 ="";
+        
+          saveWifiCredentials(ssid0,password0,nomedobot0,geo0);
+          ESP.restart();
 
 }

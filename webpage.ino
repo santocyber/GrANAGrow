@@ -1,4 +1,7 @@
 
+
+//#########################################Cria paginas WEB
+
 void handleMain() {
   String html = "<html><head>";
   html += "<style>";
@@ -15,20 +18,17 @@ void handleMain() {
   html += "<p class='data'>" + geo + "</p>";
   html += "<h2>SSID:</h2>";
   html += "<p class='data'>" + ssid + "</p>";
-  html += "<h2>ENTRADA:</h2>";
-  html += "<p class='data'>" + String(contagrana) + "</p>";
-  html += "<h2>SAIDA:</h2>";
-  html += "<p class='data'>" + String(contaobj) + "</p>";
+  html += "<h2>MENSAGEM:</h2>";
+  html += "<p class='data'>" + String(mensagem) + "</p>";
   html += "<h2>ESTADO:</h2>";
   html += "<p class='data'>" + String(estado) + "</p>";
   html += "</body></html>";
-
 
   server.send(200, "text/html", html);
 }
 
 void handleRoot() {
-  loadWifiCredentials(ssid, password, nomedobot,geo);
+  loadWifiCredentials(ssid, password, nomedobot, geo, usuario); // Carrega os dados
 
   String html = "<html><head>";
   html += "<style>";
@@ -49,6 +49,8 @@ void handleRoot() {
   html += "<p class='data'>" + ssid + "</p>";
   html += "<h2>password:</h2>";
   html += "<p class='data'>" + password + "</p>";
+  html += "<h2>Usuário:</h2>"; // Adiciona o título do campo de usuário
+  html += "<p class='data'>" + usuario + "</p>"; // Mostra o usuário
   html += "<form method='get' action='/scan'>";
   html += "<input type='submit' class='button' value='Escanear Redes'>";
   html += "</form>";
@@ -66,7 +68,7 @@ void handleScan() {
   html += "ul { list-style-type: none; padding: 0; }";
   html += "li { margin: 10px 0; }";
   html += "label { font-weight: bold; }";
-  html += "input[type='text'], input[type='password'] { width: 100%; padding: 10px; margin: 5px 0; }";
+  html += "input[type='text'], input[type='text'] { width: 100%; padding: 10px; margin: 5px 0; }";
   html += "input[type='submit'], input[type='button'] { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer; }";
   html += "a { text-decoration: none; }";
   html += "</style></head><body>";
@@ -76,23 +78,25 @@ void handleScan() {
   WiFi.disconnect();
 
   // Scan for Wi-Fi networks
-   int n = WiFi.scanNetworks();
-    Serial.println("Scan done");
-    if (n == 0) {
-        html += "<h1>No Wi-Fi Network:</h1>";
-        Serial.println("no networks found");
-    } else {
-  for (int i = 0; i < n; i++) {
-    // Add each network to the HTML list
-    String ssid = WiFi.SSID(i);
-    int32_t rssi = WiFi.RSSI(i);
-    html += "<li><input type='radio' name='ssid' value='" + ssid + "'>" + ssid + " (RSSI: " + String(rssi) + ")</li>";
-  }}
+  int n = WiFi.scanNetworks();
+  Serial.println("Scan done");
+  if (n == 0) {
+    html += "<h1>No Wi-Fi Network:</h1>";
+    Serial.println("no networks found");
+  } else {
+    for (int i = 0; i < n; i++) {
+      // Add each network to the HTML list
+      String ssid = WiFi.SSID(i);
+      int32_t rssi = WiFi.RSSI(i);
+      html += "<li><input type='radio' name='ssid' value='" + ssid + "'>" + ssid + " (RSSI: " + String(rssi) + ")</li>";
+    }
+  }
 
   html += "</ul>";
+  html += "<label for='password'>Password:</label><input type='text' name='password'><br>";
   html += "<label for='nomedobot'>NOMEDOBOT:</label><input type='text' name='nomedobot'><br>";
   html += "<label for='geo'>GEOLOCALIZACAO:</label><input type='text' name='geo'><br>";
-  html += "<label for='password'>Password:</label><input type='password' name='password'><br>";
+  html += "<label for='usuario'>Usuario:</label><input type='text' name='usuario'><br>"; // Novo input
   html += "<input type='submit' value='CONECTAR'>";
   html += "</form>";
   html += "<p><br><br><br><a href='/'>Back</a></p>";
@@ -103,6 +107,7 @@ void handleScan() {
   server.send(200, "text/html", html);
 }
 
+
 void handleConnect() {
   Serial.println("CONECT");
 
@@ -110,7 +115,7 @@ void handleConnect() {
   String password = server.arg("password");
   String nomedobot = server.arg("nomedobot");
   String geo = server.arg("geo");
-saveWifiCredentials(ssid.c_str(), password.c_str(), nomedobot.c_str(), geo.c_str());
+  saveWifiCredentials(ssid.c_str(), password.c_str(), nomedobot.c_str(), geo.c_str());
 
   // Verifique se o SSID e a senha não estão vazios
   if (ssid.length() > 0 && password.length() > 0) {
