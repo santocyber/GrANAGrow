@@ -18,11 +18,31 @@
   
 // Verifica se os sensores devem ser lidos ou não
 #if (SENSORES == 1)
-  // Se os sensores devem ser lidos, adquire suas leituras
+
+if (aht.begin()) {
+    
+   Serial.println("AHT inicializado com sucesso!");
+     Serial.println("DADOS SENSORES ");
+  Serial.println(readDHTTemperature());
+  Serial.println(readDHTHumidity());
+  Serial.println(readDHTPressao());
+    // Se os sensores devem ser lidos, adquire suas leituras
   postData += "&temperatura=" + readDHTTemperature();
   postData += "&umidade=" + readDHTHumidity();
   postData += "&pressao=" + readDHTPressao();
   postData += "&ph=7";
+
+  }else{
+    Serial.println("Falha ao inicializar o sensor AHT!");
+      // Se os sensores não devem ser lidos, define valores padrão como 0
+  postData += "&temperatura=0";
+  postData += "&umidade=0";
+  postData += "&pressao=0";
+  postData += "&ph=0";
+
+}
+
+
 #else
   // Se os sensores não devem ser lidos, define valores padrão como 0
   postData += "&temperatura=0";
@@ -36,7 +56,7 @@
   postData += "&datalocal=" + dataAtual;
   postData += "&nomedobot=" + nomedobot;
   postData += "&geo=" + geo;
-  postData += "&usuario=" + usuario;
+  postData += "&usuarios=" + usuario;
 
     int httpCode = https.POST(postData);
       Serial.println(postData);

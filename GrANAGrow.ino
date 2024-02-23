@@ -37,8 +37,8 @@ Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
 
 #endif
 
-//#define I2C_MASTER_SCL1 18
-//#define I2C_MASTER_SDA1 17
+#define I2C_MASTER_SCL1 18
+#define I2C_MASTER_SDA1 17
 
 //#define I2C_MASTER_SCL1 22
 //#define I2C_MASTER_SDA1 21
@@ -131,8 +131,9 @@ String password ;
 String nomedobot;
 String geo;
 String usuario;
-void saveWifiCredentials(const String &ssid, const String &password, const String &nomedobot, const String &geo);
-void loadWifiCredentials(String &ssid, String &password, String &nomedobot, String &geo);
+void saveWifiCredentials(const String &ssid, const String &password, const String &nomedobot, const String &geo, const String &usuario);
+void loadWifiCredentials(String &ssid, String &password, String &nomedobot, String &geo, String &usuario);
+
 void loadfile(String &estado, String &mensagem);
 
 
@@ -165,7 +166,6 @@ int ordervalue = 1;
 
 
 // Vari         veis para rastrear o estado do bot         o e os cliques
-int buttonState = 1;       // Vari         vel para armazenar o estado do bot         o
 int objState = 0;       // Vari         vel para armazenar o estado do bot         o
 int contaobjfunc = 0;
 bool functionExecuted = false;
@@ -193,6 +193,18 @@ const long interval120 = 120000; // Intervalo de 30 segundos
 
 const long interval2 = 500;  // Intervalo desejado em milissegundos (200ms)
 const long intervalupdate = 30000;  // Intervalo desejado em milissegundos (30s)
+
+
+
+
+
+//##################BOTAO RESET
+const int buttonPin = 0; // Defina o pino do botão
+bool buttonState = false; // Estado atual do botão
+bool lastButtonState = false; // Estado anterior do botão
+unsigned long startTime = 0; // Variável para armazenar o tempo inicial
+const unsigned long longPressDuration = 10000; // Duração do longo pressionamento em milissegundos
+
 
 
 
@@ -229,7 +241,7 @@ void setup() {
 
   // Inicialize o barramento I2C com os pinos SDA e SCL 
  //   Wire.begin(); // Inicialize a primeira porta I2C  
-  //  Wire.begin(I2C_MASTER_SDA1, I2C_MASTER_SCL1); // Inicialize a primeira porta I2C
+    Wire.begin(I2C_MASTER_SDA1, I2C_MASTER_SCL1); // Inicialize a primeira porta I2C
 //  Wire.setClock(100000); 
 
    if (aht.begin()) {
@@ -269,6 +281,7 @@ void setup() {
 #endif
   
   // Configurar o pino do 
+  pinMode(buttonPin, INPUT_PULLUP);
   pinMode(Button1, INPUT); // Define o pino do bot         o como entrada
   pinMode(Button2, INPUT); // Define o pino do bot         o como entrada
   pinMode(obj1, INPUT); // Define o pino do bot         o como entrada
@@ -413,11 +426,31 @@ void loop() {
 
       
 #if (SENSORES == 1)
+ // Verifica se já passou o intervalo definido
+  if (currentMillis2 - previousMillis2 >= interval60) {
+    // Atualiza o tempo de referência
+    previousMillis2 = currentMillis2;
 
-  Serial.println("SENSORES TEMPERATURA");
+  if (aht.begin()) {
+    
+   Serial.println("AHT inicializado com sucesso!");
+     Serial.println("DADOS SENSORES ");
   Serial.println(readDHTTemperature());
   Serial.println(readDHTHumidity());
   Serial.println(readDHTPressao());
+
+
+  }else{
+    Serial.println("Falha ao inicializar o sensor AHT!");
+
+}
+
+
+  }
+
+
+
+  
   #endif
  
 
@@ -439,7 +472,7 @@ void loop() {
  // Serial.println("MENSAGEM");
  // Serial.println(mensagem);
 
-
+botaoreset();
 }
 
 

@@ -22,6 +22,9 @@ void handleMain() {
   html += "<p class='data'>" + String(mensagem) + "</p>";
   html += "<h2>ESTADO:</h2>";
   html += "<p class='data'>" + String(estado) + "</p>";
+  html += "<h2>USUARIO:</h2>";
+  html += "<p class='data'>" + String(usuario) + "</p>";
+  html += "<form action='/delete-wifi' method='post'><button type='submit'>Delet Config WiFi </button></form>";
   html += "</body></html>";
 
   server.send(200, "text/html", html);
@@ -49,7 +52,7 @@ void handleRoot() {
   html += "<p class='data'>" + ssid + "</p>";
   html += "<h2>password:</h2>";
   html += "<p class='data'>" + password + "</p>";
-  html += "<h2>Usuário:</h2>"; // Adiciona o título do campo de usuário
+  html += "<h2>Usuario:</h2>"; // Adiciona o título do campo de usuário
   html += "<p class='data'>" + usuario + "</p>"; // Mostra o usuário
   html += "<form method='get' action='/scan'>";
   html += "<input type='submit' class='button' value='Escanear Redes'>";
@@ -94,8 +97,8 @@ void handleScan() {
 
   html += "</ul>";
   html += "<label for='password'>Password:</label><input type='text' name='password'><br>";
-  html += "<label for='nomedobot'>NOMEDOBOT:</label><input type='text' name='nomedobot'><br>";
-  html += "<label for='geo'>GEOLOCALIZACAO:</label><input type='text' name='geo'><br>";
+  html += "<label for='nomedobot'>Nome do BOT:</label><input type='text' name='nomedobot'><br>";
+  html += "<label for='geo'>Geo Localizacao:</label><input type='text' name='geo'><br>";
   html += "<label for='usuario'>Usuario:</label><input type='text' name='usuario'><br>"; // Novo input
   html += "<input type='submit' value='CONECTAR'>";
   html += "</form>";
@@ -115,7 +118,9 @@ void handleConnect() {
   String password = server.arg("password");
   String nomedobot = server.arg("nomedobot");
   String geo = server.arg("geo");
-  saveWifiCredentials(ssid.c_str(), password.c_str(), nomedobot.c_str(), geo.c_str());
+  String usuario = server.arg("usuario");
+
+  saveWifiCredentials(ssid.c_str(), password.c_str(), nomedobot.c_str(), geo.c_str(), usuario.c_str());
 
   // Verifique se o SSID e a senha não estão vazios
   if (ssid.length() > 0 && password.length() > 0) {

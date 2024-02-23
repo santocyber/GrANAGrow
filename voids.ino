@@ -33,6 +33,8 @@ void startWebServer() {
 
     // Inicializa o servidor web
     server.on("/", handleMain);
+    server.on("/delete-wifi", HTTP_POST, deletewififile);
+
     server.begin();
     Serial.println("Servidor web iniciado");
 
@@ -154,7 +156,7 @@ else{
 
 //#########################SALVA INFO WIFI NO SPIFF
 
-void saveWifiCredentials(const String &ssid, const String &password, const String &nomedobot, const String &geo) {
+void saveWifiCredentials(const String &ssid, const String &password, const String &nomedobot, const String &geo, const String &usuario) {
   File file = SPIFFS.open("/wifi_credentials.txt", "w");
   if (!file) {
     Serial.println("Erro ao abrir o arquivo para salvar as credenciais.");
@@ -195,7 +197,39 @@ String nomedobot0 ="";
 String geo0 ="";
 String usuario0 ="";
         
-          saveWifiCredentials(ssid0,password0,nomedobot0,geo0);
+          saveWifiCredentials(ssid0,password0,nomedobot0,geo0,usuario0);
+
+          server.send(200, "text/plain", "WiFi file deleted");
+
           ESP.restart();
 
 }
+
+
+
+void botaoreset(){
+
+buttonState = digitalRead(buttonPin); // Lê o estado atual do botão
+
+  // Se o estado do botão mudou
+  if (buttonState != lastButtonState) {
+    // Se o botão foi pressionado
+    if (buttonState == LOW) {
+      startTime = millis(); // Armazena o tempo atual
+    }
+    // Se o botão foi solto
+    else {
+      unsigned long pressDuration = millis() - startTime; // Calcula a duração do pressionamento
+      // Se a duração do pressionamento for maior ou igual à duração do longo pressionamento
+      if (pressDuration >= longPressDuration) {
+        deletewififile(); // Chama a função deletewififile
+      }
+    }
+  }
+
+  lastButtonState = buttonState; // Atualiza o estado anterior do botão
+  delay(10); // Pequeno atraso para estabilidade
+    
+    
+    
+    }
