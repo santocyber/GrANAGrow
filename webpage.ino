@@ -52,8 +52,8 @@ void handleRoot() {
   html += "<p class='data'>" + ssid + "</p>";
   html += "<h2>password:</h2>";
   html += "<p class='data'>" + password + "</p>";
-  html += "<h2>Usuario:</h2>"; // Adiciona o título do campo de usuário
-  html += "<p class='data'>" + usuario + "</p>"; // Mostra o usuário
+  html += "<h2>Usuario:</h2>"; // Adiciona o t��tulo do campo de usu��rio
+  html += "<p class='data'>" + usuario + "</p>"; // Mostra o usu��rio
   html += "<form method='get' action='/scan'>";
   html += "<input type='submit' class='button' value='Escanear Redes'>";
   html += "</form>";
@@ -122,12 +122,12 @@ void handleConnect() {
 
   saveWifiCredentials(ssid.c_str(), password.c_str(), nomedobot.c_str(), geo.c_str(), usuario.c_str());
 
-  // Verifique se o SSID e a senha não estão vazios
+  // Verifique se o SSID e a senha n��o est��o vazios
   if (ssid.length() > 0 && password.length() > 0) {
     WiFi.begin(ssid.c_str(), password.c_str());
 
-    // Aguarde a conexão ser estabelecida
-    int timeout = 10; // Tempo limite para a conexão em segundos
+    // Aguarde a conex��o ser estabelecida
+    int timeout = 10; // Tempo limite para a conex��o em segundos
     while (WiFi.status() != WL_CONNECTED && timeout > 0) {
       delay(1000); // Aguarde 1 segundo
       timeout--;

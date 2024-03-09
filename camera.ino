@@ -8,9 +8,17 @@
 #include <esp_system.h>
 #include <nvs_flash.h>
 #include "esp_camera.h"
-#include "esp_spi_flash.h"
 
-// Configura����o da c��mera
+
+#include <stdio.h>
+#include <driver/gpio.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <esp_attr.h>
+#include "esp_heap_caps.h"
+
+
+// Configura������������o da c������mera
 camera_fb_t * fb = NULL;
 
 framesize_t configframesize = FRAMESIZE_VGA; // FRAMESIZE_ + QVGA|CIF|VGA|SVGA|XGA|SXGA|UXGA
@@ -119,6 +127,13 @@ bool setupCamera()
 //###############################################TIRA FOTO ENVIA
 
 void capturaimagem() {
+    Serial.println("INICIA FUNCAO CAMERA");
+
+  
+    timerfotostatus.trim();
+
+    if (timerfotostatus == "1") {
+    Serial.println("Modo FOTO automático ativado");
 
     // Obt o frame buffer da cmera
     camera_fb_t* fb = esp_camera_fb_get();
@@ -158,8 +173,12 @@ void capturaimagem() {
     Serial.println(F("Desconectando."));
     http.end();
     esp_camera_fb_return(fb);
-}
+}else{
+      Serial.println("Modo FOTO automático desativado");
 
+  }
+
+}
 
 
 #endif
