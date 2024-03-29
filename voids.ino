@@ -156,7 +156,6 @@ void startWebServer() {
     server.begin();
     Serial.println("Servidor web iniciado");
 
-    // Exibe informa����es sobre os servidores DNS
     IPAddress dns1 = WiFi.dnsIP(0); // Primeiro servidor DNS
     IPAddress dns2 = WiFi.dnsIP(1); // Segundo servidor DNS
     Serial.print("Servidor DNS prim��rio: ");

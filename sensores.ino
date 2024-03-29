@@ -1,5 +1,40 @@
+
+
+
+
+
+
+////#############################################################################Le sensores
+
+float sensorValue_7 = 2048; // Valor do sensor para pH 7.0
+float sensorValue_low = 1024; // Valor do sensor para pH baixo (por exemplo, 4.0)
+float sensorValue_high = 3072; // Valor do sensor para pH alto (por exemplo, 10.0)
+
+
+float ph() {
+
+  int sensorValue = analogRead(phpin);
+  
+  // Mapeamento linear para a faixa de pH
+  float pHValue = map(sensorValue, sensorValue_low, sensorValue_high, 4.0, 10.0); // Mapeia o valor do sensor para a faixa de pH (4.0 a 10.0)
+  
+  return pHValue;
+
+}
+
+
+
+
+
+
+
 //############################################CONFIG SENSOR TEMPERATURA PRESSAO
 #if (SENSORES == 1)
+
+
+
+
+
 
 
 
@@ -49,5 +84,18 @@ sensors_event_t pressure_event;
     return String(p);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif

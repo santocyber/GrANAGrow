@@ -1,10 +1,4 @@
 #if (TELA == 1)
-unsigned long updateInterval = 500; // Update interval in milliseconds (1 second)
-unsigned long intervalclima = 10000; // Intervalo de 10 segundos em milissegundos
-unsigned long intervalclock = 60000; // Intervalo de 10 segundos em milissegundos
-
-unsigned long lastExecutionTime = 0;
-
 
 
 //#define TFT_WIDTH 240
@@ -167,17 +161,15 @@ menu();
 
   if (statetela == "clock") {
 
-
-
+  
   if (currentMillis - lastExecutionTime >= intervalclock) {
     lastExecutionTime = currentMillis;
     functionExecuted = false; // Reseta a variável para próxima execução
+
   }
 
+ configureClock();
 
-
-
-  
  updateClock();  
     
   }
@@ -297,11 +289,53 @@ menu();
 
 
 
+ if (statetela == "donate") {
+ 
+  Serial.println("modo donate");
+       
+          touchEventHandlerpix();
+
+
+
+          // Se loopCounter for 30, execute a ação
+    if (loopCounter == 10) {
+      isAdding = true;
+      functionExecuted = false;  // Marca a função como executada
+      pix();
+
+      loopCounter = 0; // Reseta o contador de loop
+      ordervalue = 5;
+      statetela = "";
+      touchCount = 0;  // Redefine o contador se exceder 4
+
+      
+    }
+    else {
+      // Aumenta o contador de loop
+      loopCounter++;
+     }
+    
+
+          
+
+ if (statetela == "donate" && !functionExecuted) {
+
+          drawButtons();
+
+
+  }
+
+  
+
+ }
+
+
   
  if (statetela == "scrolling") {
-     // Serial.println("modo scrolling");
+      Serial.println("modo scrolling");
+      Serial.println(mensagemstatus);
+
       displayScrollingText(mensagem.c_str());
-    //  statetela = "hora";
 
   //    functionExecuted = true;  // Marca a função como executada
 
@@ -315,12 +349,7 @@ menu();
     lastExecutionTime = currentMillis;
     functionExecuted = false; // Reseta a variável para próxima execução
   }
-
-
-    
-   //   Serial.println("modo hora");
       hora();
-      //statetela = "hora";
       functionExecuted = true;  // Marca a função como executada
 
   }
@@ -331,16 +360,67 @@ menu();
     lastExecutionTime = currentMillis;
     functionExecuted = false; // Reseta a variável para próxima execução
   }
-   //   Serial.println("modo hora");
       horax();
-      //statetela = "hora";
       functionExecuted = true;  // Marca a função como executada
 
   }
 
 
+     if (statetela == "site" && !functionExecuted) {
+
+     if (currentMillis - lastExecutionTime >= intervalclock) {
+    lastExecutionTime = currentMillis;
+    functionExecuted = false; // Reseta a variável para próxima execução
+  }
+    qrcodemonitor();
+      functionExecuted = true;  // Marca a função como executada
+
+  }
+
+
+    if (statetela == "olhos") {
+    olhos();
+  }
+  
+
+
 
 #if (SENSORES == 1)
+
+
+
+if (statetela == "ph") {
+  if (currentMillis - lastExecutionTime >= intervalclima) {
+    lastExecutionTime = currentMillis;
+    functionExecuted = false; // Reseta a variável para próxima execução
+  }}
+
+  if (statetela == "ph" && !functionExecuted) {
+       tft.setRotation(3);
+
+    tft.fillScreen(TFT_BLACK);
+    tft.loadFont(AA_FONT_LARGE); // Load another different font
+
+
+    if (aht.begin()) {
+      Serial.println("AHT inicializado com sucesso!");
+
+phtela();
+
+
+
+    
+
+    }else {
+        
+      tft.print("Falha ao inicializar o sensor AHT!");
+      tft.print("sensor AHT!");
+      Serial.println("Falha ao inicializar o sensor AHT!");
+    }
+
+    functionExecuted = true;  // Marca a função como executada
+  }
+
 
 
 if (statetela == "clima") {
@@ -350,9 +430,14 @@ if (statetela == "clima") {
   }}
 
   if (statetela == "clima" && !functionExecuted) {
+       tft.setRotation(3);
+
     tft.fillScreen(TFT_BLACK);
     tft.loadFont(AA_FONT_LARGE); // Load another different font
 
+
+    if (aht.begin()) {
+      Serial.println("AHT inicializado com sucesso!");
     sensors_event_t temp;
     aht_temp->getEvent(&temp);  
     float t = temp.temperature;
@@ -365,6 +450,8 @@ if (statetela == "clima") {
     bmp_pressure->getEvent(&pressure_event);
     float p = pressure_event.pressure;
 
+
+
     // Draw temperature bar graph
     drawBarGraph(t, "Temperatura", 0, 50, TFT_RED);
 
@@ -372,10 +459,15 @@ if (statetela == "clima") {
     drawBarGraph(h, "Umidade", 0, 150, TFT_BLUE);
 
     // Draw pressure pie chart
-    drawBarGraph(p, "Pressao", 0, 200, TFT_YELLOW);
-    
-    // Draw pH bar graph
-    drawBarGraph(p, "pH", 0, 250, TFT_GREEN);
+    drawBarGraph(p*100, "Pressao", 0, 250, TFT_YELLOW);
+
+
+    }else {
+        
+      tft.print("Falha ao inicializar o sensor AHT!");
+      tft.print("sensor AHT!");
+      Serial.println("Falha ao inicializar o sensor AHT!");
+    }
 
     functionExecuted = true;  // Marca a função como executada
   }
@@ -385,9 +477,6 @@ if (statetela == "clima") {
 
 
 
-
-
-
   
   }
 
@@ -399,74 +488,6 @@ if (statetela == "clima") {
 
 
 
-
-void toque() {
-    uint16_t x, y;
-    static unsigned long lastTouchTime = 0;
-    static bool isTouched = false;
-    static int touchCount = 0;
-
-    // Verifica se houve toque
-    if (tft.getTouchRawZ() > 1000) {
-        tft.getTouchRaw(&x, &y);
-        Serial.printf("x: %i     ", x);
-        Serial.printf("y: %i     ", y);
-        Serial.printf("z: %i \n", tft.getTouchRawZ());
-
-        // Marca o toque como ativo e registra o tempo do último toque
-        isTouched = true;
-        lastTouchTime = millis();
-    } else {
-        // Se o toque não estiver mais presente, verifica o tempo de toque
-        if (isTouched && (millis() - lastTouchTime > 200)) {
-            isTouched = false;  // Marca o toque como inativo
-            // Incrementa o contador de toques apenas quando o dedo é levantado da tela
-            touchCount++;
-
-            functionExecuted = false;  // Marca a função como executada
-
-            Serial.println("Número de toques: " + String(touchCount));
-            if (touchCount >= 10) {
-                touchCount = 0;  // Redefine o contador se exceder 4
-
-                Serial.println("O contador de toques foi redefinido.");
-            }
-        }
-    }
-
-    // Lógica para diferentes ações com base no número de toques
-    switch (touchCount) {
-        case 1:
-            statetela = "scrolling";
-            break;
-        case 2:
-            statetela = "hora";
-            break;
-        case 3:
-            statetela = "clock";
-            break;
-        case 4:
-            statetela = "menu";
-            break;
-        case 5:
-            statetela = "mensagem";
-            break;
-        case 6:
-            statetela = "vert";
-            break;
-        case 7:
-            statetela = "horax";
-            break; 
-        case 8:
-            statetela = "clima";
-            break;
-        case 9:
-            statetela = "horiz";
-            break;
-    }
-
-  //  Serial.println("Estado da tela: " + statetela);
-}
 
 
 
@@ -646,16 +667,15 @@ if (statetela == "clock" && !functionExecuted) {
 
 void updateClock() {
 
-  configureClock();
+
+
 
  if (targetTime < millis()) {
     targetTime += 1000;
     ss++; // Advance second
     if (ss == 60) {
       ss = 0;
- //     functionExecuted = false;  // Marca a função como executada
-      configureClock();
-
+     // configureClock();
 
       mm++; // Advance minute
       if (mm > 59) {
@@ -705,22 +725,25 @@ static uint8_t conv2d(const char *p) {
 
 void menu(){
 
-   tft.setRotation(3);
+ tft.setRotation(3);
 
-tft.loadFont(AA_FONT_LARGE); // Load another different font
+  tft.loadFont(AA_FONT_LARGE); // Load another different font
 
-tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(TFT_BLACK);
   tft.setTextSize(1);
   tft.setCursor(0, 0); // Set cursor at top left of screen
-//  tft.setTextColor(TFT_CYAN, TFT_BLACK);
- tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
-
-
-  
   tft.setCursor(0, 100);  // Posição do cursor na tela
+
+
+  tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
   tft.println("BEM VINDO,");
+  tft.setTextColor(TFT_RED, TFT_BLACK); // Change the font colour and the background colour
   tft.println("EU SOU O ROBO");
+  tft.setTextColor(TFT_WHITE, TFT_BLACK); // Change the font colour and the background colour
   tft.println("GrANA");
+  tft.setTextColor(TFT_GREEN, TFT_BLACK);
+  tft.println("The Green ANArchy");
+  tft.setTextColor(TFT_CYAN, TFT_BLACK);
   tft.println("TOQUE NA TELA");
 
  //   tft.unloadFont(); // Remove the font to recover memory used
@@ -729,78 +752,388 @@ tft.fillScreen(TFT_BLACK);
 
 
 
+//phtela
+void phtela(){
+    tft.setCursor(0, 0); // Set cursor at top left of screen
+
+    tft.fillScreen(TFT_BLACK);
+    tft.loadFont(AA_FONT_LARGE); // Load another different font
+    tft.setTextColor(TFT_CYAN, TFT_BLACK);
+    tft.println("Clima Monitor");
+    drawBarGraph(ph(), "pH", 0, 250, TFT_GREEN);
+
+
+  sensors_event_t temp;
+  aht_temp->getEvent(&temp);
+  float t = temp.temperature;
+  
+  sensors_event_t humidity;
+  aht_humidity->getEvent(&humidity);
+  float h = humidity.relative_humidity;
+
+
+  float vpd = calcularVPD(t, h);
+
+
+  String fase = determinarFaseDeCrescimento(vpd);
+
+  
+  exibirInformacoesNaTela(vpd, fase);
+
+
+}
 
 
 
 
-     
+
+float calcularVPD(float t, float h) {
+  // Cálculo do VPD
+  float es = 6.112 * exp((17.67 * t) / (t + 243.5));
+  float e = (h / 100.0) * es;
+  float vpd = es - e;
+  return vpd;
+}
+
+
+
+String determinarFaseDeCrescimento(float vpd) {
+  // Determinar a fase de crescimento baseada no VPD
+  if (vpd < 0.4) {
+    return "Fase de germinacao";
+  } else if (vpd >= 0.4 && vpd < 0.8) {
+    return "Fase inicial de crescimento";
+  } else if (vpd >= 0.8 && vpd < 1.2) {
+    return "Fase vegetativa";
+  } else if (vpd >= 1.2 && vpd < 1.6) {
+    return "Fase de floracao inicial";
+  } else {
+    return "VPD muito alto";
+  }
+}
+
+
+void exibirInformacoesNaTela(float vpd, String fase) {
+  // Limpar a tela
+
+  // Exibir as informações
+  tft.setCursor(10, 50);
+  tft.setTextSize(2);
+  tft.print("VPD: ");
+  tft.println(vpd);
+
+  tft.setCursor(10, 80);
+  tft.println(fase);
+
+  // Indicar o que precisa ser melhorado
+  if (vpd < 0.8) {
+    tft.setCursor(10, 150);
+    tft.print("Aumente a umidade!");
+  } else if (vpd > 1.2) {
+    tft.setCursor(10, 150);
+    tft.print("Diminua a umidade!");
+  }
+
+  sensors_event_t temp;
+  aht_temp->getEvent(&temp);
+  float t = temp.temperature;
+  
+  sensors_event_t humidity;
+  aht_humidity->getEvent(&humidity);
+  float h = humidity.relative_humidity;
+
+  
+  if (t < 20 || t > 30) {
+    tft.setCursor(10, 200);
+    tft.print("Ajuste a temperatura!");
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+  
+}
 
 // #########################################################################
-//  Draw the analogue meter on the screen
+//  Desenha o medidor analógico na tela
 // #########################################################################
 void drawBarGraph(float value, String label, int x, int y, uint16_t color) {
-  int barWidth = map(value, 0, 100, 0, tft.width() - 50);
+  int barWidth;
+  String status;
+  
+  if (label == "Pressao") {
+    if (value > 93000) {
+      barWidth = 0; // Barra vazia
+      status = "Sol";
+    } else {
+      barWidth = tft.width() - 50; // Barra cheia
+      status = "Chuva";
+    }
+  } else {
+    barWidth = map(value, 0, 100, 0, tft.width() - 50);
+    status = ""; // Não é necessário exibir status para outras medidas
+  }
+  
   tft.fillRect(0, y - 20, tft.width() - 50, 20, TFT_BLACK);
   tft.fillRect(0, y - 20, barWidth, 20, color);
   tft.setCursor(x, y);
   tft.setTextColor(color);
-  tft.print(label + ": " + String(value) + (label == "Temperatura" ? " C" : " %"));
+  
+  // Adicionando condições para exibir a unidade correta
+  String unit;
+  if (label == "Pressao") {
+    unit = " hPa";
+  } else if (label == "Umidade") {
+    unit = " %";
+  } else if (label == "Temperatura") {
+    unit = " C";
+  } else if (label == "pH") {
+    unit = "";
+  } else {
+    unit = ""; // Adicione outras unidades conforme necessário
+  }
+  
+  tft.print(label + ": " + String(value) + unit);
+  tft.setCursor(x, y + 25); // Exibir status abaixo da medida
+  tft.print(status);
+}
+
+
+
+
+
+
+void touchEventHandlerpix() {
+  uint16_t x, y;
+
+  if (tft.getTouch(&x, &y)) { // Changed to tft.getTouch for potential compatibility
+    // Adjust mapping arguments if needed based on TFT_eSPI documentation
+    x = map(x, 0, tft.width(), tft.width(), 0);
+    y = map(y, 0, tft.height(), tft.height(), 0);
+
+    checkButtons(x, y);
+  }
+}
+
+
+
+void qrcodemonitor() {
+
+  Serial.println("QR CODE: " + site);
+  Serial.println("Gerando QR Code...");
+
+
+
+  
+
+  uint8_t* qrcode = (uint8_t*)malloc(qrcodegen_BUFFER_LEN_MAX);
+  uint8_t tempBuffer[qrcodegen_BUFFER_LEN_MAX];
+
+  bool ok = qrcodegen_encodeText(site.c_str(), tempBuffer, qrcode, qrcodegen_Ecc_HIGH, qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX, qrcodegen_Mask_AUTO, true);
+
+  if (ok) {
+   
+    print_qrcodemonitor(qrcode);
+  }
+
+  free(qrcode); // Liberar a memória alocada dinamicamente
+  Serial.println("QR Code gerado e Impresso");
+}
+
+
+void print_qrcodemonitor(const uint8_t qrcode[]) {
+  tft.setRotation(3);
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(1);
+  tft.setCursor(0, 0); // Set cursor at top left of screen
+  tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
+  tft.println("Escaneie o QrCode ");
+  tft.setTextColor(TFT_GREEN, TFT_BLACK);
+  tft.println("Controle de qualquer");
+  tft.println("lugar o ROBO");
+  tft.setCursor(150, 150); // Set cursor at top left of screen
+
+  
+  int size = qrcodegen_getSize(qrcode);
+  char border = 2;
+  char module_size = 5;
+  uint16_t color;
+  int xOffset = 12;
+  int yOffset = 120;
+
+  for (int y = -border; y < size + border; y++) {
+    for (int x = -border; x < size + border; x++) {
+      color = qrcodegen_getModule(qrcode, x, y) ? TFT_BLACK : TFT_WHITE;
+      int pixelX = (x + border) * module_size + xOffset;
+      int pixelY = (y + border) * module_size + yOffset;
+
+      for (int i = 0; i < module_size; i++) {
+        for (int j = 0; j < module_size; j++) {
+          tft.drawPixel(pixelX + j, pixelY + i, color);
+        }
+      }
+    }
+  }
+}
+
+
+void toque() {
+    uint16_t x, y;
+    static unsigned long lastTouchTime = 0;
+    static bool isTouched = false;
+ //   static int touchCount = 0;
+
+    // Verifica se houve toque
+    if (tft.getTouchRawZ() > 1000) {
+        tft.getTouchRaw(&x, &y);
+        Serial.printf("x: %i     ", x);
+        Serial.printf("y: %i     ", y);
+        Serial.printf("z: %i \n", tft.getTouchRawZ());
+
+        // Marca o toque como ativo e registra o tempo do último toque
+        isTouched = true;
+        lastTouchTime = millis();
+    } else {
+        // Se o toque não estiver mais presente, verifica o tempo de toque
+        if (isTouched && (millis() - lastTouchTime > 200)) {
+            isTouched = false;  // Marca o toque como inativo
+            // Incrementa o contador de toques apenas quando o dedo é levantado da tela
+            touchCount++;
+
+            functionExecuted = false;  // Marca a função como executada
+
+            Serial.println("Número de toques: " + String(touchCount));
+            if (touchCount > 13) {
+                touchCount = 0;  // Redefine o contador se exceder 4
+
+                Serial.println("O contador de toques foi redefinido.");
+            }
+        }
+    }
+
+    // Lógica para diferentes ações com base no número de toques
+    switch (touchCount) {
+        case 1:
+            statetela = "clima";
+            break;
+        case 2:
+            statetela = "hora";
+            break;
+        case 3:
+            statetela = "clock";
+            break;
+        case 4:
+            statetela = "horax";
+            break;
+        case 5:
+            statetela = "mensagem";
+            break;
+        case 6:
+            statetela = "vert";
+            break;
+        case 7:
+            statetela = "menu";
+            break; 
+        case 8:
+            statetela = "scrolling";
+            break;
+        case 9:
+            statetela = "horiz";
+            break;
+        case 10:
+            statetela = "ph";
+            break; 
+        case 11:
+            statetela = "site";
+            break;  
+        case 12:
+            statetela = "olhos";
+            break;
+        case 13:
+            statetela = "donate";
+            break;
+    }
+
+  //  Serial.println("Estado da tela: " + statetela);
 }
 
 
 
 void verificasqltela(){
-  
-  
-          Serial.println("inicia mensagem tela sql");
+      Serial.println("inicia mensagem tela sql");
+
+      loadfile(estado, mensagem, mensagemstatus);
+      mensagemstatus.trim();
+    
       Serial.println(statetela);
       Serial.println(mensagemstatus);
      //  functionExecuted = false;  // Marca a função como executada
 
-    mensagemstatus.trim();
+  if (mensagemstatus == "0") {
+      Serial.println("Nao faz nada pelo SQL");
+    }
 
- if (mensagemstatus == "1") {
-      Serial.println("Scrolling pelo SQL");
-    functionExecuted = false; // Reseta a variável para próxima execução
-
-      statetela = "scrolling";
+     if (mensagemstatus == "1") {
+         Serial.println("Scrolling pelo SQL");
+         Serial.println(mensagemstatus);
+         Serial.println(mensagem);
+         functionExecuted = false; // Reseta a variável para próxima execução
+         statetela = "scrolling";
   } 
   
-  if (mensagemstatus == "0") {
+      if (mensagemstatus == "2") {
           Serial.println("Hora analog pelo SQL");
-              functionExecuted = false; // Reseta a variável para próxima execução
-
-     statetela = "clock";
-    
+          Serial.println(mensagemstatus);
+          functionExecuted = false; // Reseta a variável para próxima execução
+          statetela = "clock";
     }
 
      if (mensagemstatus == "3") {
           Serial.println("Hora digital pelo SQL");
-              functionExecuted = false; // Reseta a variável para próxima execução
-
-     statetela = "hora";
-    
+          functionExecuted = false; // Reseta a variável para próxima execução
+          statetela = "hora"; 
     }   
+
     if (mensagemstatus == "4") {
           Serial.println("Clima pelo SQL");
-              functionExecuted = false; // Reseta a variável para próxima execução
-
-     statetela = "clima";
-    
+          functionExecuted = false; // Reseta a variável para próxima execução
+          statetela = "clima";
     }  
     
     if (mensagemstatus == "5") {
           Serial.println("Mensagem pelo SQL");
-              functionExecuted = false; // Reseta a variável para próxima execução
+          Serial.println(mensagem);
+          functionExecuted = false; // Reseta a variável para próxima execução
+          statetela = "mensagem";  
+    } 
+    
+    if (mensagemstatus == "6") {
+          Serial.println("Olho pelo SQL");
+          functionExecuted = false; // Reseta a variável para próxima execução
+          statetela = "olhos";   
+    }
 
-     statetela = "mensagem";
+     if (mensagemstatus == "7") {
+          Serial.println("QRcode site pelo SQL");
+          functionExecuted = false; // Reseta a variável para próxima execução
+          statetela = "site";
+
     
     }
+
+    
   
  
   
   }
-
 
 
 

@@ -17,12 +17,8 @@
 
 
 
-//#define TFT_WIDTH  320
-//#define TFT_HEIGHT 480
-
-
-#define TFT_WIDTH  180
-#define TFT_HEIGHT 180
+#define TFT_WIDTH  320
+#define TFT_HEIGHT 480
 
 
 

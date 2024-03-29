@@ -20,6 +20,9 @@
 
 
 
+#include "User_Setup.h"
+
+
 //#Biblioteca WEBSERVER
 #include <WebServer.h>
 
@@ -35,8 +38,8 @@ WebServer server(80);
 
 Adafruit_BMP280 bmp;  // Objeto do sensor BMP280
 Adafruit_AHTX0 aht;   // Objeto do sensor AHTX0
-#define BMP280_ADDRESS 0x77
-#define AHT_ADDRESS 0x38
+//#define BMP280_ADDRESS 0x77
+//#define AHT_ADDRESS 0x38
 
 Adafruit_Sensor *aht_humidity, *aht_temp;
 Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
@@ -55,6 +58,9 @@ Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
 //#define I2C_MASTER_SCL2 5 // Exemplo de pino para a segunda porta I2C
 //#define I2C_MASTER_SDA2 4 // Exemplo de pino para a segunda porta I2C
 
+
+
+#define phpin 33
 
 
 
@@ -177,6 +183,7 @@ const int relayPin3 = 0; // Pino GPIO para o rel
 
 
 const char* host = "santocyber.helioho.st";
+String site =        "http://santocyber.helioho.st/";
 String url =        "http://santocyber.helioho.st/granagw/gravatele.php";
 String urlsalvafoto = "http://santocyber.helioho.st/granagw/salvafoto.php";
 String urlverifica = "http://santocyber.helioho.st/granagw/verificaacao.php";
@@ -232,6 +239,7 @@ String timerfoto = "10";
 String statetela;
 
 int ordervalue = 1;
+int loopCounter = 0; // contador de loop
 
 
 // Vari         veis para rastrear o estado do bot         o e os cliques
@@ -249,8 +257,9 @@ int verificacoes = 0;
 
 
 //###########################################CONFIGURA O LOOP DE UPDATE NO SERVDIOR SQL
+static int touchCount = 0;
 
-unsigned long previousMillis2 = 0;
+unsigned long previousMillis = 0;
 unsigned long previousMillis3 = 0;
 
 const long intervalo5 = 5000; // Intervalo de 30 segundos
@@ -261,6 +270,12 @@ const long interval120 = 120000; // Intervalo de 30 segundos
 
 const long interval2 = 500;  // Intervalo desejado em milissegundos (200ms)
 const long intervalupdate = 30000;  // Intervalo desejado em milissegundos (30s)
+
+unsigned long updateInterval = 500; // Update interval in milliseconds (1 second)
+unsigned long intervalclima = 10000; // Intervalo de 10 segundos em milissegundos
+unsigned long intervalclock = 60000; // Intervalo de 10 segundos em milissegundos
+
+unsigned long lastExecutionTime = 0;
 
 
 
@@ -391,6 +406,8 @@ if (!SPIFFS.begin(true)) {
     Serial.println("An error has occurred while mounting SPIFFS");
   }
   Serial.println("SPIFFS mounted successfully");
+
+  last_id = read_nvs_data();
 
 
 // Carrega as credenciais Wi-Fi e realiza trim nos valores
@@ -532,70 +549,60 @@ void loop() {
     server.handleClient();
 
   unsigned long currentMillis = millis();
-  unsigned long currentMillis2 = millis();
-    unsigned long currentMillis3 = millis();
+
+ #if (TELA == 1)
+
+   
+ // Verifica se passou o intervalo definido
+  if (currentMillis - previousMillis >= interval60) {
+    // Atualiza o tempo de referencia
+    previousMillis = currentMillis;
+    
+
+   Serial.println("VERIFICA TELA SQL!");
+   touchCount = 0;
+   verificasqltela();
+
+  }
+
+
+  // Verifica se a string é igual a "donate"
+  if (statetela == "donate" && "") {
+    
+    // Se a string for igual a "donate", não executa a função toque()
+   // Serial.println("String é 'donate'. Não executando toque.");
+  } else {
+    // Se a string for diferente de "donate", executa a função toque()
+    toque();
+  }
+  
+   // toque();
+
+
+     if (currentMillis - previousMillis3 >= 500) {
+    // Atualiza o tempo de referencia
+    previousMillis3 = currentMillis;
+    tela();
+ 
+}
+
+#endif
+
+
+
+
+
+
+
+   //  Serial.println(ph());
+   //   Serial.println(analogRead(phpin));
+    //  delay(1000);
 
 
 
 
       
-#if (SENSORES == 1)
- // Verifica se j�� passou o intervalo definido
-  if (currentMillis2 - previousMillis2 >= interval60) {
-    // Atualiza o tempo de refer��ncia
-    previousMillis2 = currentMillis2;
-    verificasqltela();
-
-
-  if (aht.begin()) {
-    
-   Serial.println("AHT inicializado com sucesso!");
-     Serial.println("DADOS SENSORES ");
-  Serial.println(readDHTTemperature());
-  Serial.println(readDHTHumidity());
-  Serial.println(readDHTPressao());
-
-
-  }else{
-    Serial.println("Falha ao inicializar o sensor AHT!");
-
-}
-
-
-  }
-
-
-
-  
-  #endif
- 
-
-
-//  Serial.println("VARIAVEIS ARMAZENADA NO SPIFF SALVAS SE DESLIGAR");
-//  Serial.println("ESTADO");
- // Serial.println(estado);
- // Serial.println("MENSAGEM");
- // Serial.println(mensagem);
-
-//botaoreset();
-
  esp_task_wdt_reset();
-
-
-
- //   serial();
-    toque();
-
-
-     if (currentMillis3 - previousMillis3 >= 1000) {
-    // Atualiza o tempo de refer��ncia
-    previousMillis3 = currentMillis3;
-    tela();
- 
-}
-
-
-
 }
 
 

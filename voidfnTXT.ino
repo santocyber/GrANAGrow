@@ -15,6 +15,13 @@ void telemetria(){
   
     // Verifica se os sensores devem ser lidos ou não
     #if (SENSORES == 1)
+
+
+      Serial.println(ph());
+      Serial.println(analogRead(phpin));
+
+
+    
     if (aht.begin()) {
       Serial.println("AHT inicializado com sucesso!");
       Serial.println("DADOS SENSORES ");
@@ -26,7 +33,7 @@ void telemetria(){
       postData += "&temperatura=" + String(readDHTTemperature());
       postData += "&umidade=" + String(readDHTHumidity());
       postData += "&pressao=" + String(readDHTPressao());
-      postData += "&ph=7";
+      postData += "&ph=" + String(ph(), 3);
     } else {
       Serial.println("Falha ao inicializar o sensor AHT!");
     
@@ -100,7 +107,7 @@ void verifyActionAndExecute() {
     String payload = https.getString();
     Serial.println(payload);
 
-    DynamicJsonDocument doc(1024);
+    JsonDocument doc;
     deserializeJson(doc, payload);
 
     String acoes = doc["acoes"].as<String>();

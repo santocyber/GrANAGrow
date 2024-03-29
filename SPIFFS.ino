@@ -145,3 +145,38 @@ saveTime(hrliga0, hrdesliga0, timerautomatico0, timerfoto0, timerfotostatus0);
 
         
 }
+
+
+
+
+
+
+
+
+
+
+uint32_t read_nvs_data(){
+uint32_t last_id = 0;
+  if (SPIFFS.begin(true))
+  {
+    File nvsFile = SPIFFS.open("/nvs.txt", "r");
+    if (nvsFile)
+    {
+      last_id = nvsFile.parseInt();
+      nvsFile.close();
+    }
+  }
+  return last_id;
+}
+
+void save_nvs_data(uint32_t data){
+  if (SPIFFS.begin(true))
+  {
+    File nvsFile = SPIFFS.open("/nvs.txt", "w");
+    if (nvsFile)
+    {
+      nvsFile.print(data);
+      nvsFile.close();
+    }
+  }
+}
