@@ -146,7 +146,9 @@ void enterPassword() {
   tft.setTextColor(TFT_WHITE);
   tft.println("Digite a senha:");
   tft.println("Para o SSID:");
-  tft.print(ssid);
+  tft.println(ssid);
+  tft.println("E aperte #");
+
 
   delay(2000);
   uint8_t z; // Declaramos z fora do loop para obter a pressão do toque
@@ -157,15 +159,7 @@ void enterPassword() {
     if (z > MIN_PRESSURE) {
       // Desenhar teclado na tela
       if (key == '#') {
-        tft.println("Senha digitada.");
-        tft.println(password);
-        password = inputText;
-        saveWifiCredentials(ssid, password, nomedobot.c_str(), geo.c_str(), usuario.c_str());
-
-        menu();
-        delay(1000);
-        break; // Sair do loop após o tempo limite
-
+        break;
         return;
       } 
     }
@@ -173,36 +167,6 @@ void enterPassword() {
 }
 
 
-void drawKeyboard() {
-    // Limpar tela
-    tft.fillScreen(TFT_BLACK);
-    tft.setCursor(0, 0); // Posição para exibir o texto na parte inferior da tela
-  // Desenhar teclado na tela
-    int keyWidth = tft.width() / 11; // Número de colunas no teclado
-    int keyHeight = tft.height() / 5; // Número de linhas no teclado
-
-
-
-    for (int row = 0; row < 5; row++) {
-        for (int col = 0; col < 11; col++) {
-            char key = keys[row][col];
-            int x = col * keyWidth;
-            int y = row * keyHeight;
-            tft.fillRect(x, y, keyWidth, keyHeight, TFT_WHITE);
-            tft.setCursor(x + keyWidth / 4, y + keyHeight / 4);
-            tft.setTextColor(TFT_BLACK);
-            tft.setTextSize(5);
-            tft.print(key);
-        }
-    }
-
-    // Exibir o texto digitado na tela
-    tft.setCursor(5, tft.height() - 40); // Posição para exibir o texto na parte inferior da tela
-    tft.setTextSize(2);
-    tft.setTextColor(TFT_RED);
-    tft.print("Senha:");
-    tft.print(inputText);
-}
 
 
 
@@ -223,9 +187,8 @@ void getKeyFromTouch2(uint16_t* x, uint16_t* y, uint8_t* z) {
         Serial.print("z: ");
         Serial.println(*z);
 
-  
-int colIndex = map(*y, 550, 3766, 0, 11);
-int rowIndex = map(*x, 444,3400, 0, 5);
+int rowIndex = map(*x, 444,3555, 0, 5);
+int colIndex = map(*y, 444, 3666, 0, 11);
 colIndex = constrain(colIndex, 0, 10);
 rowIndex = constrain(rowIndex, 0, 4);
 
@@ -260,16 +223,24 @@ rowIndex = constrain(rowIndex, 0, 4);
                   inputText.remove(inputText.length() - 1);
                    password = inputText;
                    Serial.println(password);
-                   saveWifiCredentials(ssid, password, nomedobot.c_str(), geo.c_str(), usuario.c_str());
+
                    inputText = "";
+                   key = NO_KEY;
+                   saveWifiCredentials(ssid, password, nomedobot.c_str(), geo.c_str(), usuario);
+
                      tft.fillScreen(TFT_BLACK);
                      tft.setCursor(0, 0); 
                      tft.setTextSize(4);
                      tft.setTextColor(TFT_PINK);
-                     tft.print("Senha salva com sucesso!");
-                     delay(5000);
-                   //menu();
-                   return;
+                     tft.print("Senha:");
+                     tft.println(password);
+                     tft.println("Salvo com sucesso!");
+                     delay(4000);
+                     enterUsuario();
+                     return;
+
+
+                   
                 }
                 
             drawKeyboard(); // Redesenhar o teclado para atualizar o texto digitado na tela
@@ -277,4 +248,155 @@ rowIndex = constrain(rowIndex, 0, 4);
     } else {
         *z = 0; // Define z como 0 se não houver toque
     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void enterUsuario() {
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(4);
+  tft.setCursor(0, 0);
+  tft.setTextColor(TFT_WHITE);
+  tft.println("Digite o usuario:");
+  tft.println("E aperte #");
+
+
+  delay(2000);
+
+  uint8_t z; // Declaramos z fora do loop para obter a pressão do toque
+
+     drawKeyboard();
+
+  while (true) {
+    getKeyFromTouch3(&x, &y, &z); // Obter toque
+    if (z > MIN_PRESSURE) {
+      // Desenhar teclado na tela
+      if (key == '#') {
+        break;
+        return;
+        
+      } 
+    }
+  }
+}
+
+
+
+
+
+
+void getKeyFromTouch3(uint16_t* x, uint16_t* y, uint8_t* z) {
+    // Verifica se houve toque
+    if (tft.getTouchRawZ() > 500) {
+        tft.getTouchRaw(x, y);
+        *z = tft.getTouchRawZ();
+        delay(300);
+
+  
+int rowIndex = map(*x, 444,3555, 0, 5);
+int colIndex = map(*y, 444, 3666, 0, 11);
+colIndex = constrain(colIndex, 0, 10);
+rowIndex = constrain(rowIndex, 0, 4);
+
+
+        char key = keys[rowIndex][colIndex];
+
+        // Adicionar o caractere ao texto digitado ou executar ação conforme o botão pressionado
+        if (key != ' ') {
+               Serial.println("key");
+               Serial.println(key);
+               Serial.println(rowIndex);
+               Serial.println(colIndex);
+
+
+            // Ação para caracteres de texto
+            if (rowIndex != 0 && inputText.length() < 20) { // Limite de 20 caracteres
+                inputText += key;
+            }
+            // Ação para botões especiais
+            else {
+                if (key == '<') { // Botão de apagar
+                    if (!inputText.isEmpty()) {
+                        inputText.remove(inputText.length() - 1); // Remove o último caractere digitado
+                    }
+                    
+                }
+
+            }
+
+            if (key == '#') { // Botão de cancelar
+                  Serial.println("ENTER TECLADO VIRTUAL");
+                  inputText.remove(inputText.length() - 1);
+                   usuario = inputText;
+                   Serial.println(usuario);
+
+                   saveWifiCredentials(ssid, password, nomedobot.c_str(), geo.c_str(), usuario);
+                   inputText = "";
+                   key = NO_KEY;
+
+                     tft.fillScreen(TFT_BLACK);
+                     tft.setCursor(0, 0); 
+                     tft.setTextSize(4);
+                     tft.setTextColor(TFT_PINK);
+                     tft.print("Usuario:");
+                     tft.println(usuario);
+                     tft.println("Salvo com sucesso!");
+                     delay(4000);
+                    menu();
+
+                   return;
+
+                }
+                
+            drawKeyboard(); // Redesenhar o teclado para atualizar o texto digitado na tela
+        }
+    } else {
+        *z = 0; // Define z como 0 se não houver toque
+    }
+}
+
+
+void drawKeyboard() {
+    // Limpar tela
+    tft.fillScreen(TFT_BLACK);
+    tft.setCursor(0, 0); // Posição para exibir o texto na parte inferior da tela
+  // Desenhar teclado na tela
+    int keyWidth = tft.width() / 11; // Número de colunas no teclado
+    int keyHeight = tft.height() / 5; // Número de linhas no teclado
+
+
+
+    for (int row = 0; row < 5; row++) {
+        for (int col = 0; col < 11; col++) {
+            char key = keys[row][col];
+            int x = col * keyWidth;
+            int y = row * keyHeight;
+            tft.fillRect(x, y, keyWidth, keyHeight, TFT_WHITE);
+            tft.setCursor(x + keyWidth / 4, y + keyHeight / 4);
+            tft.setTextColor(TFT_BLACK);
+            tft.setTextSize(6);
+            tft.print(key);
+        }
+    }
+
+    // Exibir o texto digitado na tela
+    tft.setCursor(5, tft.height() - 40); // Posição para exibir o texto na parte inferior da tela
+    tft.setTextSize(4);
+    tft.setTextColor(TFT_RED, TFT_BLACK);
+    tft.print(":");
+    tft.print(inputText);
 }

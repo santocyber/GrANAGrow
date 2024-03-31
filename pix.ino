@@ -229,12 +229,12 @@ void orders() {
 
 
   delay(10000);
-     statetela = "olhos";
 
             break;
           } else if (pagamento == "0") {
             // Não é necessário incrementar verificacoes neste caso.
           Serial.println("pagamento nao efetuado verificado no sql");
+
 
           }
          
@@ -246,6 +246,8 @@ void orders() {
      // ensureWiFiConnection();
 
     }
+    
+     statetela = "olhos";
 
     Serial.println("");
     Serial.println(F("Desconectando."));

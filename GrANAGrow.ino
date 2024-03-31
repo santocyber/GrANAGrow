@@ -448,7 +448,6 @@ if (ssid.length() > 0 && password.length() > 0) {
         Serial.println("Falha ao reconectar ao Wi-Fi.");
         startAPMode();
         scanWiFiNetworks();
-        saveWifiCredentials(ssid.c_str(), password.c_str(), nomedobot.c_str(), geo.c_str(), usuario.c_str());
 
     } else {
         Serial.println("Conexão bem-sucedida, iniciar o servidor web e o update ativo");
@@ -461,7 +460,6 @@ if (ssid.length() > 0 && password.length() > 0) {
     // Se as credenciais estiverem vazias, iniciar o modo AP
     startAPMode();
     scanWiFiNetworks();
-    saveWifiCredentials(ssid.c_str(), password.c_str(), nomedobot.c_str(), geo.c_str(), usuario.c_str());
 
 }
 
@@ -474,6 +472,40 @@ if (ssid.length() > 0 && password.length() > 0) {
    Serial.println("iniciando tela");
     tft.init();
     tft.setRotation(3);
+
+
+     // Se não conectar, iniciar o modo AP
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("Falha ao reconectar ao Wi-Fi.");
+  tft.fillScreen(TFT_RED);
+  tft.setTextSize(5);
+  tft.setCursor(0, 0); // Set cursor at top left of screen
+  tft.setCursor(10, 10);  // Posição do cursor na tela
+  tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
+  tft.println("Nao conectado");
+  delay(3000);
+
+        
+    } else {
+        Serial.println("Conexão bem-sucedida, iniciar o servidor web e o update ativo");
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(4);
+  tft.setCursor(0, 0); // Set cursor at top left of screen
+  tft.setCursor(10, 10);  // Posição do cursor na tela
+  tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
+  tft.println("Config robo GrANA");
+  tft.setTextColor(TFT_RED, TFT_BLACK); // Change the font colour and the background colour
+  tft.println(ssid);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK); // Change the font colour and the background colour
+  tft.println(usuario);
+  tft.setTextColor(TFT_GREEN, TFT_BLACK);
+  tft.println(WiFi.localIP().toString());
+  tft.setTextColor(TFT_CYAN, TFT_BLACK);
+  tft.println(WiFi.dnsIP(0));
+  delay(5000);
+
+    }
+    
     menu();
 
 #endif
