@@ -128,45 +128,6 @@ esp_get_free_heap_size();
 }
 
 
-void startAPMode() {
-    // Iniciar o modo AP
-    WiFi.mode(WIFI_AP);
-    WiFi.softAP("GRANAConfig"); // Nome da rede AP
-    IPAddress myIP = WiFi.softAPIP();
-    Serial.print("End IP do AP: ");
-    Serial.println(myIP);
-
-    // Inicializa o servidor web
-    server.on("/", handleRoot);
-    server.on("/scan", HTTP_GET, handleScan);
-    server.on("/connect", handleConnect);
-    server.begin();
-    Serial.println("Servidor AP iniciado");
-}
-
-void startWebServer() {
-    // Configura o certificado CA
- //   client.setCACert(caCert);
-    setClock();
-
-    // Inicializa o servidor web
-    server.on("/", handleMain);
-    server.on("/delete-wifi", HTTP_POST, deletewififile);
-
-    server.begin();
-    Serial.println("Servidor web iniciado");
-
-    IPAddress dns1 = WiFi.dnsIP(0); // Primeiro servidor DNS
-    IPAddress dns2 = WiFi.dnsIP(1); // Segundo servidor DNS
-    Serial.print("Servidor DNS prim��rio: ");
-    Serial.println(dns1);
-    Serial.print("Servidor DNS secund��rio: ");
-    Serial.println(dns2);
-}
-
-
-
-
 
 
 

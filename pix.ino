@@ -8,8 +8,8 @@ uint8_t qrcode[qrcodegen_BUFFER_LEN_MAX];
 uint8_t tempBuffer[qrcodegen_BUFFER_LEN_MAX];
 
 
-String urlpix = "https://santocyber.helioho.st/pix-gateway/v2/pixapi.php";
-String urlorders = "https://santocyber.helioho.st/pix-gateway/v2/api_orders.php";
+String urlpix = "https://santocyber.helioho.st/pix/pixapi.php";
+String urlorders = "https://santocyber.helioho.st/pix/api_orders.php";
 
 
 
@@ -105,6 +105,8 @@ void pix() {
 
   } else {
     Serial.println(F("Número máximo de tentativas atingido, não foi possível estabelecer a conexão."));
+    statetela = "olhos";
+
   }
 
  // neopixelWrite(RGB_BUILTIN, 0, 0, RGB_BRIGHTNESS); // Blue
@@ -214,7 +216,7 @@ void orders() {
 
   tft.fillScreen(TFT_GREEN);  // Limpa a tela com fundo verde
   tft.setTextColor(TFT_WHITE);  // Define a cor do texto como branco
-  tft.setTextSize(5);  // Define o tamanho do texto
+  tft.setTextSize(6);  // Define o tamanho do texto
 
   tft.setCursor(50, 100);  // Posição do cursor na tela
   tft.println("PAGAMENTO");
@@ -227,7 +229,7 @@ void orders() {
 
 
   delay(10000);
-     statetela = "menu";
+     statetela = "olhos";
 
             break;
           } else if (pagamento == "0") {
@@ -267,7 +269,7 @@ void orders() {
 #define TFT_GREY 0x5AEB // Cor cinza para os botões
 #define TFT_WHITE 0xFFFF // Cor branca para o texto
 
-#define BUTTON_WIDTH 120 // Largura dos botões
+#define BUTTON_WIDTH 60 // Largura dos botões
 #define BUTTON_HEIGHT 60 // Altura dos botões
 
 
@@ -276,14 +278,14 @@ void orders() {
 void drawButtons() {
   tft.fillScreen(TFT_BLACK);
   // Desenhando o botão "Menos"
-  drawButton(20, 150, "-", TFT_RED);
+  drawButton(50, 170, "-", TFT_RED);
 
   // Desenhando o botão "Mais"
-  drawButton(140, 150, "+", TFT_GREEN);
+  drawButton(140, 170, "+", TFT_GREEN);
   
   // Mostrar valor atual
   tft.setTextColor(TFT_WHITE);
-  tft.setTextSize(5);
+  tft.setTextSize(6);
   tft.setCursor(10, 10);
   tft.print("Valor: " + String(ordervalue));
   functionExecuted = true;  // Marca a função como executada

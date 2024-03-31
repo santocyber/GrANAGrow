@@ -1,6 +1,6 @@
 //###Green Anarchy project GrANAGROW
 //###by SantoCyber
-//###sehue no YT @RastaNerdi
+//###segue no YT @RastaNerdi
 //###
 //###
 
@@ -17,10 +17,6 @@
 #include <ESPmDNS.h>
 #include <HTTPClient.h>
 #include <ESPping.h>
-
-
-
-#include "User_Setup.h"
 
 
 //#Biblioteca WEBSERVER
@@ -60,7 +56,6 @@ Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
 
 
 
-#define phpin 33
 
 
 
@@ -127,7 +122,7 @@ const char* caCert = \
 
 //##############CONFIG TASKHANDLE
 // Define o tamanho da pilha para ambas as tarefas.
-#define STACK_SIZE 10000
+#define STACK_SIZE 5000
 
 // Define os identificadores de tarefa.
 TaskHandle_t xHandle_TELE = NULL;
@@ -173,6 +168,8 @@ TFT_eSPI tft = TFT_eSPI();
 
 //###########################CONFIGURACAO DAS PINAGENS
 
+#define phpin 33
+
       int Button1 = 0;  // Pino do bot         o
       int Button2 = 0;  // Pino do bot         o
       int obj1 = 0;  // Pino do bot         o
@@ -187,6 +184,7 @@ String site =        "http://santocyber.helioho.st/";
 String url =        "http://santocyber.helioho.st/granagw/gravatele.php";
 String urlsalvafoto = "http://santocyber.helioho.st/granagw/salvafoto.php";
 String urlverifica = "http://santocyber.helioho.st/granagw/verificaacao.php";
+String qrdoa =        "00020101021226900014BR.GOV.BCB.PIX2568pix-qr.mercadopago.com/instore/p/v2/dbb558faf3c14a7a98e7e8fb805f6c1643530016com.mercadolibre0129https://mpago.la/pos/162635835204000053039865802BR5922Cooperativa mirako org6009SAO PAULO62070503***6304C530";
 
 
 bool wifiConnected = false;
@@ -208,11 +206,7 @@ void loadTime(String &hrliga, String &hrdesliga, String &timerautomatico, String
  
 //##############CONFIG DOS CONTADORES
 uint32_t last_id;
-uint32_t contaobj;
-uint32_t contagrana;
-uint32_t contagrana1;
-uint32_t contagrana2;
-uint32_t contagrana3;
+
 
 char info[30];
 
@@ -222,7 +216,6 @@ char buffer[300];
 String horaAtual;
 String dataAtual;
 
-String State = "menu";
 String StateUpdate = "desativado";
 String payload;
 String payloadx;
@@ -310,6 +303,12 @@ unsigned long lastUpdateTime = 0;
 
 
 
+
+
+
+
+
+
 void obterHoraEDataAtual() {
     time_t agora = time(nullptr); // Obtemos a hora atual
     struct tm infoTempo;
@@ -335,11 +334,12 @@ void setup() {
    Serial.begin(115200);
     //   Serial.setDebugOutput(true);
        
-  esp_task_wdt_init(120, true); //enable panic so ESP32 restarts
+  esp_task_wdt_init(240, true); //enable panic so ESP32 restarts
   esp_task_wdt_add(NULL); //add current thread to WDT watch
 
   
    Serial.println("Dispositivo GRANA iniciado");
+
 
 
 
@@ -387,6 +387,13 @@ void setup() {
 }
 
 #endif
+
+
+
+
+
+
+
   
   // Configurar o pino do 
   pinMode(buttonPin, INPUT_PULLUP);
@@ -428,7 +435,7 @@ if (ssid.length() > 0 && password.length() > 0) {
     WiFi.begin(ssid.c_str(), password.c_str());
     // checkWiFiConnection();
     Serial.println("Conectando ao WiFi...");
-    client.setInsecure();//skip verification
+    //client.setInsecure();//skip verification
 
     // Aguarda conexão por até 10 segundos
     unsigned long startTime = millis();
@@ -440,6 +447,9 @@ if (ssid.length() > 0 && password.length() > 0) {
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("Falha ao reconectar ao Wi-Fi.");
         startAPMode();
+        scanWiFiNetworks();
+        saveWifiCredentials(ssid.c_str(), password.c_str(), nomedobot.c_str(), geo.c_str(), usuario.c_str());
+
     } else {
         Serial.println("Conexão bem-sucedida, iniciar o servidor web e o update ativo");
 
@@ -450,10 +460,24 @@ if (ssid.length() > 0 && password.length() > 0) {
 } else {
     // Se as credenciais estiverem vazias, iniciar o modo AP
     startAPMode();
+    scanWiFiNetworks();
+    saveWifiCredentials(ssid.c_str(), password.c_str(), nomedobot.c_str(), geo.c_str(), usuario.c_str());
+
 }
 
 
     Serial.println("Config do ESP finalizada");
+
+    
+#if (TELA == 1)
+
+   Serial.println("iniciando tela");
+    tft.init();
+    tft.setRotation(3);
+    menu();
+
+#endif
+
 
   loadfile(estado, mensagem, mensagemstatus);
   loadTime(hrliga, hrdesliga, timerautomatico, timerfoto, timerfotostatus);
@@ -474,21 +498,6 @@ if (ssid.length() > 0 && password.length() > 0) {
 
 
 
-//#####################################################wifi scan
-
-#if (TELA == 1)
-
-   Serial.println("iniciando tela");
-    tft.init();
- tft.setRotation(3);
- 
-  
-  menu();
-
-
- 
-  
-#endif
 //#####################################################wifi scan
 
 #if (CAMERA == 1)

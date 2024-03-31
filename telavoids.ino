@@ -31,30 +31,6 @@ bool initial = 1;
 
 
 
-
-//rainbow
-
-byte red = 31;
-byte green = 0;
-byte blue = 0;
-byte state = 0;
-unsigned int colourx = red << 11; // Colour order is RGB 5+6+5 bits each
-
-
-
-//matrix
-#define TEXT_HEIGHT 8 // Height of text to be printed and scrolled
-#define BOT_FIXED_AREA 0  // Number of lines in bottom fixed area (lines counted from bottom of screen)
-#define TOP_FIXED_AREA 0  // Number of lines in top fixed area (lines counted from top of screen)
-
-uint16_t yStart = TOP_FIXED_AREA;
-uint16_t yArea = 320 - TOP_FIXED_AREA - BOT_FIXED_AREA;
-uint16_t yDraw = 320 - BOT_FIXED_AREA - TEXT_HEIGHT;
-byte     pos[42];
-uint16_t xPos = 0;
-
-
-
 void tela(){
    unsigned long currentMillis = millis();
 
@@ -62,11 +38,8 @@ void tela(){
 
 
 if (statetela == "menu" && !functionExecuted) {
-menu();
-
-       functionExecuted = true;  // Marca a função como executada
-
-
+    menu();
+    functionExecuted = true;  // Marca a função como executada
  }
 
   if (statetela == "texto" && !functionExecuted) {
@@ -305,7 +278,6 @@ menu();
 
       loopCounter = 0; // Reseta o contador de loop
       ordervalue = 5;
-      statetela = "";
       touchCount = 0;  // Redefine o contador se exceder 4
 
       
@@ -377,6 +349,17 @@ menu();
 
   }
 
+   if (statetela == "doa" && !functionExecuted) {
+
+     if (currentMillis - lastExecutionTime >= intervalclock) {
+    lastExecutionTime = currentMillis;
+    functionExecuted = false; // Reseta a variável para próxima execução
+  }
+    qrcodedoa();
+      functionExecuted = true;  // Marca a função como executada
+
+  }
+  
 
     if (statetela == "olhos") {
     olhos();
@@ -499,7 +482,7 @@ unsigned long lastScrollTime = 0;
 
 void displayScrollingText(const char* text) {
 
-      tft.setTextSize(25); // Set text size
+      tft.setTextSize(8); // Set text size
 
   static unsigned long lastScrollTime = 0;
   static int16_t x = TFT_WIDTH;
@@ -925,6 +908,79 @@ void touchEventHandlerpix() {
 
 
 
+
+
+
+
+
+
+void qrcodedoa() {
+
+
+
+
+  Serial.println("QR CODE:  " + qrdoa);
+  Serial.println("Gerando QR Code...");
+
+
+
+  
+
+  uint8_t* qrcode = (uint8_t*)malloc(qrcodegen_BUFFER_LEN_MAX);
+  uint8_t tempBuffer[qrcodegen_BUFFER_LEN_MAX];
+
+  bool ok = qrcodegen_encodeText(qrdoa.c_str(), tempBuffer, qrcode, qrcodegen_Ecc_HIGH, qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX, qrcodegen_Mask_AUTO, true);
+
+  if (ok) {
+
+
+  tft.unloadFont(); // Remove the font to recover memory used
+  tft.setRotation(3); // Ajusta a rotação do display, se necessário
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(1);
+  tft.setCursor(350, 0); // Set cursor at top left of screen
+  tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
+  tft.println("Escaneie o QrCode ");
+  tft.setTextColor(TFT_GREEN, TFT_BLACK);
+  tft.setCursor(350, 20); // Set cursor at top left of screen
+  tft.println("Apoie o projeto ");
+  tft.setCursor(350, 40); // Set cursor at top left of screen
+  tft.println("com qualquer valor");
+
+
+     int size = qrcodegen_getSize(qrcode);
+  char border = 2;
+  uint16_t color;
+ int xOffset = 0;
+  int yOffset = 0;
+  char module_size = 4;
+
+
+  for (int y = -border; y < size + border; y++) {
+    for (int x = -border; x < size + border; x++) {
+      color = qrcodegen_getModule(qrcode, x, y) ? TFT_BLACK : TFT_WHITE;
+      int pixelX = (x + border) * module_size + xOffset;
+      int pixelY = (y + border) * module_size + yOffset;
+
+      for (int i = 0; i < module_size; i++) {
+        for (int j = 0; j < module_size; j++) {
+          tft.drawPixel(pixelX + j, pixelY + i, color);
+        }
+      }
+    }
+  }
+
+  
+  }
+
+  free(qrcode); // Liberar a memória alocada dinamicamente
+  Serial.println("QR Code gerado e Impresso");
+}
+
+
+
+
+
 void qrcodemonitor() {
 
   Serial.println("QR CODE: " + site);
@@ -1011,7 +1067,7 @@ void toque() {
             functionExecuted = false;  // Marca a função como executada
 
             Serial.println("Número de toques: " + String(touchCount));
-            if (touchCount > 13) {
+            if (touchCount > 14) {
                 touchCount = 0;  // Redefine o contador se exceder 4
 
                 Serial.println("O contador de toques foi redefinido.");
@@ -1054,11 +1110,14 @@ void toque() {
         case 11:
             statetela = "site";
             break;  
-        case 12:
-            statetela = "olhos";
-            break;
+         case 12:
+            statetela = "doa";
+            break;  
         case 13:
             statetela = "donate";
+            break;
+        case 14:
+            statetela = "olhos";
             break;
     }
 
@@ -1125,6 +1184,13 @@ void verificasqltela(){
           Serial.println("QRcode site pelo SQL");
           functionExecuted = false; // Reseta a variável para próxima execução
           statetela = "site";
+
+    
+    }
+    if (mensagemstatus == "8") {
+          Serial.println("QRcode doa pelo SQL");
+          functionExecuted = false; // Reseta a variável para próxima execução
+          statetela = "doa";
 
     
     }
