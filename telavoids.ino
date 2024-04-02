@@ -1223,7 +1223,21 @@ bool fetchAndPrintRSS(String rss_feed_url) {
         title.replace("&quot;", "\"");
         title.replace("&lt;", "<");
         title.replace("&gt;", ">");
-        title.replace("&apos;", "'");
+        title.replace("&apos;", "'");    
+        // Remove <![CDATA[ e ]]>
+        title.replace("<![CDATA[", "");
+        title.replace("]]>", "");
+
+
+         // Limita o título a 15 palavras
+        int spaceCount = 0;
+        for (int i = 0; i < title.length(); i++) {
+          if (title[i] == ' ') spaceCount++;
+          if (spaceCount == 15) {
+            title = title.substring(0, i);
+            break;
+          }
+        }
 
         // Extrai a descrição do item
         int descStart = itemData.indexOf("<description>") + 13;
@@ -1259,6 +1273,18 @@ bool fetchAndPrintRSS(String rss_feed_url) {
             int urlEnd = description.indexOf(">", urlStart);
             description.remove(urlStart, urlEnd - urlStart + 1);
             urlStart = description.indexOf("<a href=");
+        }
+
+
+
+        // Limita a descrição a 20 palavras
+        spaceCount = 0;
+        for (int i = 0; i < description.length(); i++) {
+          if (description[i] == ' ') spaceCount++;
+          if (spaceCount == 60) {
+            description = description.substring(0, i);
+            break;
+          }
         }
         
 

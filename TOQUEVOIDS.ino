@@ -74,22 +74,22 @@ checkButtonPress();
     switch (touchCount) {
 
         case 1:
-            statetela = "clima";
+            statetela = "clock";
             break;
         case 2:
             statetela = "hora";
             break;
         case 3:
-            statetela = "telegram";
+            statetela = "clima";
             break;
         case 4:
-            statetela = "news";
-            break;
-        case 5:
             statetela = "mensagem";
             break;
+        case 5:
+            statetela = "news";
+            break;
         case 6:
-            statetela = "vert";
+            statetela = "telegram";
             break;
         case 7:
             statetela = "menu";
@@ -110,7 +110,7 @@ checkButtonPress();
             statetela = "site";
             break;  
          case 13:
-            statetela = "clock";
+            statetela = "vert";
             break;  
          case 14:
             statetela = "doa";
