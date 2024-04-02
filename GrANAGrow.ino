@@ -603,6 +603,8 @@ void loop() {
 
    Serial.println("VERIFICA TELA SQL!");
    touchCount = 0;
+   buttonsCreated = false;
+
    verificasqltela();
 
   }

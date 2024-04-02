@@ -17,17 +17,33 @@ void toque() {
 
  // Verifica se a string é igual a "donate"
   if (statetela == "news") {
-checkButtonPress();
+        checkButtonPress();
+        Serial.println("FUNCAO NEWS");
+        contador++;
+        Serial.println(contador);
 
+     if (contador >= 20) {
+        statetela = "padrao";
+        touchCount++; 
+        contador = 0;
+
+  }  
     
   }  if (statetela == "donate") {
         Serial.println("FUNCAO DONATE");   
   } if (statetela == "telegram") {
         Serial.println("FUNCAO TELEGRAM");
         contador++;
-     if (contador <= 10) {
+        Serial.println(contador);
+
+     if (contador >= 20) {
         contador = 0;
         statetela = "padrao";
+        touchCount++; 
+        statetela = "menu";
+
+
+        
   }  
         getKeyFromTouch4(&x, &y, &z); // Obter toque
  
@@ -216,6 +232,7 @@ void verificasqltela(){
   
 void checkButtonPress() {
       if (tft.getTouchRawZ() > 400) {
+        contador = 0;
 
     tft.getTouchRaw(&x, &y);
     int buttonIndex = mapTouchToButton(x, y);

@@ -1281,7 +1281,7 @@ bool fetchAndPrintRSS(String rss_feed_url) {
         spaceCount = 0;
         for (int i = 0; i < description.length(); i++) {
           if (description[i] == ' ') spaceCount++;
-          if (spaceCount == 60) {
+          if (spaceCount == 40) {
             description = description.substring(0, i);
             break;
           }
