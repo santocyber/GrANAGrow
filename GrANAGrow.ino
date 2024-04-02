@@ -18,7 +18,6 @@
 #include <HTTPClient.h>
 #include <ESPping.h>
 
-
 //#Biblioteca WEBSERVER
 #include <WebServer.h>
 
@@ -128,6 +127,7 @@ const char* caCert = \
 TaskHandle_t xHandle_TELE = NULL;
 TaskHandle_t xHandle_CAM = NULL;
 
+
 // Define os buffers e pilhas de tarefa estáticos.
 StaticTask_t xTaskBuffer_TELE, xTaskBuffer_CAM;
 StackType_t xStack_TELE[STACK_SIZE], xStack_CAM[STACK_SIZE];
@@ -152,14 +152,6 @@ StackType_t xStack_TELE[STACK_SIZE], xStack_CAM[STACK_SIZE];
 #include <SPI.h>
 #include <TFT_eSPI.h>
 TFT_eSPI tft = TFT_eSPI();
-
-
-#include "NotoSansBold15.h"
-#include "NotoSansBold36.h"
-
-// The font names are arrays references, thus must NOT be in quotes ""
-#define AA_FONT_SMALL NotoSansBold15
-#define AA_FONT_LARGE NotoSansBold36
 
 
 
@@ -230,15 +222,33 @@ String timerautomatico;
 String timerfotostatus;
 String timerfoto = "10";
 String statetela;
+String statetoque;
+String msgtg;
+
+String inputText = ""; // Variável para armazenar o texto digitado
+
+char keys[5][11] = {
+    {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '<'}, 
+    {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '!'},
+    {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', '$', '%'},
+    {'z', 'x', 'c', 'v', 'b', 'n', 'm', '.', '_', '*', '@'},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', '-', '?', '&', '#'}
+};
+char key = keys[5][11];
+const char NO_KEY = '\0'; // Definindo NO_KEY como um caractere nulo
 
 int ordervalue = 1;
 int loopCounter = 0; // contador de loop
+int contador = 0;
 
 
 // Vari         veis para rastrear o estado do bot         o e os cliques
 int objState = 0;       // Vari         vel para armazenar o estado do bot         o
 int contaobjfunc = 0;
 bool functionExecuted = false;
+bool Executed = true;
+bool buttonsCreated = false; // Variável para controlar se os botões foram criados
+bool stopFetching = false;
 
 
 int contacendled = 0;
@@ -253,6 +263,7 @@ int verificacoes = 0;
 static int touchCount = 0;
 
 unsigned long previousMillis = 0;
+unsigned long previousMillis2 = 0;
 unsigned long previousMillis3 = 0;
 
 const long intervalo5 = 5000; // Intervalo de 30 segundos
@@ -335,7 +346,7 @@ void setup() {
     //   Serial.setDebugOutput(true);
        
   esp_task_wdt_init(240, true); //enable panic so ESP32 restarts
-  esp_task_wdt_add(NULL); //add current thread to WDT watch
+ // esp_task_wdt_add(NULL); //add current thread to WDT watch
 
   
    Serial.println("Dispositivo GRANA iniciado");
@@ -483,27 +494,12 @@ if (ssid.length() > 0 && password.length() > 0) {
   tft.setCursor(10, 10);  // Posição do cursor na tela
   tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
   tft.println("Nao conectado");
-  delay(3000);
+  delay(2000);
 
         
     } else {
         Serial.println("Conexão bem-sucedida, iniciar o servidor web e o update ativo");
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextSize(4);
-  tft.setCursor(0, 0); // Set cursor at top left of screen
-  tft.setCursor(10, 10);  // Posição do cursor na tela
-  tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
-  tft.println("Config robo GrANA");
-  tft.setTextColor(TFT_RED, TFT_BLACK); // Change the font colour and the background colour
-  tft.println(ssid);
-  tft.setTextColor(TFT_WHITE, TFT_BLACK); // Change the font colour and the background colour
-  tft.println(usuario);
-  tft.setTextColor(TFT_GREEN, TFT_BLACK);
-  tft.println(WiFi.localIP().toString());
-  tft.setTextColor(TFT_CYAN, TFT_BLACK);
-  tft.println(WiFi.dnsIP(0));
-  delay(5000);
-
+        configwifi();
     }
     
     menu();
@@ -551,7 +547,7 @@ xHandle_TELE = xTaskCreateStaticPinnedToCore(
     "TELE",          // Text name for the task.
     STACK_SIZE,      // Stack size in bytes, not words.
     (void *)1,       // Parameter passed into the task. (void *)1
-    1,               // Priority at which the task is created.
+    2,               // Priority at which the task is created.
     xStack_TELE,     // Array to use as the task's stack.
     &xTaskBuffer_TELE, // Variable to hold the task's data structure.
     1                // Core number to which the task should be pinned.
@@ -567,7 +563,7 @@ xHandle_CAM = xTaskCreateStaticPinnedToCore(
     "CAM",           // Text name for the task.
     STACK_SIZE,      // Stack size in bytes, not words.
     (void *)1,       // Parameter passed into the task. (void *)1
-    1,               // Priority at which the task is created.
+    3,               // Priority at which the task is created.
     xStack_CAM,      // Array to use as the task's stack.
     &xTaskBuffer_CAM, // Variable to hold the task's data structure.
     1                // Core number to which the task should be pinned.
@@ -575,6 +571,7 @@ xHandle_CAM = xTaskCreateStaticPinnedToCore(
 
 
 #endif
+
   }
 
 
@@ -586,7 +583,8 @@ xHandle_CAM = xTaskCreateStaticPinnedToCore(
 
 void loop() {
 
-    
+    esp_task_wdt_reset();
+
     server.handleClient();
 
   unsigned long currentMillis = millis();
@@ -607,24 +605,19 @@ void loop() {
   }
 
 
-  // Verifica se a string é igual a "donate"
-  if (statetela == "donate" && "") {
-    
-    // Se a string for igual a "donate", não executa a função toque()
-   // Serial.println("String é 'donate'. Não executando toque.");
-  } else {
-    // Se a string for diferente de "donate", executa a função toque()
+     if (currentMillis - previousMillis2 >= 300) {
+    // Atualiza o tempo de referencia
+    previousMillis2 = currentMillis;
     toque();
-  }
-  
-   // toque();
 
+}  
 
-     if (currentMillis - previousMillis3 >= 500) {
+if (currentMillis - previousMillis3 >= 1000) {
     // Atualiza o tempo de referencia
     previousMillis3 = currentMillis;
     tela();
- 
+
+
 }
 
 #endif
@@ -639,11 +632,7 @@ void loop() {
    //   Serial.println(analogRead(phpin));
     //  delay(1000);
 
-
-
-
-      
- esp_task_wdt_reset();
+     
 }
 
 

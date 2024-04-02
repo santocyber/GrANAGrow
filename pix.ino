@@ -99,7 +99,7 @@ void pix() {
     qrcodefun();
     statetela = "";
 
-    delay(5000);
+    delay(25000);
     orders();
 
 
@@ -114,6 +114,7 @@ void pix() {
   Serial.println("");
   Serial.println(F("Desconectando."));
   http.end();
+
 
 }
 
@@ -177,7 +178,7 @@ void orders() {
   //ensureWiFiConnection();
   HTTPClient http;
   int httpResponseCode;
-  int maxTries = 40;
+  int maxTries = 15;
   
   for (verificacoes = 0; verificacoes < maxTries; verificacoes++) {
        Serial.printf("[HTTPS] Tentativa %d...\n", verificacoes);
@@ -216,7 +217,7 @@ void orders() {
 
   tft.fillScreen(TFT_GREEN);  // Limpa a tela com fundo verde
   tft.setTextColor(TFT_WHITE);  // Define a cor do texto como branco
-  tft.setTextSize(6);  // Define o tamanho do texto
+  tft.setTextSize(4);  // Define o tamanho do texto
 
   tft.setCursor(50, 100);  // Posição do cursor na tela
   tft.println("PAGAMENTO");
@@ -225,16 +226,31 @@ void orders() {
   tft.println("OBRIGADO"); 
   tft.println("DEUS TE ABENCOE!");
             //acionabraco();
+
     statetela = "";
 
-
   delay(10000);
+     statetela = "olhos";
 
             break;
           } else if (pagamento == "0") {
             // Não é necessário incrementar verificacoes neste caso.
           Serial.println("pagamento nao efetuado verificado no sql");
 
+  tft.fillScreen(TFT_RED);  // Limpa a tela com fundo verde
+  tft.setTextColor(TFT_YELLOW);  // Define a cor do texto como branco
+  tft.setTextSize(4);  // Define o tamanho do texto
+
+  tft.setCursor(0, 0);  // Posição do cursor na tela
+  tft.println("PAGAMENTO");
+  tft.println("NAO EFETUADO");
+  tft.println("NAOOOOOOOOOO");
+  tft.println("OBRIGADO"); 
+  tft.println("DIABO TE ABENCOE!");
+  tft.println("TENTATIVA");
+  tft.println(verificacoes);
+
+  delay(10000);
 
           }
          

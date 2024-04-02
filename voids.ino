@@ -60,6 +60,7 @@ const TickType_t xDelay = 30000 / portTICK_PERIOD_MS;
   for( ;; )
   {
   readTel();
+
       vTaskDelay( xDelay );
   }
 

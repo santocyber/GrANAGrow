@@ -41,6 +41,12 @@ void startWebServer() {
 //#########################################Cria paginas WEB
 
 void handleMain() {
+
+
+  String nomedobot = server.arg("nomedobot");
+  String usuario = server.arg("usuario");
+
+  
   String html = "<html><head>";
   html += "<style>";
   html += "body { font-family: Arial, sans-serif; margin: 20px; }";

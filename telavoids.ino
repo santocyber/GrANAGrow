@@ -10,8 +10,6 @@
 
 
 
-
-
 //clock
 
 #define TFT_GREY 0x5AEB
@@ -34,7 +32,12 @@ bool initial = 1;
 void tela(){
    unsigned long currentMillis = millis();
 
+
+
+
+
    
+
 
 
 if (statetela == "menu" && !functionExecuted) {
@@ -56,7 +59,7 @@ if (statetela == "menu" && !functionExecuted) {
   // Large font
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-  tft.loadFont(AA_FONT_LARGE); // Load another different font
+ // tft.loadFont(AA_FONT_LARGE); // Load another different font
 
   //tft.fillScreen(TFT_BLACK);
   
@@ -219,43 +222,29 @@ if (statetela == "menu" && !functionExecuted) {
   if (statetela == "teste") {
   Serial.println("modo teste");
   tft.fillScreen(TFT_GREEN);
-
-// Escreve o texto na tela
-    tft.println(mensagem.c_str());
+  tft.println(mensagem.c_str());
 
   }
 
 
  if (statetela == "vert" && !functionExecuted) {
-    tft.init();
-
-
-  //tft.fillRectHGradient(0, 0, 160, 50, TFT_MAGENTA, TFT_BLUE);
-  //tft.setCursor(10,10);
-  //tft.print("Horizontal gradient");
-
+  
   tft.fillRectVGradient(0, 0, 480, 320, TFT_ORANGE, TFT_RED);
   tft.setCursor(0,0);
   tft.setTextWrap(true, true); // Wrap on width and height switched off
-
   tft.print(mensagem.c_str());
-        functionExecuted = true;  // Marca a função como executada
-
-
+  functionExecuted = true;  // Marca a função como executada
+  
  } 
  
  
  
  if (statetela == "horiz" && !functionExecuted) {
 
-
   tft.fillRectHGradient(0, 0, 480, 320, TFT_MAGENTA, TFT_BLUE);
   tft.setCursor(10,10);
   tft.print(mensagem.c_str());
-        functionExecuted = true;  // Marca a função como executada
-
-
-
+  functionExecuted = true;  // Marca a função como executada
 
  }
 
@@ -279,6 +268,7 @@ if (statetela == "menu" && !functionExecuted) {
       loopCounter = 0; // Reseta o contador de loop
       ordervalue = 5;
       touchCount = 0;  // Redefine o contador se exceder 4
+
 
       
     }
@@ -359,6 +349,23 @@ if (statetela == "menu" && !functionExecuted) {
       functionExecuted = true;  // Marca a função como executada
 
   }
+
+
+
+     if (statetela == "news" && !functionExecuted) {
+
+     if (currentMillis - lastExecutionTime >= intervalclock) {
+    lastExecutionTime = currentMillis;
+    functionExecuted = false; // Reseta a variável para próxima execução
+  }
+       
+        if (!buttonsCreated) {
+    createButtons();
+    buttonsCreated = true;
+  }
+
+  }
+
   
 
     if (statetela == "olhos") {
@@ -366,6 +373,14 @@ if (statetela == "menu" && !functionExecuted) {
   }
   
 
+  if (statetela == "telegram" && !functionExecuted) {
+
+    telegram();
+    functionExecuted = true;  // Marca a função como executada
+
+  }
+
+  
 
 
 #if (SENSORES == 1)
@@ -382,7 +397,7 @@ if (statetela == "ph") {
        tft.setRotation(3);
 
     tft.fillScreen(TFT_BLACK);
-    tft.loadFont(AA_FONT_LARGE); // Load another different font
+   // tft.loadFont(AA_FONT_LARGE); // Load another different font
 
 
     if (aht.begin()) {
@@ -416,7 +431,7 @@ if (statetela == "clima") {
        tft.setRotation(3);
 
     tft.fillScreen(TFT_BLACK);
-    tft.loadFont(AA_FONT_LARGE); // Load another different font
+   // tft.loadFont(AA_FONT_LARGE); // Load another different font
 
 
     if (aht.begin()) {
@@ -596,8 +611,7 @@ if (statetela == "clock" && !functionExecuted) {
 
  // tft.init();
   tft.setRotation(3);
-  tft.loadFont(AA_FONT_LARGE); // Load another different font
-
+  tft.setTextSize(4); // Set text size
   tft.fillScreen(TFT_BLACK);
 // Define o centro da tela
   uint16_t centerX = tft.width() / 2;
@@ -710,13 +724,12 @@ void menu(){
 
  tft.setRotation(3);
 
-  tft.loadFont(AA_FONT_LARGE); // Load another different font
+ // tft.loadFont(AA_FONT_LARGE); // Load another different font
+  tft.setTextWrap(true, true); // Wrap on width and height
 
   tft.fillScreen(TFT_BLACK);
-  tft.setTextSize(1);
+  tft.setTextSize(4);
   tft.setCursor(0, 0); // Set cursor at top left of screen
-  tft.setCursor(0, 100);  // Posição do cursor na tela
-
 
   tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
   tft.println("BEM VINDO,");
@@ -735,12 +748,43 @@ void menu(){
 
 
 
+void telegram(){
+
+ tft.setRotation(3);
+
+ // tft.loadFont(AA_FONT_LARGE); // Load another different font
+  tft.setTextWrap(true, true); // Wrap on width and height
+
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(4);
+  tft.setCursor(0, 0); // Set cursor at top left of screen
+
+  tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
+  tft.println("ENVIANDO,");
+  tft.setTextColor(TFT_RED, TFT_BLACK); // Change the font colour and the background colour
+  tft.println("MENSAGEM");
+  tft.setTextColor(TFT_WHITE, TFT_BLACK); // Change the font colour and the background colour
+  tft.println("TELEGRAM");
+  tft.setTextColor(TFT_GREEN, TFT_BLACK);
+  tft.println("The Green ANArchy");
+  tft.setTextColor(TFT_CYAN, TFT_BLACK);
+  tft.println("TOQUE NA TELA");
+  delay(2000);
+  telegrammsg();
+
+
+ //   tft.unloadFont(); // Remove the font to recover memory used
+}
+
+
+
+
 //phtela
 void phtela(){
     tft.setCursor(0, 0); // Set cursor at top left of screen
 
     tft.fillScreen(TFT_BLACK);
-    tft.loadFont(AA_FONT_LARGE); // Load another different font
+   // tft.loadFont(AA_FONT_LARGE); // Load another different font
     tft.setTextColor(TFT_CYAN, TFT_BLACK);
     tft.println("Clima Monitor");
     drawBarGraph(ph(), "pH", 0, 250, TFT_GREEN);
@@ -1041,165 +1085,289 @@ void print_qrcodemonitor(const uint8_t qrcode[]) {
 }
 
 
-void toque() {
-    uint16_t x, y;
-    static unsigned long lastTouchTime = 0;
-    static bool isTouched = false;
- //   static int touchCount = 0;
 
-    // Verifica se houve toque
-    if (tft.getTouchRawZ() > 1000) {
-        tft.getTouchRaw(&x, &y);
-        Serial.printf("x: %i     ", x);
-        Serial.printf("y: %i     ", y);
-        Serial.printf("z: %i \n", tft.getTouchRawZ());
 
-        // Marca o toque como ativo e registra o tempo do último toque
-        isTouched = true;
-        lastTouchTime = millis();
-    } else {
-        // Se o toque não estiver mais presente, verifica o tempo de toque
-        if (isTouched && (millis() - lastTouchTime > 200)) {
-            isTouched = false;  // Marca o toque como inativo
-            // Incrementa o contador de toques apenas quando o dedo é levantado da tela
-            touchCount++;
 
-            functionExecuted = false;  // Marca a função como executada
 
-            Serial.println("Número de toques: " + String(touchCount));
-            if (touchCount > 14) {
-                touchCount = 0;  // Redefine o contador se exceder 4
 
-                Serial.println("O contador de toques foi redefinido.");
-            }
-        }
-    }
 
-    // Lógica para diferentes ações com base no número de toques
-    switch (touchCount) {
-        case 1:
-            statetela = "clima";
-            break;
-        case 2:
-            statetela = "hora";
-            break;
-        case 3:
-            statetela = "clock";
-            break;
-        case 4:
-            statetela = "horax";
-            break;
-        case 5:
-            statetela = "mensagem";
-            break;
-        case 6:
-            statetela = "vert";
-            break;
-        case 7:
-            statetela = "menu";
-            break; 
-        case 8:
-            statetela = "scrolling";
-            break;
-        case 9:
-            statetela = "horiz";
-            break;
-        case 10:
-            statetela = "ph";
-            break; 
-        case 11:
-            statetela = "site";
-            break;  
-         case 12:
-            statetela = "doa";
-            break;  
-        case 13:
-            statetela = "donate";
-            break;
-        case 14:
-            statetela = "olhos";
-            break;
-    }
 
-  //  Serial.println("Estado da tela: " + statetela);
+
+
+
+
+
+
+
+const int numButtons = 10;
+const int buttonWidth = 100;
+const int buttonHeight = 50;
+const int spacingX = 20;
+const int spacingY = 20;
+const int startX = 20;
+const int startY = 20;
+String buttonLabels[numButtons] = {"BBC", "TECMUNDO"};
+
+void createButtons() {
+  int numCols = 1; // Número de colunas
+  int numRows = 2; // Número de linhas
+  int buttonWidth = (tft.width() - (numCols + 1) * spacingX) / numCols;
+  int buttonHeight = (tft.height() - (numRows + 1) * spacingY) / numRows;
+
+  int currentX = spacingX;
+  int currentY = spacingY;
+  
+  tft.unloadFont(); // Remove a fonte para recuperar a memória usada
+  tft.setTextWrap(true, false); // Quebra de texto em largura e altura
+
+  tft.setCursor(0, 0); // Define o cursor no canto superior esquerdo da tela
+  tft.fillScreen(TFT_BLACK); // Limpa a tela antes de exibir as notícias
+
+  for (int i = 0; i < numButtons; i++) {
+    tft.fillRect(currentX, currentY, buttonWidth, buttonHeight, TFT_CYAN);
+    tft.setTextColor(TFT_BLACK);
+    tft.setTextSize(6);
+    tft.setCursor(currentX + 10, currentY + 15);
+    tft.println(buttonLabels[i]);
+
+    currentY += buttonHeight + spacingY;
+  }
 }
 
 
 
-void verificasqltela(){
-      Serial.println("inicia mensagem tela sql");
 
-      loadfile(estado, mensagem, mensagemstatus);
-      mensagemstatus.trim();
-    
-      Serial.println(statetela);
-      Serial.println(mensagemstatus);
-     //  functionExecuted = false;  // Marca a função como executada
 
-  if (mensagemstatus == "0") {
-      Serial.println("Nao faz nada pelo SQL");
+
+void fetchAndPrintRSSWithRetry(String rss_feed_url) {
+  int retryAttempts = 0;
+  while (retryAttempts < 5) {
+    if (fetchAndPrintRSS(rss_feed_url)) {
+      return; // Se obtiver sucesso, saia da função
     }
-
-     if (mensagemstatus == "1") {
-         Serial.println("Scrolling pelo SQL");
-         Serial.println(mensagemstatus);
-         Serial.println(mensagem);
-         functionExecuted = false; // Reseta a variável para próxima execução
-         statetela = "scrolling";
-  } 
-  
-      if (mensagemstatus == "2") {
-          Serial.println("Hora analog pelo SQL");
-          Serial.println(mensagemstatus);
-          functionExecuted = false; // Reseta a variável para próxima execução
-          statetela = "clock";
-    }
-
-     if (mensagemstatus == "3") {
-          Serial.println("Hora digital pelo SQL");
-          functionExecuted = false; // Reseta a variável para próxima execução
-          statetela = "hora"; 
-    }   
-
-    if (mensagemstatus == "4") {
-          Serial.println("Clima pelo SQL");
-          functionExecuted = false; // Reseta a variável para próxima execução
-          statetela = "clima";
-    }  
-    
-    if (mensagemstatus == "5") {
-          Serial.println("Mensagem pelo SQL");
-          Serial.println(mensagem);
-          functionExecuted = false; // Reseta a variável para próxima execução
-          statetela = "mensagem";  
-    } 
-    
-    if (mensagemstatus == "6") {
-          Serial.println("Olho pelo SQL");
-          functionExecuted = false; // Reseta a variável para próxima execução
-          statetela = "olhos";   
-    }
-
-     if (mensagemstatus == "7") {
-          Serial.println("QRcode site pelo SQL");
-          functionExecuted = false; // Reseta a variável para próxima execução
-          statetela = "site";
-
-    
-    }
-    if (mensagemstatus == "8") {
-          Serial.println("QRcode doa pelo SQL");
-          functionExecuted = false; // Reseta a variável para próxima execução
-          statetela = "doa";
-
-    
-    }
-
-    
-  
- 
-  
+    retryAttempts++;
+    Serial.println("Tentando novamente...");
+    delay(2000); // Espere antes de tentar novamente
   }
+  Serial.println("Excedido o número máximo de tentativas.");
+}
+
+bool fetchAndPrintRSS(String rss_feed_url) {
+  HTTPClient http;
+
+  Serial.println("Obtendo feeds RSS...");
+  Serial.println(rss_feed_url);
+
+  http.begin(rss_feed_url);
+  int httpCode = http.GET();
+
+  if (httpCode > 0) {
+    if (httpCode == HTTP_CODE_OK) {
+      String payload = http.getString();
+
+      statetela = "esperando";
+
+
+
+      // Função para substituir caracteres fora do padrão por espaços em branco
+      payload.replace('\r', ' '); // Substitui carriage return por espaço em branco
+      payload.replace('\n', ' '); // Substitui nova linha por espaço em branco
+      payload.replace('õ', 'o'); // Substitui tabulação por espaço em branco
+      payload.replace('ã', 'a'); // Substitui til por espaço em branco
+      payload.replace('ç', 'c'); // Substitui cedilha por 'c'
+      payload.replace('í', 'i'); // Substitui cedilha por 'c'
+      payload.replace('ó', 'o'); // Substitui cedilha por 'c'
+      payload.replace('á', 'a'); // Substitui cedilha por 'c'
+      payload.replace('ú', 'u'); // Substitui cedilha por 'c'
+      payload.replace('é', 'e'); // Substitui cedilha por 'c'
+      payload.replace('ê', 'e'); // Substitui cedilha por 'c'
+      payload.replace('â', 'a'); // Substitui cedilha por 'c'
+      payload.replace('à', 'a'); // Substitui cedilha por 'c'
+      payload.replace('ô', 'o'); // Substitui cedilha por 'c'
+
+
+
+      int startPos = 0;
+      int endPos = 0;
+      int itemCount = 0;
+          String cleanedRSS = "";
+
+
+      while (true) {
+        startPos = payload.indexOf("<item>", endPos); // Encontra o início de um item
+        endPos = payload.indexOf("</item>", startPos); // Encontra o fim do item
+    
+        if (itemCount >= 6) { // Se não houver mais itens ou 2 itens foram exibidos
+          startPos = 0; // Reinicia a exibição do primeiro item
+          endPos = 0;
+          itemCount = 0; // Reinicia o contador de itens exibidos
+          startPos = payload.indexOf("<item>", endPos); // Encontra o início de um item
+          endPos = payload.indexOf("</item>", startPos); // Encontra o fim do item
+          
+
+        }
+
+        // Encontra o fim do item
+        int endPos = payload.indexOf("</item>", startPos);
+        if (endPos == -1) break;
+
+        // Extrai os dados do item
+        String itemData = payload.substring(startPos, endPos);
+
+        // Extrai o título do item
+        int titleStart = itemData.indexOf("<title>") + 7;
+        int titleEnd = itemData.indexOf("</title>", titleStart);
+        String title = itemData.substring(titleStart, titleEnd);
+        // Remove caracteres indesejados do título
+        title.replace("&amp;", "&");
+        title.replace("&quot;", "\"");
+        title.replace("&lt;", "<");
+        title.replace("&gt;", ">");
+        title.replace("&apos;", "'");
+
+        // Extrai a descrição do item
+        int descStart = itemData.indexOf("<description>") + 13;
+        int descEnd = itemData.indexOf("</description>", descStart);
+        String description = itemData.substring(descStart, descEnd);
+        // Remove caracteres indesejados da descrição
+        description.replace("&amp;", "&");
+        description.replace("&quot;", "\"");
+        description.replace("&lt;", "<");
+        description.replace("&gt;", ">");
+        description.replace("&apos;", "'");
+
+        // Remove tags <p> e <a> da descrição
+        description.replace("<p>", "");
+        description.replace("</p>", "");
+        description.replace("<a>", "");
+        description.replace("</a>", "");
+         // Remove <![CDATA[ e ]]>
+        description.replace("<![CDATA[", "");
+        description.replace("]]>", "");
+
+           // Remove tags <strong> e </strong> sem remover o conteúdo
+        description.replace("<strong>", "");
+        description.replace("</strong>", "");
+         // Remove a tag <p dir="ltr"><span>
+        description.replace("<p dir=\"ltr\"><span>", "");
+
+        
+
+        // Remove URLs da descrição
+        int urlStart = description.indexOf("<a href=");
+        while (urlStart != -1) {
+            int urlEnd = description.indexOf(">", urlStart);
+            description.remove(urlStart, urlEnd - urlStart + 1);
+            urlStart = description.indexOf("<a href=");
+        }
+        
+
+        // Adiciona o título e a descrição limpos à string final
+        cleanedRSS += "Título: " + title + "\n";
+        cleanedRSS += "Descrição: " + description + "\n\n";
+
+        // Procura o próximo item
+        startPos = payload.indexOf("<item>", endPos);
+    
+
+          Serial.println(cleanedRSS);
+
+
+
+
+        /*
+
+     
+   
+        String itemData = payload.substring(startPos, endPos); // Extrai os dados do item
+
+        // Extrai o título do item
+        int titleStart = itemData.indexOf("<title>") + 16;
+        int titleEnd = itemData.indexOf("]]></title>", titleStart);
+        String title = itemData.substring(titleStart, titleEnd);
+        // Limita o título a 15 palavras
+        int spaceCount = 0;
+        for (int i = 0; i < title.length(); i++) {
+          if (title[i] == ' ') spaceCount++;
+          if (spaceCount == 15) {
+            title = title.substring(0, i);
+            break;
+          }
+        }
+
+        // Extrai a descrição do item
+        int descStart = itemData.indexOf("<description>") + 22;
+        int descEnd = itemData.indexOf("]]></description>", descStart);
+        String description = itemData.substring(descStart, descEnd);
+        // Limita a descrição a 20 palavras
+        spaceCount = 0;
+        for (int i = 0; i < description.length(); i++) {
+          if (description[i] == ' ') spaceCount++;
+          if (spaceCount == 60) {
+            description = description.substring(0, i);
+            break;
+          }
+        }
+
+
+
+
+*/
+
+
+
+
+
+        // Imprime o título e a descrição na tela
+        tft.fillScreen(TFT_BLACK); // Limpa a tela antes de exibir as notícias
+        tft.setTextColor(TFT_WHITE);
+        tft.setTextSize(2);
+        tft.setCursor(10, 20);
+        tft.println(title);
+   
+
+        tft.setTextColor(TFT_RED);
+        tft.setTextSize(3);
+        tft.setCursor(10, 70);
+        tft.println(description);
+
+
+        delay(10000); // Atraso de 10 segundos entre cada item
+
+        itemCount++;
+
+           if (tft.getTouchRawZ() > 300) {
+          Serial.println("Tela tocada. Saindo do loop.stopFetching");
+          statetela = "menu";
+          break;
+        }
+      
+      }
+      http.end();
+
+      return true; // Indica que obteve com sucesso os feeds RSS
+    } else {
+      Serial.println("Falha ao obter o feed RSS.");
+      createButtons();
+    }
+  } else {
+    Serial.println("Falha ao conectar-se ao servidor RSS.");
+    createButtons();
+  }
+
+  http.end();
+  return false; // Indica que falhou ao obter os feeds RSS
+
+}
+
+
+
+
+
+
+
+
+
 
 
 

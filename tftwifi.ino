@@ -1,11 +1,9 @@
 
-const char NO_KEY = '\0'; // Definindo NO_KEY como um caractere nulo
+
 const int MAX_NETWORKS = 3; // Definir o máximo de redes para exibir na tela
 
 const uint16_t MIN_PRESSURE = 200;
 const uint16_t MAX_PRESSURE = 4000;
-uint16_t x, y;
-uint8_t z;
 
 int scan() {
     // Scan for Wi-Fi networks
@@ -13,7 +11,27 @@ int scan() {
     return n;
 }
 
+void configwifi(){
 
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(4);
+  tft.setCursor(0, 0); // Set cursor at top left of screen
+  tft.setCursor(10, 10);  // Posição do cursor na tela
+  tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
+  tft.println("Config robo GrANA");
+  tft.setTextColor(TFT_RED, TFT_BLACK); // Change the font colour and the background colour
+  tft.println(ssid);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK); // Change the font colour and the background colour
+  tft.println(usuario);
+  tft.setTextColor(TFT_GREEN, TFT_BLACK);
+  tft.println(WiFi.localIP().toString());
+  tft.setTextColor(TFT_CYAN, TFT_BLACK);
+  tft.println(WiFi.dnsIP(0));
+  delay(4000);
+
+}
+
+  
 void scanWiFiNetworks() {
    int n = scan();
        delay(500); // Atualizar a lista a cada 5 segundos
@@ -125,18 +143,10 @@ void getKeyFromTouch(uint16_t* x, uint16_t* y, uint8_t* z) {
 
 
   
-char keys[5][11] = {
-    {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '<'}, 
-    {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '!'},
-    {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', '$', '%'},
-    {'z', 'x', 'c', 'v', 'b', 'n', 'm', '.', '_', '*', '@'},
-    {' ', ' ', ' ', ' ', ' ', ' ', ' ', '-', '?', '&', '#'}
-};
-
-char key = keys[5][11];
 
 
-String inputText = ""; // Variável para armazenar o texto digitado
+
+
 
 
 void enterPassword() {
@@ -309,8 +319,8 @@ void getKeyFromTouch3(uint16_t* x, uint16_t* y, uint8_t* z) {
   
 int rowIndex = map(*x, 444,3555, 0, 5);
 int colIndex = map(*y, 444, 3666, 0, 11);
-colIndex = constrain(colIndex, 0, 10);
 rowIndex = constrain(rowIndex, 0, 4);
+colIndex = constrain(colIndex, 0, 10);
 
 
         char key = keys[rowIndex][colIndex];
@@ -396,7 +406,7 @@ void drawKeyboard() {
     // Exibir o texto digitado na tela
     tft.setCursor(5, tft.height() - 40); // Posição para exibir o texto na parte inferior da tela
     tft.setTextSize(4);
-    tft.setTextColor(TFT_RED, TFT_BLACK);
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
     tft.print(":");
     tft.print(inputText);
 }
