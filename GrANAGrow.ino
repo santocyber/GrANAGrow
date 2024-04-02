@@ -237,6 +237,9 @@ char keys[5][11] = {
 char key = keys[5][11];
 const char NO_KEY = '\0'; // Definindo NO_KEY como um caractere nulo
 
+int buttonIndex = -1;
+
+
 int ordervalue = 1;
 int loopCounter = 0; // contador de loop
 int contador = 0;

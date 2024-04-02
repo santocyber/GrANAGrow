@@ -13926,10 +13926,6 @@ void split( // Subdivides motion path into two sub-paths w/randimization
       else if (v > IRIS_MAX) v = IRIS_MAX;
       frame(v);        // Draw frame w/interim iris scale value
 
-          if (tft.getTouchRawZ() > 400) {
-          Serial.println("Tela tocada. Saindo do loop.");
-          break;
-        }
         
     }
   }
