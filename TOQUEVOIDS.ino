@@ -14,6 +14,8 @@ const String rss_feed_urls[2] = {
 
 
 void toque() {
+        Serial.println("STATETELA");   
+        Serial.println(statetela);   
 
  // Verifica se a string é igual a "donate"
   if (statetela == "news") {
@@ -31,21 +33,30 @@ void toque() {
     
   }  if (statetela == "donate") {
         Serial.println("FUNCAO DONATE");   
+        
+        functionExecuted = false;  // Marca a função como nao executada
+        if (statetela == "donate" && !functionExecuted) {
+        drawButtons();
+        }
+        
+        contador++;
+        Serial.println(contador);
+        touchEventHandlerpix();
+  
   } if (statetela == "telegram") {
         Serial.println("FUNCAO TELEGRAM");
+
+        getKeyFromTouch4(&x, &y, &z);
+
         contador++;
         Serial.println(contador);
 
      if (contador >= 20) {
-        contador = 0;
-        statetela = "padrao";
-        touchCount++; 
         statetela = "menu";
-
-
-        
-  }  
-        getKeyFromTouch4(&x, &y, &z); // Obter toque
+        touchCount++; 
+        menu();
+        contador = 0;
+          }  
  
   }else{
     // Verifica se houve toque
@@ -228,6 +239,31 @@ void verificasqltela(){
 
 
 
+void touchEventHandlerpix() {
+while (boolpix) {
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= 1000) {
+      previousMillis = currentMillis;
+      contadorpix++; 
+    }
+ if (contadorpix == 20) {
+          boolpix = false;
+          contadorpix = 0;
+          touchCount++; 
+
+ }
+
+  
+  if (tft.getTouch(&x, &y)) {
+     contadorpix = 0;
+
+    contador = 0;
+    x = map(x, 0, tft.width(), tft.width(), 0);
+    y = map(y, 0, tft.height(), tft.height(), 0);
+
+    checkButtons(x, y);
+  }
+}}
 
   
 void checkButtonPress() {

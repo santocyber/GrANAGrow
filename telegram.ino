@@ -46,6 +46,32 @@ void telegrammsg() {
 
 
 
+#if (CAMERA == 1)
 
 
-        
+const char* apiUrl = "http://suaapi.com/upload.php";
+
+
+// Função para enviar a foto para a API
+void sendPhotoToAPI() {
+  // Captura da foto (mantenha o código de captura da foto aqui)
+
+  // Envio da foto para a API PHP
+  HTTPClient http;
+  http.begin(apiUrl);
+  http.addHeader("Content-Type", "image/jpeg");
+  int httpResponseCode = http.POST((uint8_t*)fb->buf, fb->len);
+  
+  if (httpResponseCode > 0) {
+    Serial.print("Resposta da API: ");
+    Serial.println(httpResponseCode);
+  } else {
+    Serial.print("Erro ao enviar a foto. Código de erro: ");
+    Serial.println(httpResponseCode);
+  }
+  
+  http.end();
+  esp_camera_fb_return(fb);
+}
+
+ #endif       

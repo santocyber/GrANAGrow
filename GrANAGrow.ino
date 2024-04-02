@@ -243,6 +243,7 @@ int buttonIndex = -1;
 int ordervalue = 1;
 int loopCounter = 0; // contador de loop
 int contador = 0;
+int contadorpix = 0;
 
 
 // Vari         veis para rastrear o estado do bot         o e os cliques
@@ -252,6 +253,7 @@ bool functionExecuted = false;
 bool Executed = true;
 bool buttonsCreated = false; // Variável para controlar se os botões foram criados
 bool stopFetching = false;
+bool boolpix = true;
 
 
 int contacendled = 0;

@@ -13,9 +13,14 @@ String urlorders = "https://santocyber.helioho.st/pix/api_orders.php";
 
 
 
-
-
 //botao na tela
+
+#define TFT_GREY 0x5AEB // Cor cinza para os botões
+#define TFT_WHITE 0xFFFF // Cor branca para o texto
+
+#define BUTTON_WIDTH 70 // Largura dos botões
+#define BUTTON_HEIGHT 70 // Altura dos botões
+
 
 const int buttonSize = 75;
 const int buttonMargin = 10;
@@ -29,6 +34,8 @@ const int buttonSumX = screenWidth - buttonSize - buttonMargin;
 const int buttonSumY = buttonMargin;
 const int buttonSumSize = 75;
 
+const int sendButtonX = 230; // Coordenada X do botão "Enviar"
+const int sendButtonY = 170; // Coordenada Y do botão "Enviar"
 
 unsigned long lastInteractionTime = 0;
 bool isAdding = false;
@@ -121,8 +128,7 @@ void pix() {
 
 
 void print_qrcode(const uint8_t qrcode[]) {
-   tft.setRotation(3);
-
+  tft.setRotation(3);
   tft.fillScreen(TFT_BLACK);
   tft.setCursor(0, 0); // Set cursor at top left of screen
   
@@ -130,8 +136,8 @@ void print_qrcode(const uint8_t qrcode[]) {
   char border = 4;
   char module_size = 4;
   uint16_t color;
-  int xOffset = 86;
-  int yOffset = 6;
+  int xOffset = 10;
+  int yOffset = 10;
 
   for (int y = -border; y < size + border; y++) {
     for (int x = -border; x < size + border; x++) {
@@ -219,7 +225,7 @@ void orders() {
   tft.setTextColor(TFT_WHITE);  // Define a cor do texto como branco
   tft.setTextSize(4);  // Define o tamanho do texto
 
-  tft.setCursor(50, 100);  // Posição do cursor na tela
+  tft.setCursor(0, 0);  // Posição do cursor na tela
   tft.println("PAGAMENTO");
   tft.println("EFETUADO");
   tft.println("");
@@ -282,15 +288,6 @@ void orders() {
 
 
 
-//botao na tela
-
-#define TFT_GREY 0x5AEB // Cor cinza para os botões
-#define TFT_WHITE 0xFFFF // Cor branca para o texto
-
-#define BUTTON_WIDTH 60 // Largura dos botões
-#define BUTTON_HEIGHT 60 // Altura dos botões
-
-
 
 
 void drawButtons() {
@@ -300,16 +297,18 @@ void drawButtons() {
 
   // Desenhando o botão "Mais"
   drawButton(140, 170, "+", TFT_GREEN);
-  
+
+  drawButton(sendButtonX, sendButtonY, "#", TFT_GREY);
+
   // Mostrar valor atual
   tft.setTextColor(TFT_WHITE);
   tft.setTextSize(6);
   tft.setCursor(10, 10);
-  tft.print("Valor: " + String(ordervalue));
+  tft.println("Valor: ");
   functionExecuted = true;  // Marca a função como executada
 
 }
-
+/*
 // Função para verificar qual botão foi pressionado
 void checkButtons(int x, int y) {
        functionExecuted = false;  // Marca a função como executada
@@ -325,22 +324,51 @@ void checkButtons(int x, int y) {
     displayValue(); // Atualizando o display
   }
 }
+*/
+
+
+
+void checkButtons(int x, int y) {
+
+      Serial.println("XY");
+    Serial.println(x);
+    Serial.println(y);
+
+  if (x > 30 && x < 100 && y > 100 && y < 100 + buttonSize) {
+    ordervalue--; // Diminuindo o valor
+    displayValue(); // Atualizando o display
+  }
+  else if (x > 120 && x < 190 && y > 100 && y < 100 + buttonSize) {
+    ordervalue++; // Aumentando o valor
+    displayValue(); // Atualizando o display
+  }
+  else if (x > 200 && x < 270 && y > 100 && y < 100 + buttonSize) {
+      Serial.println("enviar pressionado");
+
+      pix();
+
+      boolpix = false;
+  }
+}
 
 // Função para desenhar um botão na tela
 void drawButton(int x, int y, String label, uint16_t color) {
   tft.fillRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, color); // Desenhando o botão
   tft.drawRect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, TFT_WHITE); // Desenhando a borda do botão
   tft.setTextColor(TFT_WHITE); // Configurando a cor do texto
-  tft.setTextSize(2); // Configurando o tamanho do texto
+  tft.setTextSize(4); // Configurando o tamanho do texto
   tft.setTextDatum(MC_DATUM); // Configurando o ponto de referência do texto
   tft.drawString(label, x + BUTTON_WIDTH / 2, y + BUTTON_HEIGHT / 2); // Exibindo o texto no centro do botão
 }
 
 // Função para exibir o valor na tela
 void displayValue() {
-  tft.fillRect(50, 50, 100, 30, TFT_BLACK); // Limpando a área onde o valor é exibido
-  tft.setTextColor(TFT_WHITE); // Configurando a cor do texto
-  tft.setTextSize(2); // Configurando o tamanho do texto
+  tft.fillRect(0, 70, 120, 50, TFT_GREEN); // Limpando a área onde o valor é exibido
+  tft.setTextColor(TFT_BLACK); // Configurando a cor do texto
+  tft.setTextSize(6); // Configurando o tamanho do texto
   tft.setTextDatum(MC_DATUM); // Configurando o ponto de referência do texto
-  tft.drawString(String(ordervalue), 100, 65); // Exibindo o valor no centro da tela
+  tft.setTextSize(6);
+  tft.setCursor(40, 100);
+  //tft.println("Valor: ");
+  tft.drawString(String(ordervalue), 60, 100); // Exibindo o valor no centro da tela
 }

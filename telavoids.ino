@@ -33,86 +33,10 @@ void tela(){
    unsigned long currentMillis = millis();
 
 
-
-
-
-   
-
-
-
 if (statetela == "menu" && !functionExecuted) {
     menu();
     functionExecuted = true;  // Marca a função como executada
  }
-
-  if (statetela == "texto" && !functionExecuted) {
-        Serial.println("modo texto");
-
-   tft.fillScreen(TFT_BLACK);
-
-  tft.setTextColor(TFT_WHITE, TFT_BLACK); // Set the font colour AND the background colour
-                                          // so the anti-aliasing works
-
-  tft.setCursor(0, 0); // Set cursor at top left of screen
-
-  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-  // Large font
-  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
- // tft.loadFont(AA_FONT_LARGE); // Load another different font
-
-  //tft.fillScreen(TFT_BLACK);
-  
-  // Draw changing numbers - does not work unless a filled rectangle is drawn over the old text
-  for (int i = 0; i <= 99; i++)
-  {
-    tft.setCursor(50, 50);
-    tft.setTextColor(TFT_GREEN, TFT_BLACK); // TFT_BLACK is used for anti-aliasing only
-                                            // By default background fill is off
-    tft.print("      "); // Overprinting old number with spaces DOES NOT WORK!
-    tft.setCursor(50, 50);
-    tft.print(i / 10.0, 1);
-
-    // Adding a parameter "true" to the setTextColor() function fills character background
-    // This extra parameter is only for smooth fonts!
-    tft.setTextColor(TFT_GREEN, TFT_BLACK, true);
-    tft.setCursor(50, 90);
-    tft.print(i / 10.0, 1);
-    
-    delay (200);
-  }
-
-  delay(5000);
-
-  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-  // Large font text wrapping
-  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-  tft.fillScreen(TFT_BLACK);
-  
-  tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
-
-  tft.setCursor(0, 0); // Set cursor at top left of screen
-
-  tft.println("Large font!");
-
-  tft.setTextWrap(true); // Wrap on width
-  tft.setTextColor(TFT_CYAN, TFT_BLACK);
-  tft.println("Long lines wrap to the next line");
-
-  tft.setTextWrap(false, false); // Wrap on width and height switched off
-  tft.setTextColor(TFT_MAGENTA, TFT_BLACK);
-  tft.println("Unless text wrap is switched off");
-
-  tft.unloadFont(); // Remove the font to recover memory used
-
-  delay(8000);
-
-     functionExecuted = true;  // Marca a função como executada
-
-  
-  }
-
 
   if (statetela == "mensagem" && !functionExecuted) {
         Serial.println("modo mensagem");
@@ -127,8 +51,6 @@ if (statetela == "menu" && !functionExecuted) {
     tft.print(mensagem); // Exibe o texto
 
      functionExecuted = true;  // Marca a função como executada
-
-
 
 }
 
@@ -145,85 +67,8 @@ if (statetela == "menu" && !functionExecuted) {
   }
 
  configureClock();
-
  updateClock();  
     
-  }
-
-
-  if (statetela == "rainbow") {
-
-
-        Serial.println("modo rainbow");
-
-
-
-
-  if (targetTime < millis()) {
-    targetTime = millis() + 10000;
-
-    //rainbow_fill(); // Fill the screen with rainbow colours
-
-    // The standard AdaFruit font still works as before
-    tft.setTextColor(TFT_BLACK); // Background is not defined so it is transparent
- 
-    tft.setCursor (60, 5);
-    tft.setTextFont(0);        // Select font 0 which is the Adafruit font
-    tft.print("Original Adafruit font!");
-
-    //tft.drawString("Original Adafruit font!",60,5,1); 
-
-    // The new larger fonts do not need to use the .setCursor call, coords are embedded
-    tft.setTextColor(TFT_BLACK); // Do not plot the background colour
-    // Overlay the black text on top of the rainbow plot (the advantage of not drawing the background colour!)
-    tft.drawCentreString("Font size 2", 120, 14, 2); // Draw text centre at position 120, 14 using font 2
-    tft.drawCentreString("Font size 4", 120, 30, 4); // Draw text centre at position 120, 30 using font 4
-    tft.drawCentreString("12.34", 120, 54, 6);       // Draw text centre at position 120, 54 using font 6
-
-    tft.drawCentreString("12.34 is in font size 6", 120, 92, 2); // Draw text centre at position 120, 92 using font 2
-    // Note the x position is the top of the font!
-
-    // draw a floating point number
-    float pi = 3.14159; // Value to print
-    int precision = 3;  // Number of digits after decimal point
-    int xpos = 90;      // x position
-    int ypos = 110;     // y position
-    int font = 2;       // font number 2
-    xpos += tft.drawFloat(pi, precision, xpos, ypos, font); // Draw rounded number and return new xpos delta for next print position
-    tft.drawString(" is pi", xpos, ypos, font);             // Continue printing from new x position
-
-    tft.setTextSize(1);           // We are using a size multiplier of 1
-
-    tft.setTextColor(TFT_BLACK);  // Set text colour to black, no background (so transparent)
-
-    tft.setCursor(36, 150, 4);    // Set cursor to x = 36, y = 150 and use font 4
-    tft.println("Transparent...");  // As we use println, the cursor moves to the next line
-
-    tft.setCursor(30, 175);    // Set cursor to x = 30, y = 175
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);  // Set text colour to white and background to black
-    tft.println("White on black");
-
-    tft.setTextFont(4);        // Select font 4 without moving cursor
-    tft.setCursor(50, 210);    // Set cursor to x = 50, y = 210 without changing the font
-    tft.setTextColor(TFT_WHITE);
-    // By using #TFT print we can use all the formatting features like printing HEX
-    tft.print(57005, HEX);    // Cursor does no move to next line
-    tft.println(48879, HEX);  // print and move cursor to next line
-
-    tft.setTextColor(TFT_GREEN, TFT_BLACK); // This time we will use green text on a black background
-    tft.setTextFont(2); // Select font 2
-    //Text will wrap to the next line if needed, by luck it breaks the lines at spaces!
-    tft.println(" Ode to a Small Lump of Green Putty I Found in My Armpit One Midsummer Morning ");
-  }
-}
-
-
-
-  if (statetela == "teste") {
-  Serial.println("modo teste");
-  tft.fillScreen(TFT_GREEN);
-  tft.println(mensagem.c_str());
-
   }
 
 
@@ -238,7 +83,6 @@ if (statetela == "menu" && !functionExecuted) {
  } 
  
  
- 
  if (statetela == "horiz" && !functionExecuted) {
 
   tft.fillRectHGradient(0, 0, 480, 320, TFT_MAGENTA, TFT_BLUE);
@@ -249,56 +93,11 @@ if (statetela == "menu" && !functionExecuted) {
  }
 
 
-
-
- if (statetela == "donate") {
- 
-  Serial.println("modo donate");
-       
-          touchEventHandlerpix();
-
-
-
-          // Se loopCounter for 30, execute a ação
-    if (loopCounter == 10) {
-      isAdding = true;
-      functionExecuted = false;  // Marca a função como executada
-      pix();
-
-      loopCounter = 0; // Reseta o contador de loop
-      ordervalue = 5;
-      touchCount = 0;  // Redefine o contador se exceder 4
-
-
-      
-    }
-    else {
-      // Aumenta o contador de loop
-      loopCounter++;
-     }
-    
-
-          
-
- if (statetela == "donate" && !functionExecuted) {
-
-          drawButtons();
-
-
-  }
-
-  
-
- }
-
-
   
  if (statetela == "scrolling") {
       Serial.println("modo scrolling");
       Serial.println(mensagemstatus);
-
       displayScrollingText(mensagem.c_str());
-
   //    functionExecuted = true;  // Marca a função como executada
 
   } 
@@ -428,9 +227,10 @@ if (statetela == "clima") {
   }}
 
   if (statetela == "clima" && !functionExecuted) {
-       tft.setRotation(3);
-
-    tft.fillScreen(TFT_BLACK);
+  tft.setRotation(3);
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(4);
+  tft.setCursor(0, 0); // Set cursor at top left of screen
    // tft.loadFont(AA_FONT_LARGE); // Load another different font
 
 
@@ -938,17 +738,6 @@ void drawBarGraph(float value, String label, int x, int y, uint16_t color) {
 
 
 
-void touchEventHandlerpix() {
-  uint16_t x, y;
-
-  if (tft.getTouch(&x, &y)) { // Changed to tft.getTouch for potential compatibility
-    // Adjust mapping arguments if needed based on TFT_eSPI documentation
-    x = map(x, 0, tft.width(), tft.width(), 0);
-    y = map(y, 0, tft.height(), tft.height(), 0);
-
-    checkButtons(x, y);
-  }
-}
 
 
 
@@ -1183,8 +972,36 @@ bool fetchAndPrintRSS(String rss_feed_url) {
       payload.replace('ê', 'e'); // Substitui cedilha por 'c'
       payload.replace('â', 'a'); // Substitui cedilha por 'c'
       payload.replace('à', 'a'); // Substitui cedilha por 'c'
-      payload.replace('ô', 'o'); // Substitui cedilha por 'c'
+      payload.replace('ô', 'o'); 
+      payload.replace('Ã', 'A'); 
+      
+      payload.replace("&amp;", "&");
+      payload.replace("&quot;", "\"");
+      payload.replace("&lt;", "<");
+      payload.replace("&gt;", ">");
+      payload.replace("&apos;", "'");    
+      // Remove <![CDATA[ e ]]>
+      payload.replace("<![CDATA[", "");
+      payload.replace("]]>", "");
 
+
+
+        // Remove tags <p> e <a> da descrição
+        payload.replace("<p>", "");
+        payload.replace("</p>", "");
+        payload.replace("<a>", "");
+        payload.replace("</a>", "");
+        payload.replace("</em>", "");
+        payload.replace("<em>", "");
+       
+           // Remove tags <strong> e </strong> sem remover o conteúdo
+        payload.replace("<strong>", "");
+        payload.replace("</strong>", "");
+        payload.replace("<span>", "");
+         // Remove a tag <p dir="ltr"><span>
+        payload.replace("<p dir=\"ltr\">", "");
+
+        
 
 
       int startPos = 0;
@@ -1218,15 +1035,7 @@ bool fetchAndPrintRSS(String rss_feed_url) {
         int titleStart = itemData.indexOf("<title>") + 7;
         int titleEnd = itemData.indexOf("</title>", titleStart);
         String title = itemData.substring(titleStart, titleEnd);
-        // Remove caracteres indesejados do título
-        title.replace("&amp;", "&");
-        title.replace("&quot;", "\"");
-        title.replace("&lt;", "<");
-        title.replace("&gt;", ">");
-        title.replace("&apos;", "'");    
-        // Remove <![CDATA[ e ]]>
-        title.replace("<![CDATA[", "");
-        title.replace("]]>", "");
+   
 
 
          // Limita o título a 15 palavras
@@ -1243,29 +1052,7 @@ bool fetchAndPrintRSS(String rss_feed_url) {
         int descStart = itemData.indexOf("<description>") + 13;
         int descEnd = itemData.indexOf("</description>", descStart);
         String description = itemData.substring(descStart, descEnd);
-        // Remove caracteres indesejados da descrição
-        description.replace("&amp;", "&");
-        description.replace("&quot;", "\"");
-        description.replace("&lt;", "<");
-        description.replace("&gt;", ">");
-        description.replace("&apos;", "'");
-
-        // Remove tags <p> e <a> da descrição
-        description.replace("<p>", "");
-        description.replace("</p>", "");
-        description.replace("<a>", "");
-        description.replace("</a>", "");
-         // Remove <![CDATA[ e ]]>
-        description.replace("<![CDATA[", "");
-        description.replace("]]>", "");
-
-           // Remove tags <strong> e </strong> sem remover o conteúdo
-        description.replace("<strong>", "");
-        description.replace("</strong>", "");
-         // Remove a tag <p dir="ltr"><span>
-        description.replace("<p dir=\"ltr\"><span>", "");
-
-        
+ 
 
         // Remove URLs da descrição
         int urlStart = description.indexOf("<a href=");
@@ -1281,7 +1068,7 @@ bool fetchAndPrintRSS(String rss_feed_url) {
         spaceCount = 0;
         for (int i = 0; i < description.length(); i++) {
           if (description[i] == ' ') spaceCount++;
-          if (spaceCount == 40) {
+          if (spaceCount == 85) {
             description = description.substring(0, i);
             break;
           }
@@ -1346,19 +1133,19 @@ bool fetchAndPrintRSS(String rss_feed_url) {
 
         // Imprime o título e a descrição na tela
         tft.fillScreen(TFT_BLACK); // Limpa a tela antes de exibir as notícias
-        tft.setTextColor(TFT_WHITE);
+        tft.setTextColor(TFT_YELLOW);
         tft.setTextSize(2);
         tft.setCursor(10, 20);
         tft.println(title);
    
 
-        tft.setTextColor(TFT_RED);
-        tft.setTextSize(3);
+        tft.setTextColor(TFT_WHITE);
+        tft.setTextSize(2);
         tft.setCursor(10, 70);
         tft.println(description);
 
 
-        delay(10000); // Atraso de 10 segundos entre cada item
+        delay(15000); // Atraso de 10 segundos entre cada item
 
         itemCount++;
 
