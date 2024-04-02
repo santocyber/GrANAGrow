@@ -24,8 +24,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($user) {
             // Verificar se a senha está correta
             if (password_verify($password, $user['senha'])) {
-                // Redirecionar para a página desejada após o login bem-sucedido
-                header("Location: /granagw/");
+                // Iniciar a sessão e armazenar o nome de usuário
+                session_start();
+                $_SESSION['username'] = $username;
+
+                // Verificar se é o usuário admin
+                if ($username == 'admin') {
+                    // Redirecionar para a página do painel de administração
+                    header("Location: dashboardadmin.php");
+                } else {
+                    // Redirecionar para a página do usuário normal
+                    header("Location: dashboard.php");
+                }
                 exit();
             } else {
                 // Se a senha estiver incorreta, redirecionar de volta para o index com mensagem de erro

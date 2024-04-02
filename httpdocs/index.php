@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GrANAGROW</title>
+    <title>GrANA</title>
     <style>
         /* Estilos para o cabeçalho e o rodapé */
         .header {
@@ -81,16 +81,34 @@
         .register-button:hover {
             background-color: #45a049;
         }
+ /* Estilos para o botão de cadastro */
+        .game-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .game-button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1 class="title">GrANAGROW</h1>
+        <h1 class="title">GrANA</h1>
         <a class="register-button" href="cadastro.php">Cadastro</a>
+        <a class="game-button" href="http://mirako.org">Sobre</a>
     </div>
 
     <div class="login-container">
-        <h2>Monitor IoT</h2>
+        <h2>Entre na GrANA</h2>
         <form action="login.php" method="POST">
             <input type="text" id="username" name="username" placeholder="Username" required><br><br>
             <input type="password" id="password" name="password" placeholder="Password" required><br><br>
@@ -98,7 +116,30 @@
         </form>
 
         <!-- Exibir mensagem de erro abaixo do formulário, se houver -->
-        <?php
+
+		
+		<?php
+// Iniciar a sessão para verificar se o usuário está logado
+session_start();
+
+// Verificar se o usuário já está logado
+if (isset($_SESSION['username'])) {
+    // Se o usuário já estiver logado, redirecioná-lo para a página dashboard.php
+    header("Location: dashboard.php");
+    exit(); // Certificar-se de que o script não continua a ser executado após o redirecionamento
+}
+
+	
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
         // Verificar se há uma mensagem de erro na URL e exibir apropriadamente
         $error = $_GET['error'] ?? '';
         if ($error === 'user') {
@@ -114,7 +155,7 @@
     </div>
 
     <div class="footer">
-        <p>&copy; 2024 MONITOR GRANAGROW. Todos os direitos reservados.</p>
+        <p>&copy;  GrANA - The Green ANArchy Project. Nenhum direitos reservados. CC0</p>
     </div>
 </body>
 </html>

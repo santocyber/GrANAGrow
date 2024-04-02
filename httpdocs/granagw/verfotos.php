@@ -108,7 +108,7 @@
         $mac = $_GET['mac'];
 
         // Consulta para selecionar as fotos para o MAC específico, com paginação
-        $sql = "SELECT foto, timestamp FROM fotos_serializadas WHERE mac = '$mac' ORDER BY timestamp DESC LIMIT $limit OFFSET $offset";
+        $sql = "SELECT foto, timestamp FROM fotos_serializadas WHERE mac = '$mac' ORDER BY timestamp ASC LIMIT $limit OFFSET $offset";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {

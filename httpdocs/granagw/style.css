@@ -353,3 +353,30 @@ canvas {
     top: 10px;
     right: 10px;
 }
+
+
+   .custom-button {
+        background-color: #4CAF50; /* Cor de fundo */
+        border: none; /* Sem borda */
+        color: white; /* Cor do texto */
+        padding: 10px 20px; /* Espaçamento interno */
+        text-align: center; /* Alinhamento de texto */
+        text-decoration: none; /* Sem sublinhado */
+        display: inline-block; /* Exibir como um bloco */
+        font-size: 16px; /* Tamanho da fonte */
+        margin: 4px 2px; /* Margem */
+        cursor: pointer; /* Cursor do mouse */
+        border-radius: 4px; /* Borda arredondada */
+    }
+    .custom-button:hover {
+        background-color: #45a049; /* Altera a cor de fundo ao passar o mouse */
+    }
+
+
+
+
+.button-container {
+    display: inline-block;
+}
+
+

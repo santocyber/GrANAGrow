@@ -19,16 +19,16 @@ function sanitizeInput($input) {
 }
 
 // Função para verificar se os dados existem na tabela telemetria
-function checkTelemetriaData($mac_value, $conn) {
-    $checkSql = "SELECT * FROM telemetria WHERE mac = '$mac_value'";
+function checkTelemetriaData($mac, $conn) {
+    $checkSql = "SELECT * FROM telemetria WHERE mac = '$mac'";
     $result = $conn->query($checkSql);
     return $result->num_rows > 0;
 }
 
 // Função para adicionar dados na tabela dados_serializados
-function addSerializedData($mac_value, $temperatura, $umidade, $pressao, $timestamp, $conn) {
-    $insertSql = "INSERT INTO dados_serializados (mac, temperatura, umidade, pressao, timestamp) 
-                  VALUES ('$mac_value', '$temperatura', '$umidade', '$pressao', '$timestamp')";
+function addSerializedData($mac, $temperatura, $umidade, $pressao, $ph, $timestamp, $conn) {
+    $insertSql = "INSERT INTO dados_serializados (mac, temperatura, umidade, pressao, ph, timestamp) 
+                  VALUES ('$mac', '$temperatura', '$umidade', '$pressao', '$ph', '$timestamp')";
     
     if ($conn->query($insertSql) === TRUE) {
         echo "Dados inseridos com sucesso na tabela dados_serializados";
@@ -43,21 +43,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $temperatura = sanitizeInput($_POST['temperatura']);
     $umidade = sanitizeInput($_POST['umidade']);
     $pressao = sanitizeInput($_POST['pressao']);
+    $ph = sanitizeInput($_POST['ph']); // Adicionando o campo "ph"
     $ip = sanitizeInput($_POST['iplocal']);
     $horalocal = sanitizeInput($_POST['horalocal']);
     $datalocal = sanitizeInput($_POST['datalocal']);
     $wifilocal = sanitizeInput($_POST['wifilocal']);
-    $mac_value = sanitizeInput($_POST['mac_value']);
+    $ping = sanitizeInput($_POST['ping']);
+    $mac = sanitizeInput($_POST['mac']);
     $nomedobot = sanitizeInput($_POST['nomedobot']);
     $geo = sanitizeInput($_POST['geo']);
+    $usuarios = sanitizeInput($_POST['usuarios']);
     $last_update = date('Y-m-d H:i:s');
     $timestamp = time();
 
     // Verificar se a linha já existe na tabela com base no endereço MAC
-    if (checkTelemetriaData($mac_value, $conn)) {
+    if (checkTelemetriaData($mac, $conn)) {
         // A linha já existe, então vamos atualizá-la
         $updateSql =  "UPDATE telemetria 
-                      SET ip = '$ip', umidade = '$umidade', pressao = '$pressao', temperatura = '$temperatura', wifilocal = '$wifilocal', nome = '$nomedobot', geolocalizacao = '$geo',datalocal = '$datalocal', horalocal = '$horalocal' WHERE mac = '$mac_value'";
+                      SET ip = '$ip', umidade = '$umidade', pressao = '$pressao', temperatura = '$temperatura', ph = '$ph', wifilocal = '$wifilocal', ping = '$ping', nome = '$nomedobot', geolocalizacao = '$geo', usuarios = '$usuarios',datalocal = '$datalocal', horalocal = '$horalocal' WHERE mac = '$mac'";
 
         if ($conn->query($updateSql) === TRUE) {
             echo "Dados atualizados com sucesso na tabela telemetria";
@@ -66,8 +69,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } else {
         // A linha não existe, então vamos inseri-la
-        $insertSql = "INSERT INTO telemetria (mac, ip , umidade, temperatura, pressao, wifilocal, horalocal, datalocal , nome, geolocalizacao)
-                      VALUES ('$mac_value', '$ip', '$umidade', '$temperatura', '$pressao', '$wifilocal', '$horalocal','$datalocal', '$nomedobot', '$geo')";
+        $insertSql = "INSERT INTO telemetria (mac, ip , umidade, temperatura, pressao, ph, wifilocal, ping, horalocal, datalocal , nome, geolocalizacao, usuarios)
+                      VALUES ('$mac', '$ip', '$umidade', '$temperatura', '$pressao', '$ph', '$wifilocal', '$ping', '$horalocal','$datalocal', '$nomedobot', '$geo', '$usuarios')";
 
         if ($conn->query($insertSql) === TRUE) {
             echo "Dados inseridos com sucesso na tabela telemetria";
@@ -77,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Adicionar os dados à tabela dados_serializados
-    addSerializedData($mac_value, $temperatura, $umidade, $pressao, $timestamp, $conn);
+    addSerializedData($mac, $temperatura, $umidade, $pressao, $ph, $timestamp, $conn);
 
 } else {
     echo "Apenas solicitações POST são aceitas";

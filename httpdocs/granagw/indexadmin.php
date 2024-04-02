@@ -122,7 +122,7 @@ try {
         $numLabels = $_GET['numLabels'];
     }
     
-    $query = "SELECT identificador, nome, ip, temperatura, umidade, pressao, ph, mac, datalocal, horalocal, wifilocal, last_update, acoes, geolocalizacao, usuarios, ping, estado, mensagem, mensagemstatus, timerfoto, timerfotostatus, hrliga, hrdesliga, timerautomatico FROM telemetria WHERE usuarios = :username";
+    $query = "SELECT identificador, nome, ip, temperatura, umidade, pressao, ph, mac, datalocal, horalocal, wifilocal, last_update, acoes, geolocalizacao, usuarios, ping, estado, mensagem, mensagemstatus, timerfoto, timerfotostatus, hrliga, hrdesliga, timerautomatico FROM telemetria";
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (isset($_GET['searchTerm'])) {
@@ -133,12 +133,18 @@ try {
         }
     }
 
-   if (strpos($query, 'WHERE') !== false) {
-        $query .= " ORDER BY last_update DESC"; // Ordenar por última atualização, os mais recentes primeiro
+    // Verificar se a cláusula WHERE está presente antes de adicionar a cláusula ORDER BY
+    if (strpos($query, 'WHERE') !== false) {
+        // Adicionando a cláusula ORDER BY para ordenar os resultados pelo campo identificador
+        $query .= " ORDER BY identificador ASC";
     }
 
     $stmt = $pdo->prepare($query);
-    $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+
+    if (isset($searchTerm)) {
+        $stmt->bindValue(':searchTerm', '%' . $searchTerm . '%', PDO::PARAM_STR);
+    }
+
     $stmt->execute();
 
     while ($linha = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -447,22 +453,9 @@ echo "</tr>";
                     <input type="hidden" name="listAll" value="1">
                     <button type="submit">Listar Tudo</button>
                 </form>
-				
             </div>
-			
-											   <button class="btn" id="backButton" onclick="goBack()">Voltar</button>
-
         </div>
     </div>
-	
-	
-	
-	<script>
-			      // Definir a função goBack fora do escopo DOMContentLoaded
-        function goBack() {
-            window.history.back();
-        }
-		</script>
 </body>
 </html>
 

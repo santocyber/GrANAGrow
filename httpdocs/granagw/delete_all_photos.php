@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         // Consulta para excluir todas as fotos associadas ao MAC
         $sql = "DELETE FROM fotos_serializadas WHERE mac = '$mac'";
         if ($conn->query($sql) === TRUE) {
-            echo "Todas as fotos associadas ao MAC $mac foram excluídas com sucesso.";
+            echo "Todas as fotos associadas ao MAC $mac foram excluídas com sucesso. <a href='verfotos.php?mac=$mac'>clique aqui para voltar</a>";
         } else {
             echo "Erro ao excluir fotos: " . $conn->error;
         }
@@ -32,6 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $conn->close();
     } else {
         echo "Parâmetro 'mac' não especificado.";
+		
     }
 } else {
     echo "Método de requisição inválido.";
