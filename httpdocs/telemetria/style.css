@@ -1,0 +1,373 @@
+/* Mantendo os estilos anteriores */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.search-container {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.search-container form {
+    display: inline-block;
+}
+
+.search-container input[type="text"] {
+    width: calc(100% - 100px);
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.dark-mode {
+    background-color: #222;
+    color: #fff;
+}
+
+.dark-mode .card, .dark-mode th, .dark-mode td {
+    background-color: #333;
+    color: #fff;
+    border-color: #555;
+}
+
+.dark-mode button {
+    background-color: #0056b3;
+}
+
+.dark-mode button:hover {
+    background-color: #007BFF;
+}
+
+.switch {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.switch input { 
+    display: none;
+}
+
+.slider {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+.action-input {
+    width: 100px;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    font-size: 16px;
+    margin-left: 10px;
+}
+
+.center-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.log-button {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.log-button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilos para Dark Mode */
+.dark-mode .log-button {
+    background-color: #0056b3;
+}
+
+.dark-mode .log-button:hover {
+    background-color: #007BFF;
+}
+
+#chart-container {
+    overflow-x: auto;
+}
+
+@media only screen and (max-width: 768px) {
+    /* Estilos específicos para telas de celular ou verticais */
+    .legend {
+        display: none;
+    }
+}
+
+/* Adicionando estilos bonitos aos cards das fotos */
+.card {
+    border-radius: 15px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.thumbnail {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+/* Otimizando para dispositivos móveis */
+@media only screen and (max-width: 768px) {
+    .card {
+        padding: 15px;
+    }
+}
+
+/* Estilos para dark mode */
+.dark-mode .card {
+    background-color: #333;
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(255,255,255,0.1);
+}
+
+.dark-mode .card:hover {
+    box-shadow: 0 4px 8px rgba(255,255,255,0.1);
+}
+
+/* Estilos para as miniaturas de fotos */
+.thumbnail {
+    width: 100px; /* Largura inicial da miniatura */
+    height: auto;
+    border-radius: 5px;
+    transition: transform 0.3s; /* Animação de transição */
+    cursor: pointer; /* Altera o cursor para indicar que a miniatura é clicável */
+    position: relative;
+}
+
+.thumbnail:hover {
+    transform: scale(1.5); /* Aumenta o tamanho da miniatura ao passar o mouse */
+    z-index: 999; /* Certifique-se de que a miniatura aumentada fique sobre outras miniaturas */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Adiciona uma sombra ao redor da miniatura aumentada */
+}
+
+/* Estilos para a imagem em tela cheia */
+.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: none; /* Inicialmente oculto */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Garante que a imagem em tela cheia fique acima de outros conteúdos */
+}
+
+.fullscreen img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+/* Estilos para a div que estampa a hora e o MAC */
+.image-info {
+    position: absolute;
+    top: 10px; /* Alterado para exibir no canto superior esquerdo */
+    left: 10px; /* Alterado para exibir no canto superior esquerdo */
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+/* Estilos para o botão de excluir */
+.delete-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #ff0000;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1001; /* Certifique-se de que o botão fique acima da imagem */
+}
+
+/* Estilos para os botões de navegação */
+.navigation-button {
+    position: fixed;
+    bottom: 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1001; /* Certifique-se de que os botões fiquem acima das imagens */
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+}
+
+.first-photos-button {
+    right: 20px;
+}
+
+.back-to-home-button {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.delete-all-button {
+    right: 50%;
+    transform: translateX(50%);
+    background-color: #ff0000;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    position: fixed;
+    bottom: 20px;
+    right: calc(50% + 120px); /* Distância do meio + largura do botão de gerar GIF + um espaço */
+    z-index: 1001; /* Certifique-se de que o botão fique acima das imagens */
+}
+
+.footer-buttons {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    text-align: center;
+}
+
+.footer-buttons button {
+    margin: 0 5px;
+}
+
+/* Posicionamento dos botões de fechar e pausar no canto superior direito da imagem em tela cheia */
+.fullscreen .close-button,
+.fullscreen .pause-slideshow-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+
+   .custom-button {
+        background-color: #4CAF50; /* Cor de fundo */
+        border: none; /* Sem borda */
+        color: white; /* Cor do texto */
+        padding: 10px 20px; /* Espaçamento interno */
+        text-align: center; /* Alinhamento de texto */
+        text-decoration: none; /* Sem sublinhado */
+        display: inline-block; /* Exibir como um bloco */
+        font-size: 16px; /* Tamanho da fonte */
+        margin: 4px 2px; /* Margem */
+        cursor: pointer; /* Cursor do mouse */
+        border-radius: 4px; /* Borda arredondada */
+    }
+    .custom-button:hover {
+        background-color: #45a049; /* Altera a cor de fundo ao passar o mouse */
+    }
