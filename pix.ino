@@ -76,6 +76,24 @@ void pix() {
       delay(500);
     Serial.printf("[HTTPS] Tentativa %d...\n", attempt);
 
+
+
+    
+  tft.fillScreen(TFT_RED);  // Limpa a tela com fundo verde
+  tft.setTextColor(TFT_YELLOW);  // Define a cor do texto como branco
+  tft.setTextSize(4);  // Define o tamanho do texto
+
+  tft.setCursor(0, 0);  // Posição do cursor na tela
+  tft.println("TENTANDO GERAR");
+  tft.println("QRCODE");
+  tft.println("AGUARDE");
+  tft.println("OBRIGADO"); 
+  tft.println("TENTATIVA");
+  tft.println(attempt);
+
+
+  
+
     // Fazer a solicitação POST
     httpCode = http.POST(body); // Atribua o valor a httpCode e envie o corpo da solicitação
 
