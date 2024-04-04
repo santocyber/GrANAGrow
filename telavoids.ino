@@ -54,28 +54,40 @@ if (statetela == "menu" && !functionExecuted) {
 
 }
 
+   if (statetela == "donate" && !functionExecuted) {
+        drawButtons();
+        functionExecuted = true;  // Marca a função como nao executada
 
-
+        }
+        
 
   if (statetela == "clock") {
 
-  
+       updateClock();  
+
   if (currentMillis - lastExecutionTime >= intervalclock) {
     lastExecutionTime = currentMillis;
     functionExecuted = false; // Reseta a variável para próxima execução
-
   }
 
- configureClock();
- updateClock();  
+  
+if (statetela == "clock" && !functionExecuted) {
+    configureClock();
+  functionExecuted = true;  // Marca a função como executada
+
+}
+
+}
+
     
-  }
+  
 
 
  if (statetela == "vert" && !functionExecuted) {
   
   tft.fillRectVGradient(0, 0, 480, 320, TFT_ORANGE, TFT_RED);
   tft.setCursor(0,0);
+  tft.setTextSize(4);
   tft.setTextWrap(true, true); // Wrap on width and height switched off
   tft.print(mensagem.c_str());
   functionExecuted = true;  // Marca a função como executada
@@ -87,6 +99,7 @@ if (statetela == "menu" && !functionExecuted) {
 
   tft.fillRectHGradient(0, 0, 480, 320, TFT_MAGENTA, TFT_BLUE);
   tft.setCursor(10,10);
+  tft.setTextSize(4);
   tft.print(mensagem.c_str());
   functionExecuted = true;  // Marca a função como executada
 
@@ -168,15 +181,70 @@ if (statetela == "menu" && !functionExecuted) {
   
 
     if (statetela == "olhos") {
-    olhos();
+
+    unsigned long currentMillis = millis();
+    
+    
+    if (currentMillis - lastExecutionTime >= intervalclock) {
+    lastExecutionTime = currentMillis;
+    functionExecuted = false; // Reseta a variável para próxima execução
   }
-  
+
+  if (statetela == "olhos" && !functionExecuted) {
+
+  // Initialise the eye(s), this will set all chip selects low for the tft.init()
+  initEyes();
+
+  #ifdef USE_DMA
+  tft.initDMA();
+#endif
+
+
+  tft.unloadFont(); // Remove the font to recover memory used
+  tft.setRotation(3); // Ajusta a rotação do display, se necessário
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(2);
+  tft.setCursor(30, 280);  // Posição do cursor na tela
+  tft.setTextColor(TFT_RED, TFT_BLACK); // Change the font colour and the background colour
+  tft.println("EU SOU O ROBO GrANA TOQUE NA TELA");
+  tft.setCursor(150, 300);  // Posição do cursor na tela
+  tft.setTextSize(1);
+  tft.setTextColor(TFT_GREEN, TFT_BLACK); // Change the font colour and the background colour
+  tft.println("The Green ANArchy Project");
+    
+    startTime = millis(); // For frame-rate calculation
+
+    functionExecuted = true;  // Marca a função como executada
+
+  }
+
+
+  updateEye();
+
+
+    }
+
+    
 
   if (statetela == "telegram" && !functionExecuted) {
 
     telegram();
     functionExecuted = true;  // Marca a função como executada
 
+  }
+
+
+if (statetela == "lermsgtg") {
+  if (currentMillis - lastExecutionTime >= 30000) {
+    lastExecutionTime = currentMillis;
+    functionExecuted = false; // Reseta a variável para próxima execução
+  }
+    if (statetela == "lermsgtg" && !functionExecuted) {
+
+    lermsgtg();
+    functionExecuted = true;  // Marca a função como executada
+
+  }
   }
 
   
@@ -187,34 +255,14 @@ if (statetela == "menu" && !functionExecuted) {
 
 
 if (statetela == "ph") {
-  if (currentMillis - lastExecutionTime >= intervalclima) {
+  if (currentMillis - lastExecutionTime >= 500) {
     lastExecutionTime = currentMillis;
     functionExecuted = false; // Reseta a variável para próxima execução
   }}
 
   if (statetela == "ph" && !functionExecuted) {
-       tft.setRotation(3);
-
-    tft.fillScreen(TFT_BLACK);
-   // tft.loadFont(AA_FONT_LARGE); // Load another different font
-
-
-    if (aht.begin()) {
-      Serial.println("AHT inicializado com sucesso!");
-
-phtela();
-
-
-
-    
-
-    }else {
-        
-      tft.print("Falha ao inicializar o sensor AHT!");
-      tft.print("sensor AHT!");
-      Serial.println("Falha ao inicializar o sensor AHT!");
-    }
-
+ 
+    phtela();
     functionExecuted = true;  // Marca a função como executada
   }
 
@@ -224,51 +272,18 @@ if (statetela == "clima") {
   if (currentMillis - lastExecutionTime >= intervalclima) {
     lastExecutionTime = currentMillis;
     functionExecuted = false; // Reseta a variável para próxima execução
-  }}
-
-  if (statetela == "clima" && !functionExecuted) {
-  tft.setRotation(3);
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextSize(4);
-  tft.setCursor(0, 0); // Set cursor at top left of screen
-   // tft.loadFont(AA_FONT_LARGE); // Load another different font
-
-
-    if (aht.begin()) {
-      Serial.println("AHT inicializado com sucesso!");
-    sensors_event_t temp;
-    aht_temp->getEvent(&temp);  
-    float t = temp.temperature;
-
-    sensors_event_t humidity;
-    aht_humidity->getEvent(&humidity);
-    float h = humidity.relative_humidity;
-
-    sensors_event_t pressure_event;
-    bmp_pressure->getEvent(&pressure_event);
-    float p = pressure_event.pressure;
-
-
-
-    // Draw temperature bar graph
-    drawBarGraph(t, "Temperatura", 0, 50, TFT_RED);
-
-    // Draw humidity pie chart
-    drawBarGraph(h, "Umidade", 0, 150, TFT_BLUE);
-
-    // Draw pressure pie chart
-    drawBarGraph(p*100, "Pressao", 0, 250, TFT_YELLOW);
-
-
-    }else {
-        
-      tft.print("Falha ao inicializar o sensor AHT!");
-      tft.print("sensor AHT!");
-      Serial.println("Falha ao inicializar o sensor AHT!");
-    }
-
-    functionExecuted = true;  // Marca a função como executada
   }
+  
+  
+   if (statetela == "clima" && !functionExecuted) {
+  clima();
+  functionExecuted = true;  // Marca a função como executada
+  }
+  
+  
+  }
+
+ 
 
   #endif
 
@@ -355,19 +370,16 @@ void hora(){
   
 void horax(){
   //  tft.loadFont(AA_FONT_LARGE); // Load another different font
-  tft.unloadFont(); // Remove the font to recover memory used
 
    tft.setCursor(0, 0); // Set cursor at top left of screen
 //  tft.fillRectHGradient(0, 0, 480, 320, TFT_MAGENTA, TFT_BLUE);
-  tft.fillRectVGradient(0, 0, 480, 320, TFT_ORANGE, TFT_RED);
+//  tft.fillRectVGradient(0, 0, 480, 320, TFT_CYAN, TFT_YELLOW);
+  tft.fillRectVGradient(0, 0, 480, 320, TFT_ORANGE, TFT_GREEN);
+  //tft.setTextColor(TFT_RED);  // Define a cor do texto como branco
+  tft.setTextColor(TFT_CYAN, TFT_BLACK);
 
+  tft.setTextSize(8);
 
- // tft.setTextColor(TFT_CYAN, TFT_BLACK);
-
-  tft.setTextSize(40);
-
-   //tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_WHITE);  // Define a cor do texto como branco
 
     
    unsigned long currentTime = millis(); // Get current time
@@ -402,7 +414,6 @@ void displayTime() {
 void configureClock() {
 
 
-if (statetela == "clock" && !functionExecuted) {
 
   
   hh = conv2d(__TIME__);
@@ -458,9 +469,11 @@ if (statetela == "clock" && !functionExecuted) {
 
   targetTime = millis() + 1000;
 }
-  functionExecuted = true;  // Marca a função como executada
+  
 
-}
+
+
+
 
 void updateClock() {
 
@@ -577,18 +590,72 @@ void telegram(){
 }
 
 
+//clima tela
 
+void clima(){
+
+tft.setRotation(3);
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(4);
+  tft.setCursor(0, 0); // Set cursor at top left of screen
+   // tft.loadFont(AA_FONT_LARGE); // Load another different font
+
+
+    if (aht.begin()) {
+      Serial.println("AHT inicializado com sucesso!");
+    sensors_event_t temp;
+    aht_temp->getEvent(&temp);  
+    float t = temp.temperature;
+
+    sensors_event_t humidity;
+    aht_humidity->getEvent(&humidity);
+    float h = humidity.relative_humidity;
+
+    sensors_event_t pressure_event;
+    bmp_pressure->getEvent(&pressure_event);
+    float p = pressure_event.pressure;
+
+
+
+    // Draw temperature bar graph
+    drawBarGraph(t, "Temperatura", 0, 50, TFT_RED);
+
+    // Draw humidity pie chart
+    drawBarGraph(h, "Umidade", 0, 150, TFT_BLUE);
+
+    // Draw pressure pie chart
+    drawBarGraph(p*100, "Pressao", 0, 250, TFT_YELLOW);
+    
+
+
+    }else {
+      Serial.println("Falha ao inicializar o sensor AHT!");
+      tft.fillScreen(TFT_RED);
+      tft.setTextColor(TFT_CYAN, TFT_RED);
+
+      tft.setTextSize(4);
+      tft.setCursor(0, 0); // Set cursor at top left of screen
+      tft.println("FALHA NO SENSOR");
+
+    }
+}
 
 //phtela
 void phtela(){
-    tft.setCursor(0, 0); // Set cursor at top left of screen
 
+    tft.setRotation(3);
+    tft.setTextWrap(true, true); // Wrap on width and height
     tft.fillScreen(TFT_BLACK);
-   // tft.loadFont(AA_FONT_LARGE); // Load another different font
+    tft.setTextSize(4);
+    tft.setCursor(0, 0); // Set cursor at top left of screen
     tft.setTextColor(TFT_CYAN, TFT_BLACK);
-    tft.println("Clima Monitor");
-    drawBarGraph(ph(), "pH", 0, 250, TFT_GREEN);
+    tft.println("pH Monitor");
+    tft.print(sensorValue);
 
+    drawBarGraph(ph(), "pH", 0, 250, TFT_GREEN);
+    Serial.println(ph());
+
+/*
 
   sensors_event_t temp;
   aht_temp->getEvent(&temp);
@@ -607,6 +674,7 @@ void phtela(){
   
   exibirInformacoesNaTela(vpd, fase);
 
+*/
 
 }
 
@@ -695,7 +763,7 @@ void exibirInformacoesNaTela(float vpd, String fase) {
 void drawBarGraph(float value, String label, int x, int y, uint16_t color) {
   int barWidth;
   String status;
-  
+   
   if (label == "Pressao") {
     if (value > 93000) {
       barWidth = 0; // Barra vazia
@@ -704,7 +772,11 @@ void drawBarGraph(float value, String label, int x, int y, uint16_t color) {
       barWidth = tft.width() - 50; // Barra cheia
       status = "Chuva";
     }
-  } else {
+  } else if (label == "pH") {
+    barWidth = map(value, 0, 12, 0, tft.width() - 50);
+
+    
+   }else {
     barWidth = map(value, 0, 100, 0, tft.width() - 50);
     status = ""; // Não é necessário exibir status para outras medidas
   }
@@ -841,7 +913,7 @@ void qrcodemonitor() {
 void print_qrcodemonitor(const uint8_t qrcode[]) {
   tft.setRotation(3);
   tft.fillScreen(TFT_BLACK);
-  tft.setTextSize(1);
+  tft.setTextSize(3);
   tft.setCursor(0, 0); // Set cursor at top left of screen
   tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
   tft.println("Escaneie o QrCode ");
@@ -956,8 +1028,6 @@ bool fetchAndPrintRSS(String rss_feed_url) {
 
       statetela = "esperando";
 
-
-
       // Função para substituir caracteres fora do padrão por espaços em branco
       payload.replace('\r', ' '); // Substitui carriage return por espaço em branco
       payload.replace('\n', ' '); // Substitui nova linha por espaço em branco
@@ -984,180 +1054,128 @@ bool fetchAndPrintRSS(String rss_feed_url) {
       payload.replace("<![CDATA[", "");
       payload.replace("]]>", "");
 
-
-
-        // Remove tags <p> e <a> da descrição
-        payload.replace("<p>", "");
-        payload.replace("</p>", "");
-        payload.replace("<a>", "");
-        payload.replace("</a>", "");
-        payload.replace("</em>", "");
-        payload.replace("<em>", "");
+      // Remove tags <p> e <a> da descrição
+      payload.replace("<p>", "");
+      payload.replace("</p>", "");
+      payload.replace("<a>", "");
+      payload.replace("</a>", "");
+      payload.replace("</em>", "");
+      payload.replace("<em>", "");
        
-           // Remove tags <strong> e </strong> sem remover o conteúdo
-        payload.replace("<strong>", "");
-        payload.replace("</strong>", "");
-        payload.replace("<span>", "");
-         // Remove a tag <p dir="ltr"><span>
-        payload.replace("<p dir=\"ltr\">", "");
-
-        
-
+      // Remove tags <strong> e </strong> sem remover o conteúdo
+      payload.replace("<strong>", "");
+      payload.replace("</strong>", "");
+      payload.replace("<span>", "");
+      payload.replace("</span>", "");
+      // Remove a tag <p dir="ltr"><span>
+      payload.replace("<p dir=\"ltr\">", "");
 
       int startPos = 0;
       int endPos = 0;
       int itemCount = 0;
-          String cleanedRSS = "";
+      String cleanedRSS = "";
 
-
+      unsigned long previousMillis = 0;
+      const long interval = 15000; // intervalo de 15 segundos
+      
       while (true) {
-        startPos = payload.indexOf("<item>", endPos); // Encontra o início de um item
-        endPos = payload.indexOf("</item>", startPos); // Encontra o fim do item
-    
-        if (itemCount >= 6) { // Se não houver mais itens ou 2 itens foram exibidos
-          startPos = 0; // Reinicia a exibição do primeiro item
-          endPos = 0;
-          itemCount = 0; // Reinicia o contador de itens exibidos
+
+             if (tft.getTouchRawZ() > 500) {
+            Serial.println("Tela tocada. Saindo do loop.stopFetching");
+       
+            touchCount++; 
+            break;
+          }
+
+          
+        unsigned long currentMillis = millis();
+        
+        if (currentMillis - previousMillis >= interval) {
+          previousMillis = currentMillis;
+
           startPos = payload.indexOf("<item>", endPos); // Encontra o início de um item
           endPos = payload.indexOf("</item>", startPos); // Encontra o fim do item
-          
 
-        }
-
-        // Encontra o fim do item
-        int endPos = payload.indexOf("</item>", startPos);
-        if (endPos == -1) break;
-
-        // Extrai os dados do item
-        String itemData = payload.substring(startPos, endPos);
-
-        // Extrai o título do item
-        int titleStart = itemData.indexOf("<title>") + 7;
-        int titleEnd = itemData.indexOf("</title>", titleStart);
-        String title = itemData.substring(titleStart, titleEnd);
-   
-
-
-         // Limita o título a 15 palavras
-        int spaceCount = 0;
-        for (int i = 0; i < title.length(); i++) {
-          if (title[i] == ' ') spaceCount++;
-          if (spaceCount == 15) {
-            title = title.substring(0, i);
-            break;
+          if (itemCount >= 6) { // Se não houver mais itens ou 2 itens foram exibidos
+            startPos = 0; // Reinicia a exibição do primeiro item
+            endPos = 0;
+            itemCount = 0; // Reinicia o contador de itens exibidos
+            startPos = payload.indexOf("<item>", endPos); // Encontra o início de um item
+            endPos = payload.indexOf("</item>", startPos); // Encontra o fim do item
           }
-        }
 
-        // Extrai a descrição do item
-        int descStart = itemData.indexOf("<description>") + 13;
-        int descEnd = itemData.indexOf("</description>", descStart);
-        String description = itemData.substring(descStart, descEnd);
- 
+          // Encontra o fim do item
+          int endPos = payload.indexOf("</item>", startPos);
+          if (endPos == -1) break;
 
-        // Remove URLs da descrição
-        int urlStart = description.indexOf("<a href=");
-        while (urlStart != -1) {
-            int urlEnd = description.indexOf(">", urlStart);
-            description.remove(urlStart, urlEnd - urlStart + 1);
-            urlStart = description.indexOf("<a href=");
-        }
+          // Extrai os dados do item
+          String itemData = payload.substring(startPos, endPos);
 
+          // Extrai o título do item
+          int titleStart = itemData.indexOf("<title>") + 7;
+          int titleEnd = itemData.indexOf("</title>", titleStart);
+          String title = itemData.substring(titleStart, titleEnd);
 
-
-        // Limita a descrição a 20 palavras
-        spaceCount = 0;
-        for (int i = 0; i < description.length(); i++) {
-          if (description[i] == ' ') spaceCount++;
-          if (spaceCount == 85) {
-            description = description.substring(0, i);
-            break;
+          // Limita o título a 15 palavras
+          int spaceCount = 0;
+          for (int i = 0; i < title.length(); i++) {
+            if (title[i] == ' ') spaceCount++;
+            if (spaceCount == 15) {
+              title = title.substring(0, i);
+              break;
+            }
           }
-        }
-        
 
-        // Adiciona o título e a descrição limpos à string final
-        cleanedRSS += "Título: " + title + "\n";
-        cleanedRSS += "Descrição: " + description + "\n\n";
+          // Extrai a descrição do item
+          int descStart = itemData.indexOf("<description>") + 13;
+          int descEnd = itemData.indexOf("</description>", descStart);
+          String description = itemData.substring(descStart, descEnd);
 
-        // Procura o próximo item
-        startPos = payload.indexOf("<item>", endPos);
-    
+          // Remove URLs da descrição
+          int urlStart = description.indexOf("<a href=");
+          while (urlStart != -1) {
+              int urlEnd = description.indexOf(">", urlStart);
+              description.remove(urlStart, urlEnd - urlStart + 1);
+              urlStart = description.indexOf("<a href=");
+          }
+
+          // Limita a descrição a 20 palavras
+          spaceCount = 0;
+          for (int i = 0; i < description.length(); i++) {
+            if (description[i] == ' ') spaceCount++;
+            if (spaceCount == 85) {
+              description = description.substring(0, i);
+              break;
+            }
+          }
+
+          // Adiciona o título e a descrição limpos à string final
+          cleanedRSS += "Título: " + title + "\n";
+          cleanedRSS += "Descrição: " + description + "\n\n";
+
+          // Procura o próximo item
+          startPos = payload.indexOf("<item>", endPos);
 
           Serial.println(cleanedRSS);
 
+          // Imprime o título e a descrição na tela
+          tft.fillScreen(TFT_BLACK); // Limpa a tela antes de exibir as notícias
+          tft.setTextColor(TFT_YELLOW);
+          tft.setTextSize(2);
+          tft.setCursor(10, 20);
+          tft.println(title);
+   
+          tft.setTextColor(TFT_WHITE);
+          tft.setTextSize(2);
+          tft.setCursor(10, 70);
+          tft.println(description);
 
-
-
-        /*
+          itemCount++;
 
      
-   
-        String itemData = payload.substring(startPos, endPos); // Extrai os dados do item
-
-        // Extrai o título do item
-        int titleStart = itemData.indexOf("<title>") + 16;
-        int titleEnd = itemData.indexOf("]]></title>", titleStart);
-        String title = itemData.substring(titleStart, titleEnd);
-        // Limita o título a 15 palavras
-        int spaceCount = 0;
-        for (int i = 0; i < title.length(); i++) {
-          if (title[i] == ' ') spaceCount++;
-          if (spaceCount == 15) {
-            title = title.substring(0, i);
-            break;
-          }
         }
-
-        // Extrai a descrição do item
-        int descStart = itemData.indexOf("<description>") + 22;
-        int descEnd = itemData.indexOf("]]></description>", descStart);
-        String description = itemData.substring(descStart, descEnd);
-        // Limita a descrição a 20 palavras
-        spaceCount = 0;
-        for (int i = 0; i < description.length(); i++) {
-          if (description[i] == ' ') spaceCount++;
-          if (spaceCount == 60) {
-            description = description.substring(0, i);
-            break;
-          }
-        }
-
-
-
-
-*/
-
-
-
-
-
-        // Imprime o título e a descrição na tela
-        tft.fillScreen(TFT_BLACK); // Limpa a tela antes de exibir as notícias
-        tft.setTextColor(TFT_YELLOW);
-        tft.setTextSize(2);
-        tft.setCursor(10, 20);
-        tft.println(title);
-   
-
-        tft.setTextColor(TFT_WHITE);
-        tft.setTextSize(2);
-        tft.setCursor(10, 70);
-        tft.println(description);
-
-
-        delay(15000); // Atraso de 10 segundos entre cada item
-
-        itemCount++;
-
-           if (tft.getTouchRawZ() > 300) {
-          Serial.println("Tela tocada. Saindo do loop.stopFetching");
-          statetela = "menu";
-          break;
-        }
-      
       }
       http.end();
-
       return true; // Indica que obteve com sucesso os feeds RSS
     } else {
       Serial.println("Falha ao obter o feed RSS.");
@@ -1167,11 +1185,10 @@ bool fetchAndPrintRSS(String rss_feed_url) {
     Serial.println("Falha ao conectar-se ao servidor RSS.");
     createButtons();
   }
-
   http.end();
   return false; // Indica que falhou ao obter os feeds RSS
-
 }
+
 
 
 

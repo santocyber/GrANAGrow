@@ -14,8 +14,8 @@ const String rss_feed_urls[2] = {
 
 
 void toque() {
-        Serial.println("STATETELA");   
-        Serial.println(statetela);   
+   //     Serial.println("STATETELA");   
+    //    Serial.println(statetela);   
 
  // Verifica se a string é igual a "donate"
   if (statetela == "news") {
@@ -34,14 +34,22 @@ void toque() {
   }  if (statetela == "donate") {
         Serial.println("FUNCAO DONATE");   
         
-        functionExecuted = false;  // Marca a função como nao executada
-        if (statetela == "donate" && !functionExecuted) {
-        drawButtons();
-        }
-        
+        touchEventHandlerpix();
+
         contador++;
         Serial.println(contador);
-        touchEventHandlerpix();
+
+ 
+      if (contador >= 20) {
+          boolpix = false;
+          contadorpix = 0;
+          functionExecuted = false;  // Marca a função como executada
+          statetela = "olhos";
+          olhos();
+          touchCount++; 
+          olhos();
+
+          }  
   
   } if (statetela == "telegram") {
         Serial.println("FUNCAO TELEGRAM");
@@ -52,9 +60,9 @@ void toque() {
         Serial.println(contador);
 
      if (contador >= 20) {
-        statetela = "menu";
+        statetela = "lermsgtg";
         touchCount++; 
-        menu();
+        lermsgtg();
         contador = 0;
           }  
  
@@ -71,14 +79,16 @@ void toque() {
         Serial.println(y);
         Serial.print("z: ");
         Serial.println(z);
+        Serial.println(tft.getTouch(&x, &y));
 
         //vTaskDelay(400); // Aguarde 100ms antes de verificar novamente o toque
-        delay(500);
+        delay(1000);
 
                 // Incrementa o contador de toques apenas quando o dedo é levantado da tela
             touchCount++; 
              
             functionExecuted = false;  // Marca a função como executada
+            boolpix = true;
 
             Serial.println("Número de toques: " + String(touchCount));
             
@@ -86,7 +96,7 @@ void toque() {
     } 
 
            
-            if (touchCount > 16) {
+            if (touchCount >= 18) {
                 touchCount = 0;  // Redefine o contador se exceder 4
                 Serial.println("O contador de toques foi redefinido.");
             }
@@ -110,7 +120,7 @@ void toque() {
             statetela = "clima";
             break;
         case 4:
-            statetela = "mensagem";
+            statetela = "ph";
             break;
         case 5:
             statetela = "news";
@@ -119,7 +129,7 @@ void toque() {
             statetela = "telegram";
             break;
         case 7:
-            statetela = "menu";
+            statetela = "lermsgtg";
             break; 
         case 8:
             statetela = "scrolling";
@@ -131,7 +141,7 @@ void toque() {
             statetela = "horax";
             break; 
         case 11:
-            statetela = "ph";
+            statetela = "mensagem";
             break; 
         case 12:
             statetela = "site";
@@ -140,15 +150,18 @@ void toque() {
             statetela = "vert";
             break;  
          case 14:
+            statetela = "menu";
+            break;  
+         case 15:
             statetela = "doa";
             break;  
-        case 15:
+        case 16:
             statetela = "donate";
             break;
-        case 16:
+        case 17:
             statetela = "olhos";
             break;
-            delay(1000);
+            delay(2000);
 
     }
   }
@@ -245,11 +258,20 @@ while (boolpix) {
     if (currentMillis - previousMillis >= 1000) {
       previousMillis = currentMillis;
       contadorpix++; 
+      Serial.println("contador pix ");
+      Serial.println(contadorpix);
+
     }
  if (contadorpix == 20) {
           boolpix = false;
           contadorpix = 0;
+          functionExecuted = false;  // Marca a função como executada
+          statetela = "olhos";
+          olhos();
           touchCount++; 
+          olhos();
+
+
 
  }
 
@@ -260,6 +282,7 @@ while (boolpix) {
     contador = 0;
     x = map(x, 0, tft.width(), tft.width(), 0);
     y = map(y, 0, tft.height(), tft.height(), 0);
+    delay(100);
 
     checkButtons(x, y);
   }
@@ -383,10 +406,9 @@ colIndex = constrain(colIndex, 0, 10);
                      tft.println(msgtg);
                      sendPostRequest();
 
-                     delay(4000);
-                     statetela = "olhos";
-
-                   return;
+                     delay(2000);
+                     lermsgtg();
+                     return;
 
                 }
                 

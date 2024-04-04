@@ -106,7 +106,7 @@ void pix() {
     qrcodefun();
     statetela = "";
 
-    delay(25000);
+    delay(10000);
     orders();
 
 
@@ -184,7 +184,7 @@ void orders() {
   //ensureWiFiConnection();
   HTTPClient http;
   int httpResponseCode;
-  int maxTries = 15;
+  int maxTries = 10;
   
   for (verificacoes = 0; verificacoes < maxTries; verificacoes++) {
        Serial.printf("[HTTPS] Tentativa %d...\n", verificacoes);
@@ -256,7 +256,9 @@ void orders() {
   tft.println("TENTATIVA");
   tft.println(verificacoes);
 
-  delay(10000);
+  delay(2000);
+  qrcodefun();
+
 
           }
          
@@ -305,26 +307,8 @@ void drawButtons() {
   tft.setTextSize(6);
   tft.setCursor(10, 10);
   tft.println("Valor: ");
-  functionExecuted = true;  // Marca a função como executada
 
 }
-/*
-// Função para verificar qual botão foi pressionado
-void checkButtons(int x, int y) {
-       functionExecuted = false;  // Marca a função como executada
-
-        loopCounter = 0; // Reseta o contador de loop
-
-  if (x < BUTTON_WIDTH && y > 100 && y < 100 + BUTTON_HEIGHT) {
-    ordervalue--; // Diminuindo o valor
-    displayValue(); // Atualizando o display
-  }
-  else if (x > 100 && y > 100 && y < 100 + BUTTON_HEIGHT) {
-    ordervalue++; // Aumentando o valor
-    displayValue(); // Atualizando o display
-  }
-}
-*/
 
 
 
@@ -342,7 +326,7 @@ void checkButtons(int x, int y) {
     ordervalue++; // Aumentando o valor
     displayValue(); // Atualizando o display
   }
-  else if (x > 200 && x < 270 && y > 100 && y < 100 + buttonSize) {
+  else if (x > 200 && x < 280 && y > 100 && y < 100 + buttonSize) {
       Serial.println("enviar pressionado");
 
       pix();

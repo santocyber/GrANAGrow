@@ -7,18 +7,28 @@
 ////#############################################################################Le sensores
 
 float sensorValue_7 = 2048; // Valor do sensor para pH 7.0
-float sensorValue_low = 1024; // Valor do sensor para pH baixo (por exemplo, 4.0)
-float sensorValue_high = 3072; // Valor do sensor para pH alto (por exemplo, 10.0)
-
+float sensorValue_low = 0; // Valor do sensor para pH baixo (por exemplo, 4.0)
+float sensorValue_high = 4095; // Valor do sensor para pH alto (por exemplo, 10.0)
+float phshow;
 
 float ph() {
 
-  int sensorValue = analogRead(phpin);
+   sensorValue = analogRead(phpin);
+
   
   // Mapeamento linear para a faixa de pH
-  float pHValue = map(sensorValue, sensorValue_low, sensorValue_high, 4.0, 10.0); // Mapeia o valor do sensor para a faixa de pH (4.0 a 10.0)
+  float pHValue = sensorValue*(3.3/4095.0);
+    phshow=(3.3*pHValue);
+
+
   
-  return pHValue;
+      Serial.println(sensorValue);
+    Serial.println(phshow);
+
+
+
+
+  return phshow;
 
 }
 

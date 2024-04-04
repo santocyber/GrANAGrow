@@ -1,4 +1,6 @@
 const char* serverUrl = "http://santocyber.helioho.st/granagw/telegrambot.php";
+const char* serverUrl2 = "http://santocyber.helioho.st/granagw/lermsgtg.php";
+const char* apiUrl = "http://santocyber.helioho.st/granagw//upload.php";
 
 
 void sendPostRequest() {
@@ -20,7 +22,33 @@ void sendPostRequest() {
   http.end();
 }
 
+void lermsgtg() {
 
+  // Fazer solicitação ao servidor PHP para obter mensagens
+  HTTPClient http;
+  http.begin(serverUrl2);
+  int httpResponseCode = http.GET();
+  
+  if (httpResponseCode == 200) {
+    String response = http.getString();
+    displayMessage(response);
+  } else {
+    Serial.println("Error on HTTP request");
+      tft.println("Error on HTTP request");
+
+  }
+  http.end();
+
+  delay(500); // Ajuste este valor conforme necessário para a taxa de atualização
+}
+
+void displayMessage(String message) {
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(2);
+  tft.setTextColor(TFT_WHITE);
+  tft.setCursor(0, 0);
+  tft.println(message);
+}
 
 
 
@@ -49,7 +77,6 @@ void telegrammsg() {
 #if (CAMERA == 1)
 
 
-const char* apiUrl = "http://suaapi.com/upload.php";
 
 
 // Função para enviar a foto para a API

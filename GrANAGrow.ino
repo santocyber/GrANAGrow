@@ -252,10 +252,11 @@ int contaobjfunc = 0;
 bool functionExecuted = false;
 bool Executed = true;
 bool buttonsCreated = false; // Variável para controlar se os botões foram criados
-bool stopFetching = false;
+bool stopFetching = true;
 bool boolpix = true;
+bool boololhos = true;
 
-
+int sensorValue = 0;
 int contacendled = 0;
 int conta = 1;
 unsigned long intervalo = 0;
@@ -412,6 +413,8 @@ void setup() {
 
   
   // Configurar o pino do 
+  pinMode(phpin, INPUT); // Define o pino do bot como entrada
+
   pinMode(buttonPin, INPUT_PULLUP);
   pinMode(Button1, INPUT); // Define o pino do bot         o como entrada
   pinMode(Button2, INPUT); // Define o pino do bot         o como entrada
@@ -604,7 +607,7 @@ void loop() {
     
 
    Serial.println("VERIFICA TELA SQL!");
-   touchCount = 0;
+  /// touchCount = 0;
    buttonsCreated = false;
 
    verificasqltela();
@@ -612,12 +615,7 @@ void loop() {
   }
 
 
-     if (currentMillis - previousMillis2 >= 300) {
-    // Atualiza o tempo de referencia
-    previousMillis2 = currentMillis;
-    toque();
 
-}  
 
 if (currentMillis - previousMillis3 >= 1000) {
     // Atualiza o tempo de referencia
@@ -627,10 +625,14 @@ if (currentMillis - previousMillis3 >= 1000) {
 
 }
 
+     if (currentMillis - previousMillis2 >= 300) {
+    // Atualiza o tempo de referencia
+    previousMillis2 = currentMillis;
+    toque();
+
+}  
+
 #endif
-
-
-
 
 
 
