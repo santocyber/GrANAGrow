@@ -1,7 +1,7 @@
 const char* serverUrl = "http://santocyber.helioho.st/granagw/telegrambot.php";
 const char* serverUrl2 = "http://santocyber.helioho.st/granagw/lermsgtg.php";
-const char* apiUrl = "http://santocyber.helioho.st/granagw//upload.php";
-
+const char* apiUrl = "http://santocyber.helioho.st/granagw/upload.php";
+const char* serverName = "http://santocyber.helioho.st/granagw/respondetg.php";
 
 void sendPostRequest() {
   HTTPClient http;
@@ -34,6 +34,10 @@ void lermsgtg() {
     displayMessage(response);
   } else {
     Serial.println("Error on HTTP request");
+      tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(4);
+  tft.setCursor(0, 0);
+  tft.setTextColor(TFT_WHITE);
       tft.println("Error on HTTP request");
 
   }
@@ -72,6 +76,15 @@ void telegrammsg() {
 }
 
 
+
+void checkMessages() {
+ 
+}
+
+
+void sendResponse(String response, int messageId) {
+
+}
 
 
 #if (CAMERA == 1)

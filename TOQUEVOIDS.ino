@@ -120,7 +120,7 @@ void toque() {
             statetela = "clima";
             break;
         case 4:
-            statetela = "ph";
+            statetela = "bolsa";
             break;
         case 5:
             statetela = "news";
@@ -153,12 +153,15 @@ void toque() {
             statetela = "menu";
             break;  
          case 15:
+            statetela = "bolsa";
+            break;  
+         case 16:
             statetela = "doa";
             break;  
-        case 16:
+        case 17:
             statetela = "donate";
             break;
-        case 17:
+        case 18:
             statetela = "olhos";
             break;
             delay(2000);
@@ -190,7 +193,9 @@ void verificasqltela(){
          Serial.println(mensagemstatus);
          Serial.println(mensagem);
          functionExecuted = false; // Reseta a variável para próxima execução
+         touchCount = 0;  // Redefine o contador se exceder 4
          statetela = "scrolling";
+
     } 
       
       if (mensagemstatus == "2") {
@@ -243,7 +248,14 @@ void verificasqltela(){
           statetela = "news";
           buttonIndex = 1;
     }
+ if (mensagemstatus == "90") {
+          Serial.println("UPDATE OTA PELA WEB");
+          statetela = "OTA";
+          mensagemstatus = "0";
+          updateFirmware();
 
+          delay(600000);
+    }
     
   
  
@@ -269,6 +281,7 @@ while (boolpix) {
           statetela = "olhos";
           olhos();
           touchCount++; 
+          touchCount = 0;  // Redefine o contador se exceder 4
           olhos();
 
 

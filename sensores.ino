@@ -1,14 +1,5 @@
 
 
-
-
-
-
-////#############################################################################Le sensores
-
-float sensorValue_7 = 2048; // Valor do sensor para pH 7.0
-float sensorValue_low = 0; // Valor do sensor para pH baixo (por exemplo, 4.0)
-float sensorValue_high = 4095; // Valor do sensor para pH alto (por exemplo, 10.0)
 float phshow;
 
 float ph() {

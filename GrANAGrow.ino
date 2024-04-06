@@ -4,7 +4,7 @@
 //###
 //###
 
-
+#define GRANAVERSION 0.11
 //###CONFIG INCIAIS ATIVACAO DE MODULOS
 
 #define SENSORES 1
@@ -271,6 +271,7 @@ static int touchCount = 0;
 unsigned long previousMillis = 0;
 unsigned long previousMillis2 = 0;
 unsigned long previousMillis3 = 0;
+unsigned long previousMillis4 = 0;
 
 const long intervalo5 = 5000; // Intervalo de 30 segundos
 
@@ -416,17 +417,7 @@ void setup() {
   pinMode(phpin, INPUT); // Define o pino do bot como entrada
 
   pinMode(buttonPin, INPUT_PULLUP);
-  pinMode(Button1, INPUT); // Define o pino do bot         o como entrada
-  pinMode(Button2, INPUT); // Define o pino do bot         o como entrada
-  pinMode(obj1, INPUT); // Define o pino do bot         o como entrada
-  pinMode(ledPin, OUTPUT);   // Define o pino do LED como sa         da
-  pinMode(relayPin, OUTPUT);
-  pinMode(relayPin2, OUTPUT);
-  pinMode(relayPin3, OUTPUT);
-  digitalWrite(obj1, LOW); // Inicialmente, o rel          est          desligado
-  digitalWrite(relayPin, LOW); // Inicialmente, o rel          est          desligado
-  digitalWrite(relayPin2, LOW); // Inicialmente, o rel          est          desligado
-  digitalWrite(relayPin3, LOW); // Inicialmente, o rel          est          desligado
+
 
 if (!SPIFFS.begin(true)) {
     Serial.println("An error has occurred while mounting SPIFFS");
@@ -599,21 +590,6 @@ void loop() {
 
  #if (TELA == 1)
 
-   
- // Verifica se passou o intervalo definido
-  if (currentMillis - previousMillis >= interval60) {
-    // Atualiza o tempo de referencia
-    previousMillis = currentMillis;
-    
-
-   Serial.println("VERIFICA TELA SQL!");
-  /// touchCount = 0;
-   buttonsCreated = false;
-
-   verificasqltela();
-
-  }
-
 
 
 
@@ -632,7 +608,11 @@ if (currentMillis - previousMillis3 >= 1000) {
 
 }  
 
-#endif
+  #endif
+
+
+
+
 
 
 

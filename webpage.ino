@@ -24,6 +24,7 @@ void startWebServer() {
 
     // Inicializa o servidor web
     server.on("/", handleMain);
+    server.on("/salvar", handleSalvar);
     server.on("/deletewifi", deletewififile);
     server.begin();
     Serial.println("Servidor web iniciado");
@@ -39,12 +40,18 @@ void startWebServer() {
 
 
 //#########################################Cria paginas WEB
+void handleSalvar() {
+    String nomedobot = server.arg("nomedobot");
+  String usuario = server.arg("usuario");
 
+    saveWifiCredentials(ssid.c_str(), password.c_str(), nomedobot.c_str(), geo.c_str(), usuario.c_str());
+
+        server.send(200, "text/plain", "SALVO!  ");
+
+  }
 void handleMain() {
 
 
-  String nomedobot = server.arg("nomedobot");
-  String usuario = server.arg("usuario");
 
   
   String html = "<html><head>";
@@ -68,6 +75,11 @@ void handleMain() {
   html += "<p class='data'>" + String(estado) + "</p>";
   html += "<h2>USUARIO:</h2>";
   html += "<p class='data'>" + String(usuario) + "</p>";
+  html += "<form method='post' action='/salvar'>";
+  html += "<label for='usuario'>Usuario:</label><input type='text' name='usuario'><br>"; // Novo input
+  html += "<label for='nomedobot'>Nome do BOT:</label><input type='text' name='nomedobot'><br>";
+  html += "<input type='submit' value='SALVAR'>";
+  html += "</form>";
   //html += "<form action='/deletewifi' method='post'><button type='submit'>Delet Config WiFi </button></form>";
   html += "</body></html>";
 

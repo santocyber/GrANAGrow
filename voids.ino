@@ -55,13 +55,17 @@ void TELE(void*p){
     configASSERT( ( uint32_t ) p == 1UL );
     
   // Block for 500ms.
-const TickType_t xDelay = 30000 / portTICK_PERIOD_MS;
+const TickType_t xDelay = 60000 / portTICK_PERIOD_MS;
 
   for( ;; )
   {
-  readTel();
 
+  readTel();
+  verificasqltela();
       vTaskDelay( xDelay );
+
+
+      
   }
 
   }
@@ -103,8 +107,9 @@ const TickType_t xDelay = 30000 / portTICK_PERIOD_MS;
 
     telemetria();
     pingando();
-    delay(1000);
+    delay(500);
     verifyActionAndExecute();
+
 
   }
 
@@ -119,7 +124,7 @@ const TickType_t xDelay = 30000 / portTICK_PERIOD_MS;
  
 
 
-
+esp_task_wdt_reset();
 esp_get_free_heap_size();
  
 //  vTaskDelete(NULL);

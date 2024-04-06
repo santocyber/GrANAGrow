@@ -7,8 +7,10 @@
 #define SCROLL_DELAY 10 // Altere para ajustar o intervalo de rolagem
 
 
-
-
+// Variáveis para o texto e sua posição
+int textX = 0;
+int textY;
+int scrollSpeed = 60;
 
 //clock
 
@@ -106,14 +108,34 @@ if (statetela == "clock" && !functionExecuted) {
  }
 
 
-  
  if (statetela == "scrolling") {
-      Serial.println("modo scrolling");
-      Serial.println(mensagemstatus);
-      displayScrollingText(mensagem.c_str());
-  //    functionExecuted = true;  // Marca a função como executada
+        Serial.println("modo scrolling");
 
-  } 
+
+ if (statetela == "scrolling" && !functionExecuted) {
+
+  // Carrega a fonte personalizada
+
+  // Configurações do texto
+  tft.setTextColor(TFT_YELLOW); // Define a cor do texto
+  tft.setRotation(3); // Define a orientação do display (1 ou 3 para rotacionar 90 graus)
+  tft.setTextWrap(false, false); // Wrap on width and height switched off
+
+  tft.setTextSize(10);
+  // Limpa a tela
+  tft.fillScreen(TFT_BLACK);
+
+  // Define a posição vertical do texto
+  textY = (tft.height() - tft.fontHeight()) / 2;
+    functionExecuted = true;  // Marca a função como executada
+
+ }
+
+
+    updateTextPosition();
+
+ }
+  
   
   
   
@@ -247,6 +269,28 @@ if (statetela == "lermsgtg") {
   }
   }
 
+
+    if (statetela == "bolsa" ) {
+
+    bolsa();
+  //  functionExecuted = true;  // Marca a função como executada
+
+  }
+
+   if (statetela == "OTA" ) {
+
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(4);
+  tft.setCursor(0, 0); // Set cursor at top left of screen
+
+  tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
+  tft.println("FIRMWARE");
+  tft.setTextColor(TFT_RED, TFT_BLACK); // Change the font colour and the background colour
+  tft.println("VERSAO");
+  tft.println(GRANAVERSION);
+  //  functionExecuted = true;  // Marca a função como executada
+
+  }
   
 
 
@@ -302,47 +346,9 @@ if (statetela == "clima") {
 
 
 
-
-
-unsigned long lastScrollTime = 0;
-
-
-
-
-
-void displayScrollingText(const char* text) {
-
-      tft.setTextSize(8); // Set text size
-
-  static unsigned long lastScrollTime = 0;
-  static int16_t x = TFT_WIDTH;
-  int16_t textWidth = tft.textWidth(text);
-  int16_t y = (TFT_HEIGHT - tft.fontHeight()) / 2;
-
-  // Atualiza a tela somente após o intervalo de rolagem
-  if (millis() - lastScrollTime >= SCROLL_DELAY) {
-    lastScrollTime = millis();
-    tft.fillScreen(TFT_BLACK);
-    tft.setTextWrap(false, false); // Wrap on width and height switched off
-
-    tft.setCursor(x, y);
-    tft.print(text);
-
-    x -= SCROLL_SPEED; // Desloca o texto horizontalmente
-
-    // Se o texto passar completamente pela tela, reinicie da direita
-    if (x + textWidth < 0) {
-      x = TFT_WIDTH;
-    }
-  }
-}
-
-
-
-
 void hora(){
-  //  tft.loadFont(AA_FONT_LARGE); // Load another different font
-  tft.unloadFont(); // Remove the font to recover memory used
+//   tft.loadFont(Font72x53rle); // Load another different font
+  //tft.unloadFont(); // Remove the font to recover memory used
 
    tft.setCursor(0, 0); // Set cursor at top left of screen
   tft.fillRectHGradient(0, 0, 480, 320, TFT_MAGENTA, TFT_BLUE);
@@ -596,9 +602,8 @@ void clima(){
 
 tft.setRotation(3);
   tft.fillScreen(TFT_BLACK);
-  tft.setTextSize(4);
+  tft.setTextSize(3);
   tft.setCursor(0, 0); // Set cursor at top left of screen
-   // tft.loadFont(AA_FONT_LARGE); // Load another different font
 
 
     if (aht.begin()) {
@@ -765,11 +770,11 @@ void drawBarGraph(float value, String label, int x, int y, uint16_t color) {
   String status;
    
   if (label == "Pressao") {
-    if (value > 93000) {
-      barWidth = 0; // Barra vazia
+    if (value < 93000) {
+    barWidth = map(value, 90000, 100000, 0, tft.width() - 50);
       status = "Sol";
     } else {
-      barWidth = tft.width() - 50; // Barra cheia
+    barWidth = map(value, 90000, 100000, 0, tft.width() - 50);
       status = "Chuva";
     }
   } else if (label == "pH") {
@@ -1193,6 +1198,23 @@ bool fetchAndPrintRSS(String rss_feed_url) {
 
 
 
+void updateTextPosition() {
+
+  
+      tft.drawString(mensagem, textX, textY);
+      textX -= scrollSpeed;
+      mensagem.trim();
+      tft.fillRect(0, textY - 40, tft.width(), tft.fontHeight() + 40, TFT_RED);
+      tft.drawString(mensagem, textX, textY);
+
+
+      // Verifica se o texto saiu completamente da tela
+      if (textX + tft.textWidth(mensagem.c_str()) < 0) {
+        // Se sim, reinicia a posição do texto para fora da tela
+        textX = tft.width();
+      }
+    }
+  
 
 
 
