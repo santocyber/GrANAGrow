@@ -22,6 +22,12 @@ void sendPostRequest() {
   http.end();
 }
 
+
+
+
+
+#if (TELA == 1)
+
 void lermsgtg() {
 
   // Fazer solicitação ao servidor PHP para obter mensagens
@@ -46,14 +52,6 @@ void lermsgtg() {
   delay(500); // Ajuste este valor conforme necessário para a taxa de atualização
 }
 
-void displayMessage(String message) {
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextSize(2);
-  tft.setTextColor(TFT_WHITE);
-  tft.setCursor(0, 0);
-  tft.println(message);
-}
-
 
 
 
@@ -75,6 +73,8 @@ void telegrammsg() {
 
 }
 
+
+#endif
 
 
 void checkMessages() {

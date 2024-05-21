@@ -4,7 +4,11 @@
 //###
 //###
 
-#define GRANAVERSION 0.11
+
+//########################VERSAO do FIRMWARE
+const char GRANAVERSION = 0.13;
+
+
 //###CONFIG INCIAIS ATIVACAO DE MODULOS
 
 #define SENSORES 1
@@ -177,6 +181,8 @@ String url =        "http://santocyber.helioho.st/granagw/gravatele.php";
 String urlsalvafoto = "http://santocyber.helioho.st/granagw/salvafoto.php";
 String urlverifica = "http://santocyber.helioho.st/granagw/verificaacao.php";
 String qrdoa =        "00020101021226900014BR.GOV.BCB.PIX2568pix-qr.mercadopago.com/instore/p/v2/dbb558faf3c14a7a98e7e8fb805f6c1643530016com.mercadolibre0129https://mpago.la/pos/162635835204000053039865802BR5922Cooperativa mirako org6009SAO PAULO62070503***6304C530";
+String urlchat =        "http://santocyber.helioho.st/granagw/lermsgchat.php";
+String urlbolsa =        "http://santocyber.helioho.st/money/indexesp.php";
 
 
 bool wifiConnected = false;
@@ -204,6 +210,8 @@ char info[30];
 
 char buffer[300];
 
+int rotate = 3;
+
 
 String horaAtual;
 String dataAtual;
@@ -215,6 +223,7 @@ String payloadxx;
 String pagamento;
 String estado;
 String mensagem;
+String telastatus;
 String mensagemstatus;
 String hrliga;
 String hrdesliga;
@@ -457,7 +466,9 @@ if (ssid.length() > 0 && password.length() > 0) {
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("Falha ao reconectar ao Wi-Fi.");
         startAPMode();
+#if (TELA == 1)
         scanWiFiNetworks();
+#endif
 
     } else {
         Serial.println("Conexão bem-sucedida, iniciar o servidor web e o update ativo");
@@ -469,7 +480,9 @@ if (ssid.length() > 0 && password.length() > 0) {
 } else {
     // Se as credenciais estiverem vazias, iniciar o modo AP
     startAPMode();
+#if (TELA == 1)
     scanWiFiNetworks();
+#endif
 
 }
 
@@ -481,7 +494,7 @@ if (ssid.length() > 0 && password.length() > 0) {
 
    Serial.println("iniciando tela");
     tft.init();
-    tft.setRotation(3);
+    tft.setRotation(rotate);
 
 
      // Se não conectar, iniciar o modo AP
@@ -506,7 +519,7 @@ if (ssid.length() > 0 && password.length() > 0) {
 #endif
 
 
-  loadfile(estado, mensagem, mensagemstatus);
+  loadfile(estado, telastatus, mensagemstatus, mensagem);
   loadTime(hrliga, hrdesliga, timerautomatico, timerfoto, timerfotostatus);
 
   
@@ -514,6 +527,7 @@ if (ssid.length() > 0 && password.length() > 0) {
     Serial.println(estado);
     Serial.println(mensagem);
     Serial.println(mensagemstatus);
+    Serial.println(telastatus);
 
     Serial.println(hrliga);
     Serial.println(hrdesliga);
@@ -613,14 +627,20 @@ if (currentMillis - previousMillis3 >= 1000) {
 
 
 
+/*
 
+    tft.fillScreen(TFT_BLACK);
+    tft.setCursor(0, 0); // Set cursor at top left of screen
 
+    tft.println("pH Monitor");
+    tft.println(sensorValue);
+    tft.println(ph());
+    tft.println(analogRead(phpin));
 
-
-   //  Serial.println(ph());
-   //   Serial.println(analogRead(phpin));
-    //  delay(1000);
-
+     Serial.println(ph());
+      Serial.println(analogRead(phpin));
+      delay(800);
+*/
      
 }
 

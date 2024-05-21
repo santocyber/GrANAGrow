@@ -129,7 +129,7 @@ void olhos(){
 
 
   tft.unloadFont(); // Remove the font to recover memory used
-  tft.setRotation(3); // Ajusta a rotação do display, se necessário
+  tft.setRotation(rotate); // Ajusta a rotação do display, se necessário
   tft.fillScreen(TFT_BLACK);
   tft.setTextSize(2);
   tft.setCursor(30, 280);  // Posição do cursor na tela
@@ -349,7 +349,7 @@ void frame(uint16_t iScale) // Iris scale (0-1023)
                 touchCount = 0; 
                 initEyes();
                 tft.unloadFont(); // Remove the font to recover memory used
-                tft.setRotation(3); // Ajusta a rotação do display, se necessário
+                tft.setRotation(rotate); // Ajusta a rotação do display, se necessário
                 tft.fillScreen(TFT_BLACK);
                 tft.setTextSize(8);
                 tft.setCursor(150, 150);  // Posição do cursor na tela

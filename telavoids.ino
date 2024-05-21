@@ -41,17 +41,8 @@ if (statetela == "menu" && !functionExecuted) {
  }
 
   if (statetela == "mensagem" && !functionExecuted) {
-        Serial.println("modo mensagem");
-  tft.setCursor(0, 0); // Set cursor at top left of screen
-    tft.setTextWrap(true, true); // Wrap on width and height switched off
-
-  // Defina a cor do texto
-  tft.setTextColor(TFT_WHITE);
-  // Defina o tamanho do texto
-  tft.setTextSize(6);
-    tft.fillScreen(TFT_BLACK); // Limpa a tela
-    tft.print(mensagem); // Exibe o texto
-
+     Serial.println("modo mensagem");
+     displayMessage(mensagem);
      functionExecuted = true;  // Marca a função como executada
 
 }
@@ -118,7 +109,7 @@ if (statetela == "clock" && !functionExecuted) {
 
   // Configurações do texto
   tft.setTextColor(TFT_YELLOW); // Define a cor do texto
-  tft.setRotation(3); // Define a orientação do display (1 ou 3 para rotacionar 90 graus)
+  tft.setRotation(rotate); // Define a orientação do display (1 ou 3 para rotacionar 90 graus)
   tft.setTextWrap(false, false); // Wrap on width and height switched off
 
   tft.setTextSize(10);
@@ -223,7 +214,7 @@ if (statetela == "clock" && !functionExecuted) {
 
 
   tft.unloadFont(); // Remove the font to recover memory used
-  tft.setRotation(3); // Ajusta a rotação do display, se necessário
+  tft.setRotation(rotate); // Ajusta a rotação do display, se necessário
   tft.fillScreen(TFT_BLACK);
   tft.setTextSize(2);
   tft.setCursor(30, 280);  // Posição do cursor na tela
@@ -269,15 +260,53 @@ if (statetela == "lermsgtg") {
   }
   }
 
+  
+if (statetela == "chat") {
+  if (currentMillis - lastExecutionTime >= 10000) {
+    lastExecutionTime = currentMillis;
+    functionExecuted = false; // Reseta a variável para próxima execução
+  }
+    if (statetela == "chat" && !functionExecuted) {
 
-    if (statetela == "bolsa" ) {
-
-    bolsa();
-  //  functionExecuted = true;  // Marca a função como executada
+    lermsgchat();
+    functionExecuted = true;  // Marca a função como executada
 
   }
+  }
 
-   if (statetela == "OTA" ) {
+
+ 
+if (statetela == "bolsa") {
+  if (currentMillis - lastExecutionTime >= 60000) {
+    lastExecutionTime = currentMillis;
+    functionExecuted = false; // Reseta a variável para próxima execução
+  }
+    if (statetela == "bolsa" && !functionExecuted) {
+
+    lerbolsa();
+    functionExecuted = true;  // Marca a função como executada
+
+  }
+  }
+  
+    if (statetela == "crypto") {
+
+  if (currentMillis - lastExecutionTime >= 120000) {
+    lastExecutionTime = currentMillis;
+    functionExecuted = false; // Reseta a variável para próxima execução
+  }
+    if (statetela == "crypto"  && !functionExecuted) {
+
+    bolsa();
+    lastExecutionTime = currentMillis;
+    functionExecuted = true;  // Marca a função como executada
+
+  }}
+
+
+  
+
+   if (statetela == "OTA"  && !functionExecuted) {
 
   tft.fillScreen(TFT_BLACK);
   tft.setTextSize(4);
@@ -288,7 +317,7 @@ if (statetela == "lermsgtg") {
   tft.setTextColor(TFT_RED, TFT_BLACK); // Change the font colour and the background colour
   tft.println("VERSAO");
   tft.println(GRANAVERSION);
-  //  functionExecuted = true;  // Marca a função como executada
+  functionExecuted = true;  // Marca a função como executada
 
   }
   
@@ -427,7 +456,7 @@ void configureClock() {
   ss = conv2d(__TIME__ + 6);
 
  // tft.init();
-  tft.setRotation(3);
+  tft.setRotation(rotate);
   tft.setTextSize(4); // Set text size
   tft.fillScreen(TFT_BLACK);
 // Define o centro da tela
@@ -541,7 +570,7 @@ static uint8_t conv2d(const char *p) {
 
 void menu(){
 
- tft.setRotation(3);
+ tft.setRotation(rotate);
 
  // tft.loadFont(AA_FONT_LARGE); // Load another different font
   tft.setTextWrap(true, true); // Wrap on width and height
@@ -569,7 +598,7 @@ void menu(){
 
 void telegram(){
 
- tft.setRotation(3);
+ tft.setRotation(rotate);
 
  // tft.loadFont(AA_FONT_LARGE); // Load another different font
   tft.setTextWrap(true, true); // Wrap on width and height
@@ -600,7 +629,7 @@ void telegram(){
 
 void clima(){
 
-tft.setRotation(3);
+tft.setRotation(rotate);
   tft.fillScreen(TFT_BLACK);
   tft.setTextSize(3);
   tft.setCursor(0, 0); // Set cursor at top left of screen
@@ -648,7 +677,7 @@ tft.setRotation(3);
 //phtela
 void phtela(){
 
-    tft.setRotation(3);
+    tft.setRotation(rotate);
     tft.setTextWrap(true, true); // Wrap on width and height
     tft.fillScreen(TFT_BLACK);
     tft.setTextSize(4);
@@ -778,7 +807,7 @@ void drawBarGraph(float value, String label, int x, int y, uint16_t color) {
       status = "Chuva";
     }
   } else if (label == "pH") {
-    barWidth = map(value, 0, 12, 0, tft.width() - 50);
+    barWidth = map(value, 1, 14, 0, tft.width() - 50);
 
     
    }else {
@@ -845,7 +874,7 @@ void qrcodedoa() {
 
 
   tft.unloadFont(); // Remove the font to recover memory used
-  tft.setRotation(3); // Ajusta a rotação do display, se necessário
+  tft.setRotation(rotate); // Ajusta a rotação do display, se necessário
   tft.fillScreen(TFT_BLACK);
   tft.setTextSize(1);
   tft.setCursor(350, 0); // Set cursor at top left of screen
@@ -916,7 +945,7 @@ void qrcodemonitor() {
 
 
 void print_qrcodemonitor(const uint8_t qrcode[]) {
-  tft.setRotation(3);
+  tft.setRotation(rotate);
   tft.fillScreen(TFT_BLACK);
   tft.setTextSize(3);
   tft.setCursor(0, 0); // Set cursor at top left of screen
@@ -1031,7 +1060,6 @@ bool fetchAndPrintRSS(String rss_feed_url) {
     if (httpCode == HTTP_CODE_OK) {
       String payload = http.getString();
 
-      statetela = "esperando";
 
       // Função para substituir caracteres fora do padrão por espaços em branco
       payload.replace('\r', ' '); // Substitui carriage return por espaço em branco
@@ -1091,6 +1119,12 @@ bool fetchAndPrintRSS(String rss_feed_url) {
             touchCount++; 
             break;
           }
+
+    if(statetela != "news") {
+                        break;
+
+            }
+
 
           
         unsigned long currentMillis = millis();
@@ -1204,7 +1238,7 @@ void updateTextPosition() {
       tft.drawString(mensagem, textX, textY);
       textX -= scrollSpeed;
       mensagem.trim();
-      tft.fillRect(0, textY - 40, tft.width(), tft.fontHeight() + 40, TFT_RED);
+      tft.fillRect(0, textY - 9, tft.width(), tft.fontHeight() + 10, TFT_RED);
       tft.drawString(mensagem, textX, textY);
 
 
@@ -1219,8 +1253,65 @@ void updateTextPosition() {
 
 
 
+void lermsgchat() {
+
+  // Fazer solicitação ao servidor PHP para obter mensagens
+  HTTPClient http;
+  http.begin(urlchat);
+  int httpResponseCode = http.GET();
+  
+  if (httpResponseCode == 200) {
+    String response = http.getString();
+    displayMessage(response);
+  } else {
+    Serial.println("Error on HTTP request");
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(4);
+  tft.setCursor(0, 0);
+  tft.setTextColor(TFT_WHITE);
+  tft.println("Error on HTTP request");
+
+  }
+  http.end();
+
+  delay(500); // Ajuste este valor conforme necessário para a taxa de atualização
+}
 
 
+
+void lerbolsa() {
+
+  // Fazer solicitação ao servidor PHP para obter mensagens
+  HTTPClient http;
+  http.begin(urlbolsa);
+  int httpResponseCode = http.GET();
+  
+  if (httpResponseCode == 200) {
+    String response = http.getString();
+    displayMessage(response);
+  } else {
+    Serial.println("Error on HTTP request");
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(4);
+  tft.setCursor(0, 0);
+  tft.setTextColor(TFT_WHITE);
+  tft.println("Error on HTTP request");
+
+  }
+  http.end();
+
+  delay(500); // Ajuste este valor conforme necessário para a taxa de atualização
+}
+
+
+void displayMessage(String message) {
+  tft.setTextWrap(true, false); // Wrap on width and height switched off
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(2);
+  tft.setTextColor(TFT_WHITE);
+  tft.setCursor(0, 0);
+  tft.println(message);
+}
 
 
 

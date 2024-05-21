@@ -1,3 +1,4 @@
+#if (TELA == 1)
 
 
 const int MAX_NETWORKS = 3; // Definir o máximo de redes para exibir na tela
@@ -36,7 +37,7 @@ void scanWiFiNetworks() {
    int n = scan();
        delay(500); // Atualizar a lista a cada 5 segundos
    tft.init();
-   tft.setRotation(3);
+   tft.setRotation(rotate);
    tft.setCursor(0, 0); // Set cursor at top left of screen
    tft.fillScreen(TFT_BLACK);
    tft.setTextColor(TFT_WHITE, TFT_BLACK);
@@ -410,3 +411,5 @@ void drawKeyboard() {
     tft.print(":");
     tft.print(inputText);
 }
+
+#endif

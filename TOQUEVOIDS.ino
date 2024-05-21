@@ -1,3 +1,7 @@
+ #if (TELA == 1)
+
+ 
+ 
  uint16_t x, y;
  uint8_t z;
 
@@ -31,7 +35,9 @@ void toque() {
 
   }  
     
-  }  if (statetela == "donate") {
+  }
+  
+  if (statetela == "donate") {
         Serial.println("FUNCAO DONATE");   
         
         touchEventHandlerpix();
@@ -96,7 +102,7 @@ void toque() {
     } 
 
            
-            if (touchCount >= 18) {
+            if (touchCount >= 19) {
                 touchCount = 0;  // Redefine o contador se exceder 4
                 Serial.println("O contador de toques foi redefinido.");
             }
@@ -120,7 +126,7 @@ void toque() {
             statetela = "clima";
             break;
         case 4:
-            statetela = "bolsa";
+            statetela = "ph";
             break;
         case 5:
             statetela = "news";
@@ -156,12 +162,15 @@ void toque() {
             statetela = "bolsa";
             break;  
          case 16:
+            statetela = "crypto";
+            break;  
+         case 17:
             statetela = "doa";
             break;  
-        case 17:
+        case 18:
             statetela = "donate";
             break;
-        case 18:
+        case 19:
             statetela = "olhos";
             break;
             delay(2000);
@@ -177,11 +186,53 @@ void toque() {
 void verificasqltela(){
       Serial.println("inicia mensagem tela sql");
 
-      loadfile(estado, mensagem, mensagemstatus);
+      loadfile(estado, telastatus, mensagemstatus, mensagem);
+      telastatus.trim();
       mensagemstatus.trim();
+      mensagem.trim();
+
+      
+
+
+
+//########################################  STATUS ROTATION
+
+   if (telastatus == "1") {
+          Serial.println("Rotate 4");
+          rotate = 1;
+    } 
+      
+      if (telastatus == "2") {
+          Serial.println("Rotate 2");
+          rotate = 2;
+    }
+
+     if (telastatus == "3") {
+          Serial.println("Rotate 3");
+          rotate = 3;
+    }   
+
+    if (telastatus == "4") {
+          Serial.println("Rotate 4");
+          rotate = 4;
+    }  
     
-      Serial.println(statetela);
-      Serial.println(mensagemstatus);
+    if (telastatus == "5") {
+          Serial.println("Rotate 5");
+          rotate = 5;
+    }
+    
+    if (telastatus == "6") {
+          Serial.println("Rotate 6");
+          rotate = 6;
+    }  
+
+
+    
+//####################################### STATUS TELA
+
+
+  
      //  functionExecuted = false;  // Marca a função como executada
 
     if (mensagemstatus == "0") {
@@ -191,10 +242,10 @@ void verificasqltela(){
      if (mensagemstatus == "1") {
          Serial.println("Scrolling pelo SQL");
          Serial.println(mensagemstatus);
-         Serial.println(mensagem);
          functionExecuted = false; // Reseta a variável para próxima execução
-         touchCount = 0;  // Redefine o contador se exceder 4
          statetela = "scrolling";
+         touchCount = 0;  // Redefine o contador se exceder 4
+
 
     } 
       
@@ -203,61 +254,102 @@ void verificasqltela(){
           Serial.println(mensagemstatus);
           functionExecuted = false; // Reseta a variável para próxima execução
           statetela = "clock";
+          touchCount = 0;  // Redefine o contador se exceder 4
+
     }
 
      if (mensagemstatus == "3") {
           Serial.println("Hora digital pelo SQL");
           functionExecuted = false; // Reseta a variável para próxima execução
-          statetela = "hora"; 
+          statetela = "hora";
+          touchCount = 0;  // Redefine o contador se exceder 4
+ 
     }   
 
     if (mensagemstatus == "4") {
           Serial.println("Clima pelo SQL");
           functionExecuted = false; // Reseta a variável para próxima execução
           statetela = "clima";
+          touchCount = 0;  // Redefine o contador se exceder 4
+
     }  
     
     if (mensagemstatus == "5") {
           Serial.println("Mensagem pelo SQL");
-          Serial.println(mensagem);
           functionExecuted = false; // Reseta a variável para próxima execução
-          statetela = "mensagem";  
+          statetela = "mensagem";
+          touchCount = 0;  // Redefine o contador se exceder 4
+  
     } 
     
     if (mensagemstatus == "6") {
           Serial.println("Olho pelo SQL");
           functionExecuted = false; // Reseta a variável para próxima execução
-          statetela = "olhos";   
+          statetela = "olhos";
+          touchCount = 0;  // Redefine o contador se exceder 4
+   
+    }
+   
+    if (mensagemstatus == "7") {
+          Serial.println("BOLSA pelo SQL");
+          statetela = "bolsa";
+          touchCount = 0;  // Redefine o contador se exceder 4
+   
     }
 
-     if (mensagemstatus == "7") {
+     if (mensagemstatus == "8") {
           Serial.println("QRcode site pelo SQL");
           functionExecuted = false; // Reseta a variável para próxima execução
           statetela = "site";
-    }
-    
-    if (mensagemstatus == "8") {
-          Serial.println("QRcode doa pelo SQL");
-          functionExecuted = false; // Reseta a variável para próxima execução
-          statetela = "doa";
+          touchCount = 0;  // Redefine o contador se exceder 4
+
     }
     
     if (mensagemstatus == "9") {
-          Serial.println("NEWS pelo SQL");
+          Serial.println("QRcode doa pelo SQL");
           functionExecuted = false; // Reseta a variável para próxima execução
-          statetela = "news";
-          buttonIndex = 1;
-    }
- if (mensagemstatus == "90") {
-          Serial.println("UPDATE OTA PELA WEB");
-          statetela = "OTA";
-          mensagemstatus = "0";
-          updateFirmware();
+          statetela = "doa";
+          touchCount = 0;  // Redefine o contador se exceder 4
 
-          delay(600000);
     }
     
-  
+    if (mensagemstatus == "10") {
+          Serial.println("CHAT pelo SQL");
+
+          statetela = "chat";
+          touchCount = 0;  // Redefine o contador se exceder 4
+
+    }
+        if (mensagemstatus == "11") {
+          Serial.println("PH pelo SQL");
+          functionExecuted = false; // Reseta a variável para próxima execução
+          statetela = "ph";
+          touchCount = 0;  // Redefine o contador se exceder 4
+
+    }
+
+        if (mensagemstatus == "12") {
+          Serial.println("CRYPTO pelo SQL");
+
+          statetela = "crypto";
+          touchCount = 0;  // Redefine o contador se exceder 4
+
+    }
+    
+      if (mensagemstatus == "90") {
+          Serial.println("UPDATE OTA PELA WEB");
+          statetela = "OTA";
+          touchCount = 0;  // Redefine o contador se exceder 4
+          mensagemstatus = "0";
+          updateFirmware();
+          otaconfirma();
+          savefile(estado, telastatus, mensagemstatus, mensagem);
+
+          delay(10000);
+    }
+    
+      Serial.println(statetela);
+      Serial.println(mensagemstatus);
  
   
   }
@@ -431,3 +523,6 @@ colIndex = constrain(colIndex, 0, 10);
         *z = 0; // Define z como 0 se não houver toque
     }
 }
+
+
+#endif

@@ -61,7 +61,13 @@ const TickType_t xDelay = 60000 / portTICK_PERIOD_MS;
   {
 
   readTel();
+  
+  
+#if (TELA == 1)
   verificasqltela();
+#endif
+
+  
       vTaskDelay( xDelay );
 
 
@@ -271,7 +277,7 @@ buttonState = digitalRead(buttonPin); // L�� o estado atual do bot��o
 void funcaoestado() {
     //###############INICIA LOOP ESTADO
     Serial.println("INICIA FUNCAO ESTADO LOOP");
-    loadfile(estado, mensagem, mensagemstatus);
+    loadfile(estado, telastatus, mensagemstatus, mensagem);
     estado.trim();
     
         if (estado == "liga") {

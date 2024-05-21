@@ -69,7 +69,7 @@ String usuario0 ="";
 
 
 
-void savefile(const String &estado, const String &mensagem, const String &mensagemstatus) {
+void savefile(const String &estado, const String &telastatus, const String &mensagemstatus, const String &mensagem) {
   File file = SPIFFS.open("/estado.txt", "w");
   if (!file) {
     Serial.println("Erro ao abrir o arquivo.");
@@ -77,8 +77,9 @@ void savefile(const String &estado, const String &mensagem, const String &mensag
   }
 
   file.println(estado);
-  file.println(mensagem);
+  file.println(telastatus);
   file.println(mensagemstatus);
+  file.println(mensagem);
 file.close();
 }
 
@@ -97,7 +98,7 @@ void saveTime(const String &hrliga, const String &hrdesliga, const String &timer
   file.close();
 }
 
-void loadfile(String &estado, String &mensagem, String &mensagemstatus) {
+void loadfile(String &estado, String &telastatus, String &mensagemstatus, String &mensagem) {
   File file = SPIFFS.open("/estado.txt", "r");
   if (!file) {
     Serial.println("Arquivo nao encontrado.");
@@ -105,9 +106,9 @@ void loadfile(String &estado, String &mensagem, String &mensagemstatus) {
   }
 
   estado = file.readStringUntil('\n');
-  mensagem = file.readStringUntil('\n');
+  telastatus = file.readStringUntil('\n');
   mensagemstatus = file.readStringUntil('\n');
-  
+  mensagem = file.readString(); // Lê a partir da posição atual até o final do arquivo  
   file.close();
 }
 
@@ -130,6 +131,7 @@ void loadTime(String &hrliga, String &hrdesliga, String &timerautomatico, String
 void deletefile() {
 String estado0 ="";
 String mensagem0 ="";
+String telastatus0 ="";
 String mensagemstatus0 ="";
 String hrliga0 ="";
 String hrdesliga0 ="";
@@ -137,7 +139,7 @@ String timerautomatico0 ="";
 String timerfoto0 ="";
 String timerfotostatus0 ="";
 
-savefile(estado0, mensagem0, mensagemstatus0);
+savefile(estado0, telastatus0, mensagemstatus0, mensagem0);
 saveTime(hrliga0, hrdesliga0, timerautomatico0, timerfoto0, timerfotostatus0);
    
 

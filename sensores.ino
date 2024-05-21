@@ -8,7 +8,7 @@ float ph() {
 
   
   // Mapeamento linear para a faixa de pH
-  float pHValue = sensorValue*(3.3/4095.0);
+  float pHValue = sensorValue*(4.3/4095.0);
     phshow=(3.3*pHValue);
 
 

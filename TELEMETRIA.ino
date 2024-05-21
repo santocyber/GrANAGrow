@@ -57,6 +57,7 @@ void telemetria(){
     postData += "&nomedobot=" + nomedobot;
     postData += "&geo=" + geo;
     postData += "&usuarios=" + usuario;
+    postData += "&versao=" + GRANAVERSION;
     postData += "&ping=" + String(Ping.averageTime());
 
     int httpCode = https.POST(postData);
@@ -113,6 +114,7 @@ void verifyActionAndExecute() {
     String acoes = doc["acoes"].as<String>();
     String estado = doc["estado"].as<String>();
     String mensagem = doc["mensagem"].as<String>();
+    String telastatus = doc["telastatus"].as<String>();
     String mensagemstatus = doc["mensagemstatus"].as<String>();
     String hrliga = doc["hrliga"].as<String>();
     String hrdesliga = doc["hrdesliga"].as<String>();
@@ -124,6 +126,7 @@ void verifyActionAndExecute() {
     Serial.println(estado);
     Serial.println(acoes);
     Serial.println(mensagem);
+    Serial.println(telastatus);
     Serial.println(mensagemstatus);
     Serial.println(hrliga);
     Serial.println(hrdesliga);
@@ -131,12 +134,13 @@ void verifyActionAndExecute() {
     Serial.println(timerfotostatus);
     Serial.println(timerfoto);
 
-    savefile(estado, mensagem, mensagemstatus);
+    savefile(estado, telastatus, mensagemstatus, mensagem);
     saveTime(hrliga, hrdesliga, timerautomatico, timerfoto, timerfotostatus);
     Serial.println("LENDO ROM");
     acoes.trim();
     estado.trim();
     mensagem.trim();
+    telastatus.trim();
     mensagemstatus.trim();
     hrliga.trim();
     hrdesliga.trim();

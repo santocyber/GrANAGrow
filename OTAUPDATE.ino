@@ -1,4 +1,5 @@
 const char* otaServer = "http://santocyber.helioho.st/granagw/uploads/update.bin"; // Endereço IP do servidor PHP
+const char* otaconfirm = "http://santocyber.helioho.st/granagw/processar_mensagem90.php"; // Endereço IP do servidor PHP
 const int otaPort = 80; // Porta do servidor PHP
 
 
@@ -74,3 +75,31 @@ void updateFirmware() {
 
   http.end();
 }
+
+
+
+
+
+void otaconfirma() {
+    HTTPClient http; // Cria um objeto HTTPClient
+    http.begin(otaconfirm); // Inicializa a conexão HTTP    
+    // Especifica o tipo de conteúdo como application/x-www-form-urlencoded
+    http.addHeader("Content-Type", "application/x-www-form-urlencoded");  
+    // Cria o corpo da solicitação POST
+    String postData = "mac=" + String(WiFi.macAddress()) + "&username=" + String(usuario);
+    int httpResponseCode = http.POST(postData); // Envia a solicitação HTTP POST 
+    if (httpResponseCode > 0) { // Verifica o código de resposta HTTP
+      String response = http.getString(); // Obtém a resposta como string
+      Serial.println(httpResponseCode); // Imprime o código de resposta
+      Serial.println(response); // Imprime a resposta
+    } else {
+      Serial.print("Erro na solicitação HTTP: ");
+      Serial.println(httpResponseCode);
+    }   
+    http.end(); // Finaliza a conexão HTTP
+}
+
+
+
+
+    

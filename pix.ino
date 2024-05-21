@@ -146,7 +146,7 @@ void pix() {
 
 
 void print_qrcode(const uint8_t qrcode[]) {
-  tft.setRotation(3);
+  tft.setRotation(rotate);
   tft.fillScreen(TFT_BLACK);
   tft.setCursor(0, 0); // Set cursor at top left of screen
   

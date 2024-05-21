@@ -18,7 +18,7 @@
 #include "esp_heap_caps.h"
 
 
-// Configura������������o da c������mera
+// Configurao da cera
 camera_fb_t * fb = NULL;
 
 framesize_t configframesize = FRAMESIZE_VGA; // FRAMESIZE_ + QVGA|CIF|VGA|SVGA|XGA|SXGA|UXGA
@@ -108,7 +108,7 @@ bool setupCamera()
   memtmp = NULL;
 
 
-  sensor_t1 * s = esp_camera_sensor_get();
+  sensor_t * s = esp_camera_sensor_get();
   //  drop down frame size for higher initial frame rate
   s->set_framesize(s, (framesize_t)framesize);
   s->set_quality(s, quality);
