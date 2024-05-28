@@ -114,7 +114,9 @@ if (statetela == "clock" && !functionExecuted) {
 
   tft.setTextSize(10);
   // Limpa a tela
-  tft.fillScreen(TFT_BLACK);
+ // tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(random(0xFFFF));
+
 
   // Define a posição vertical do texto
   textY = (tft.height() - tft.fontHeight()) / 2;
@@ -183,11 +185,8 @@ if (statetela == "clock" && !functionExecuted) {
     lastExecutionTime = currentMillis;
     functionExecuted = false; // Reseta a variável para próxima execução
   }
-       
-        if (!buttonsCreated) {
-    createButtons();
-    buttonsCreated = true;
-  }
+           fetchAndPrintRSSWithRetry(rss_feed_url);
+
 
   }
 
@@ -260,6 +259,20 @@ if (statetela == "lermsgtg") {
   }
   }
 
+  if (statetela == "fototft") {
+    
+
+
+    if (statetela == "fototft" && !functionExecuted) {
+
+    fototft();
+    functionExecuted = true;  // Marca a função como executada
+
+  }
+  }
+
+  
+
   
 if (statetela == "chat") {
   if (currentMillis - lastExecutionTime >= 10000) {
@@ -302,6 +315,25 @@ if (statetela == "bolsa") {
     functionExecuted = true;  // Marca a função como executada
 
   }}
+
+
+  
+
+    if (statetela == "botaorelay") {
+
+  
+    if (statetela == "botaorelay"  && !functionExecuted) {
+    drawButtonsrelay();
+    delay(300);
+
+    functionExecuted = true;  // Marca a função como executada
+
+  }}
+  
+
+  
+
+  
 
 
   
@@ -378,18 +410,15 @@ if (statetela == "clima") {
 void hora(){
 //   tft.loadFont(Font72x53rle); // Load another different font
   //tft.unloadFont(); // Remove the font to recover memory used
-
-   tft.setCursor(0, 0); // Set cursor at top left of screen
-  tft.fillRectHGradient(0, 0, 480, 320, TFT_MAGENTA, TFT_BLUE);
-
-
- // tft.setTextColor(TFT_CYAN, TFT_BLACK);
-
-  tft.setTextSize(12);
-
+   // tft.setTextColor(TFT_CYAN, TFT_BLACK);
+ // tft.fillRectHGradient(0, 0, 480, 320, TFT_MAGENTA, TFT_BLUE);
    //tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_WHITE);  // Define a cor do texto como branco
 
+   tft.setRotation(rotate);  // portrait
+   tft.setCursor(0, 0); // Set cursor at top left of screen
+   tft.fillScreen(random(0xFFFF));
+   tft.setTextSize(4);
+   tft.setTextColor(TFT_WHITE);  // Define a cor do texto como branco
     
    unsigned long currentTime = millis(); // Get current time
 
@@ -413,7 +442,7 @@ void horax(){
   //tft.setTextColor(TFT_RED);  // Define a cor do texto como branco
   tft.setTextColor(TFT_CYAN, TFT_BLACK);
 
-  tft.setTextSize(8);
+  tft.setTextSize(4);
 
 
     
@@ -432,7 +461,6 @@ void horax(){
 
 
 void displayTime() {
-    tft.setTextSize(40); // Set text size
     tft.setCursor(120, 120); // Set cursor position
     tft.printf("%02d:%02d", currentHour, currentMinute); // Print time in HH:MM format
 }
@@ -663,7 +691,7 @@ tft.setRotation(rotate);
 
 
     }else {
-      Serial.println("Falha ao inicializar o sensor AHT!");
+      Serial.println("Falha no sensor AHT!");
       tft.fillScreen(TFT_RED);
       tft.setTextColor(TFT_CYAN, TFT_RED);
 
@@ -799,11 +827,11 @@ void drawBarGraph(float value, String label, int x, int y, uint16_t color) {
   String status;
    
   if (label == "Pressao") {
-    if (value < 93000) {
-    barWidth = map(value, 90000, 100000, 0, tft.width() - 50);
+    if (value < 101600) {
+    barWidth = map(value, 99000, 102000, 0, tft.width() - 50);
       status = "Sol";
     } else {
-    barWidth = map(value, 90000, 100000, 0, tft.width() - 50);
+    barWidth = map(value, 99000, 102000, 0, tft.width() - 50);
       status = "Chuva";
     }
   } else if (label == "pH") {
@@ -984,56 +1012,6 @@ void print_qrcodemonitor(const uint8_t qrcode[]) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-const int numButtons = 10;
-const int buttonWidth = 100;
-const int buttonHeight = 50;
-const int spacingX = 20;
-const int spacingY = 20;
-const int startX = 20;
-const int startY = 20;
-String buttonLabels[numButtons] = {"BBC", "TECMUNDO"};
-
-void createButtons() {
-  int numCols = 1; // Número de colunas
-  int numRows = 2; // Número de linhas
-  int buttonWidth = (tft.width() - (numCols + 1) * spacingX) / numCols;
-  int buttonHeight = (tft.height() - (numRows + 1) * spacingY) / numRows;
-
-  int currentX = spacingX;
-  int currentY = spacingY;
-  
-  tft.unloadFont(); // Remove a fonte para recuperar a memória usada
-  tft.setTextWrap(true, false); // Quebra de texto em largura e altura
-
-  tft.setCursor(0, 0); // Define o cursor no canto superior esquerdo da tela
-  tft.fillScreen(TFT_BLACK); // Limpa a tela antes de exibir as notícias
-
-  for (int i = 0; i < numButtons; i++) {
-    tft.fillRect(currentX, currentY, buttonWidth, buttonHeight, TFT_CYAN);
-    tft.setTextColor(TFT_BLACK);
-    tft.setTextSize(6);
-    tft.setCursor(currentX + 10, currentY + 15);
-    tft.println(buttonLabels[i]);
-
-    currentY += buttonHeight + spacingY;
-  }
-}
-
-
-
-
-
-
 void fetchAndPrintRSSWithRetry(String rss_feed_url) {
   int retryAttempts = 0;
   while (retryAttempts < 5) {
@@ -1198,6 +1176,7 @@ bool fetchAndPrintRSS(String rss_feed_url) {
           Serial.println(cleanedRSS);
 
           // Imprime o título e a descrição na tela
+          tft.setRotation(rotate);
           tft.fillScreen(TFT_BLACK); // Limpa a tela antes de exibir as notícias
           tft.setTextColor(TFT_YELLOW);
           tft.setTextSize(2);
@@ -1218,11 +1197,9 @@ bool fetchAndPrintRSS(String rss_feed_url) {
       return true; // Indica que obteve com sucesso os feeds RSS
     } else {
       Serial.println("Falha ao obter o feed RSS.");
-      createButtons();
     }
   } else {
     Serial.println("Falha ao conectar-se ao servidor RSS.");
-    createButtons();
   }
   http.end();
   return false; // Indica que falhou ao obter os feeds RSS
@@ -1314,5 +1291,218 @@ void displayMessage(String message) {
 }
 
 
+
+#include <TJpg_Decoder.h>
+
+
+
+// This next function will be called during decoding of the jpeg file to
+// render each block to the TFT.  If you use a different TFT library
+// you will need to adapt this function to suit.
+bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap)
+{
+  // Stop further decoding as image is running off bottom of screen
+  if ( y >= tft.height() ) return 0;
+
+  // This function will clip the image block rendering automatically at the TFT boundaries
+  tft.pushImage(x, y, w, h, bitmap);
+
+  // Return 1 to decode next block
+  return 1;
+}
+
+
+void configfototft(){
+    // The jpeg image can be scaled by a factor of 1, 2, 4, or 8
+  TJpgDec.setJpgScale(1);
+
+  // The byte order can be swapped (set true for TFT_eSPI)
+  TJpgDec.setSwapBytes(true);
+
+  // The decoder must be given the exact name of the rendering function above
+  TJpgDec.setCallback(tft_output);
+  
+  }
+
+
+void fototftshow(){
+      String macAddress = WiFi.macAddress();
+
+  String urlWithParams = String(urlfototft) + "?mac=" + macAddress;
+
+
+    // Time recorded for test purposes
+  uint32_t t = millis();
+
+  // Fetch the jpg file from the specified URL, examples only, from imgur
+  bool loaded_ok = getFile(urlWithParams, "/imagem.jpg"); // Note name preceded with "/"
+
+  t = millis() - t;
+  if (loaded_ok) { Serial.print(t); Serial.println(" ms to download"); }
+
+  // List files stored in SPIFFS, should have the file now
+ // listSPIFFS();
+
+  t = millis();
+
+  // Now draw the SPIFFS file
+  tft.setRotation(rotate);
+  TJpgDec.drawFsJpg(0, 0, "/imagem.jpg");
+
+  t = millis() - t;
+  Serial.print(t); Serial.println(" ms to draw to TFT");
+
+  // Wait forever
+ // while(1) yield();
+
+}
+
+
+
+// Fetch a file from the URL given and save it in SPIFFS
+// Return 1 if a web fetch was needed or 0 if file already exists
+bool getFile(String url, String filename) {
+
+   //If it exists then no need to fetch it
+  if (SPIFFS.exists(filename) == true) {
+    Serial.println("Found " + filename);
+    return 0;
+  }
+
+  Serial.println("Downloading "  + filename + " from " + url);
+
+  // Check WiFi connection
+  if ((WiFi.status() == WL_CONNECTED)) {
+
+    Serial.print("[HTTP] begin...\n");
+
+
+    HTTPClient http;
+    // Configure server and url
+    http.begin(url);
+
+    Serial.print("[HTTP] GET...\n");
+    // Start connection and send HTTP header
+    int httpCode = http.GET();
+    if (httpCode > 0) {
+      fs::File f = SPIFFS.open(filename, "w+");
+      if (!f) {
+        Serial.println("file open failed");
+        return 0;
+      }
+      // HTTP header has been send and Server response header has been handled
+      Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+
+      // File found at server
+      if (httpCode == HTTP_CODE_OK) {
+
+        // Get length of document (is -1 when Server sends no Content-Length header)
+        int total = http.getSize();
+        int len = total;
+
+        // Create buffer for read
+        uint8_t buff[128] = { 0 };
+
+        // Get tcp stream
+        WiFiClient * stream = http.getStreamPtr();
+
+        // Read all data from server
+        while (http.connected() && (len > 0 || len == -1)) {
+          // Get available data size
+          size_t size = stream->available();
+
+          if (size) {
+            // Read up to 128 bytes
+            int c = stream->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
+
+            // Write it to file
+            f.write(buff, c);
+
+            // Calculate remaining bytes
+            if (len > 0) {
+              len -= c;
+            }
+          }
+          yield();
+        }
+        Serial.println();
+        Serial.print("[HTTP] connection closed or file end.\n");
+      }
+      f.close();
+    }
+    else {
+      Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+    }
+    http.end();
+  }
+  return 1; // File was fetched from web
+}
+
+
+void fototft() {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+
+    // Construir a URL com o MAC como parâmetro GET
+    String macAddress = WiFi.macAddress();
+    String urlWithParams = String(urlfototft) + "?mac=" + macAddress;
+
+    // Iniciar a conexão HTTP
+    http.begin(urlWithParams);
+
+    // Enviar a requisição GET
+    int httpResponseCode = http.GET();
+
+    if (httpResponseCode > 0) {
+      Serial.printf("Código de resposta HTTP: %d\n", httpResponseCode);
+
+      if (httpResponseCode == HTTP_CODE_OK) {
+        // Obter a resposta como uma string
+        String response = http.getString();
+        
+        // Salvar a resposta como um arquivo
+        File file = SPIFFS.open("/imagem.jpg", FILE_WRITE); // Alteração da extensão para .jpg
+        if (!file) {
+          Serial.println("Falha ao abrir o arquivo para escrever");
+          return;
+        }
+        if (file.print(response) != response.length()) {
+          Serial.println("Erro ao escrever a resposta no arquivo");
+          file.close();
+          return;
+        }
+
+        // Obter o tamanho do arquivo antes de fechá-lo
+        size_t fileSize = file.size();
+        Serial.print("Tamanho do arquivo SPIFFS: ");
+        Serial.print(fileSize);
+        Serial.println(" bytes");
+
+        file.close();
+
+        Serial.println("Imagem salva com sucesso no SPIFFS.");
+
+        //exibirImagemSPIFFS("/imagem.jpg"); // Alteração da extensão para .jpg      
+
+
+        tft.setRotation(rotate);  // portrait
+        tft.fillScreen(random(0xFFFF));
+        fototftshow();
+     //   drawJpeg("/imagem.jpg", 0 , 0);     // 240 x 320 image
+      } else {
+        Serial.printf("Erro na resposta HTTP: %s\n", http.errorToString(httpResponseCode).c_str());
+      }
+    } else {
+      Serial.println("Erro ao fazer a requisição HTTP");
+    }
+
+    http.end();
+  } else {
+    Serial.println("WiFi não conectado.");
+  }
+}
+
+
+  
 
 #endif

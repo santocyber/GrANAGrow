@@ -5,10 +5,6 @@
  uint16_t x, y;
  uint8_t z;
 
-const String rss_feed_urls[2] = {
-  "https://feeds.bbci.co.uk/portuguese/rss.xml",
-  "https://rss.tecmundo.com.br/feed",
-};
 
 
 
@@ -22,20 +18,6 @@ void toque() {
     //    Serial.println(statetela);   
 
  // Verifica se a string é igual a "donate"
-  if (statetela == "news") {
-        checkButtonPress();
-        Serial.println("FUNCAO NEWS");
-        contador++;
-        Serial.println(contador);
-
-     if (contador >= 20) {
-        statetela = "padrao";
-        touchCount++; 
-        contador = 0;
-
-  }  
-    
-  }
   
   if (statetela == "donate") {
         Serial.println("FUNCAO DONATE");   
@@ -57,7 +39,15 @@ void toque() {
 
           }  
   
-  } if (statetela == "telegram") {
+  } 
+
+   if (statetela == "botaorelay") {
+        Serial.println("FUNCAO botaorelay");   
+        botaorelay();      
+  } 
+  
+  
+  if (statetela == "telegram") {
         Serial.println("FUNCAO TELEGRAM");
 
         getKeyFromTouch4(&x, &y, &z);
@@ -184,7 +174,7 @@ void toque() {
 
 
 void verificasqltela(){
-      Serial.println("inicia mensagem tela sql");
+      Serial.println("INICIA TELA STATUS SPIFF");
 
       loadfile(estado, telastatus, mensagemstatus, mensagem);
       telastatus.trim();
@@ -335,6 +325,34 @@ void verificasqltela(){
           touchCount = 0;  // Redefine o contador se exceder 4
 
     }
+
+     if (mensagemstatus == "13") {
+          Serial.println("BOTAO RELAY pelo SQL");
+          functionExecuted = false;  // Marca a função como executada
+          drawButtonsrelay();
+          delay(300);
+          statetela = "botaorelay";
+          boolbotao = true;
+
+          touchCount = 0;  // Redefine o contador se exceder 4
+
+    }
+    
+    if (mensagemstatus == "14") {
+          Serial.println("FOTO pelo SQL");
+          functionExecuted = false;  // Marca a função como executada
+          statetela = "fototft";
+          touchCount = 0;  // Redefine o contador se exceder 4
+
+    }
+        if (mensagemstatus == "15") {
+          Serial.println("news pelo SQL");
+          functionExecuted = false;  // Marca a função como executada
+          statetela = "news";
+          touchCount = 0;  // Redefine o contador se exceder 4
+
+    }
+    
     
       if (mensagemstatus == "90") {
           Serial.println("UPDATE OTA PELA WEB");
@@ -394,68 +412,6 @@ while (boolpix) {
 }}
 
   
-void checkButtonPress() {
-      if (tft.getTouchRawZ() > 400) {
-        contador = 0;
-
-    tft.getTouchRaw(&x, &y);
-    int buttonIndex = mapTouchToButton(x, y);
-    if (buttonIndex != -1) {
-      Serial.println(buttonIndex);
-      fetchAndPrintRSSWithRetry(rss_feed_urls[buttonIndex]);
-      functionExecuted = true;  // Marca a função como executada
-      buttonsCreated = false;
-      Executed = false;  // Marca a função como executada
-                 // touchCount++; 
-       buttonIndex = -1;
-
-
-
-    }}
-  
-}
-
-
-
-int mapTouchToButton(uint16_t x, uint16_t y) {
-  // Definir as coordenadas máximas e mínimas dos eixos X e Y
-  int minX = 444;
-  int maxX = 3555;
-  int minY = 444;
-  int maxY = 3666;
-
-  // Definir o número de colunas e linhas de botões
-  int numCols = 2;
-  int numRows = 1;
-
-  // Mapeando as coordenadas X e Y para os índices de linha e coluna
-  int colIndex = map(x, minX, maxX, 0, numCols); // 0 a numCols-1
-  int rowIndex = map(y, minY, maxY, 0, numRows); // 0 a numRows-1
-
-  // Restringindo os índices dentro dos limites
-  colIndex = constrain(colIndex, 0, numCols - 1);
-  rowIndex = constrain(rowIndex, 0, numRows - 1);
-
-  // Calculando o índice do botão
-  int buttonIndex = rowIndex * numCols + colIndex;
-
-  // Adicionar mensagens de depuração para verificar os índices calculados
-  Serial.println("XY");
-  Serial.println(x);
-  Serial.println(y);
-
-  Serial.println("COLUNA ROW INDEX");
-  Serial.println(colIndex);
-  Serial.println(rowIndex);
-
-  // Adicionar mensagem de depuração para verificar o índice do botão calculado
-  Serial.println("button INDEX");
-  Serial.println(buttonIndex);
-
-  // Retornar o índice do botão
-  return buttonIndex;
-}
-
 
 
 
@@ -523,6 +479,106 @@ colIndex = constrain(colIndex, 0, 10);
         *z = 0; // Define z como 0 se não houver toque
     }
 }
+
+
+
+// Definindo as áreas dos botões
+// Definindo as dimensões da tela
+#define SCREEN_WIDTH 240
+#define SCREEN_HEIGHT 320
+
+// Definindo o número de botões e o espaçamento entre eles
+#define NUM_BUTTONS 3
+#define BUTTON_SPACING 20
+
+// Definindo as dimensões dos botões
+#define BUTTON_W 200
+#define BUTTON_H 80
+
+// Calculando as posições dos botões
+#define BUTTON1_X ((SCREEN_WIDTH - BUTTON_W) / 2)
+#define BUTTON1_Y (BUTTON_SPACING)
+#define BUTTON2_X ((SCREEN_WIDTH - BUTTON_W) / 2)
+#define BUTTON2_Y (BUTTON1_Y + BUTTON_H + BUTTON_SPACING)
+#define BUTTON3_X ((SCREEN_WIDTH - BUTTON_W) / 2)
+#define BUTTON3_Y (BUTTON2_Y + BUTTON_H + BUTTON_SPACING)
+
+
+void botaorelay() {
+  while (boolbotao) {
+    // Verificando se a tela foi tocada
+    if (tft.getTouch(&x, &y)) {
+      // Verificando se o toque foi dentro da área do botão 1
+      if (x > BUTTON1_X && x < (BUTTON1_X + BUTTON_W) && y > BUTTON1_Y && y < (BUTTON1_Y + BUTTON_H)) {
+        // Botão de sair não altera relé, mas pode ser usado para sair do loop
+        Serial.println("BOTAO RELAY1");
+        toggleRelay(RELAY1_PIN, BUTTON3_X, BUTTON3_Y);  
+        delay(200); // Debounce
+      }
+      // Verificando se o toque foi dentro da área do botão 2
+      if (x > BUTTON2_X && x < (BUTTON2_X + BUTTON_W) && y > BUTTON2_Y && y < (BUTTON2_Y + BUTTON_H)) {
+        toggleRelay(RELAY2_PIN, BUTTON2_X, BUTTON2_Y);
+        Serial.println("BOTAO RELAY2");
+        delay(200); // Debounce
+      }
+      // Verificando se o toque foi dentro da área do botão 3
+      if (x > BUTTON3_X && x < (BUTTON3_X + BUTTON_W) && y > BUTTON3_Y && y < (BUTTON3_Y + BUTTON_H)) {
+        Serial.println("BOTAO SAIR");
+         boolbotao = false;
+        delay(200); // Debounce
+      }
+    }
+  }
+}
+
+void drawButtonsrelay() {
+  tft.fillScreen(TFT_BLACK);
+  tft.setRotation(rotate); // Ajusta a rotação do display, se necessário
+
+  // Desenhando o botão de sair
+  tft.fillRect(BUTTON1_X, BUTTON1_Y, BUTTON_W, BUTTON_H, TFT_BLUE);
+  tft.setTextColor(TFT_WHITE);
+  tft.drawString("SAIR", BUTTON1_X + 10, BUTTON1_Y + 10, 2);
+
+  // Desenhando os botões dos relés
+  drawRelayButton(RELAY2_PIN, BUTTON2_X, BUTTON2_Y);
+  drawRelayButton(RELAY1_PIN, BUTTON3_X, BUTTON3_Y);
+}
+
+void drawRelayButton(int relayPin, int x, int y) {
+  int state = digitalRead(relayPin);
+  if (state == HIGH) { // Assume que HIGH é desligado
+    tft.fillRect(x, y, BUTTON_W, BUTTON_H, TFT_GREEN);
+    tft.setTextColor(TFT_RED);
+    tft.drawString("LIGADO", x + 10, y + 10, 2);
+  } else {
+    tft.fillRect(x, y, BUTTON_W, BUTTON_H, TFT_RED);
+    tft.setTextColor(TFT_WHITE);
+    tft.drawString("OFF", x + 10, y + 10, 2);
+
+  }
+}
+
+void toggleRelay(int relayPin, int x, int y) {
+  int state = digitalRead(relayPin);
+  digitalWrite(relayPin, !state); // Alterna o estado do relé
+  drawRelayButton(relayPin, x, y); // Redesenha o botão com o novo estado
+
+if (estado == "liga") {
+    estado = "desliga";
+  } else {
+    estado = "liga";
+  }
+  savefile(estado, telastatus, mensagemstatus, mensagem);
+
+  Serial.println("ESTADO RELE");
+  Serial.println(state);
+  Serial.println(relayPin);
+  Serial.println(estado);
+
+}
+
+  
 
 
 #endif

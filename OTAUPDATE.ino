@@ -46,7 +46,7 @@ void updateFirmware() {
       if (Update.end(true)) {
         Serial.println("Firmware atualizado com sucesso!");
         Serial.println(GRANAVERSION);
-         tft.setTextWrap(true, true); // Wrap on width and height
+        tft.setTextWrap(true, true); // Wrap on width and height
 
   tft.fillScreen(TFT_BLACK);
   tft.setTextSize(4);

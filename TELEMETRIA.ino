@@ -1,3 +1,77 @@
+
+
+//##############VOID TELEGRAM
+
+void TELE(void*p){
+//portVALID_STACK_MEM(pxStackBuffer);  
+    configASSERT( ( uint32_t ) p == 1UL );
+const TickType_t xDelay = 60000 / portTICK_PERIOD_MS;
+
+  for( ;; )
+  {
+
+   boolbotao = false;
+   readTel();
+
+      vTaskDelay( xDelay );
+      
+  }
+  }
+
+
+
+  void readTel(){
+
+
+
+   Serial.print("Task TELE running on core ");
+   Serial.println(xPortGetCoreID());
+
+    // Se nao conectar,avisa
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("Falha ao reconectar ao Wi-Fi.");
+        
+        WiFi.reconnect();
+
+    } else {
+        Serial.println("Conexao bem-sucedida, iniciar envio telemetria.");
+
+            // Exibe info sobre os servidores DNS
+    IPAddress dns1 = WiFi.dnsIP(0); // Primeiro servidor DNS
+    IPAddress dns2 = WiFi.dnsIP(1); // Segundo servidor DNS
+    Serial.print("Servidor DNS 1: ");
+    Serial.println(dns1);
+    Serial.print("Servidor DNS 2: ");
+    Serial.println(dns2);
+    StateUpdate = "ativo";
+    
+    }
+    
+    if (StateUpdate == "ativo") {
+
+    telemetria();
+    pingando();
+    delay(500);
+    verifyActionAndExecute();
+  }
+
+
+    loadTime(hrliga, hrdesliga, timerautomatico, timerfoto, timerfotostatus);
+    controlarRelayPeloTimer(timerautomatico, hrdesliga, hrliga, RELAY1_PIN);
+    funcaoestado();
+
+    #if (TELA == 1)
+    verificasqltela();
+    #endif
+
+    esp_task_wdt_reset();
+    esp_get_free_heap_size();
+}
+
+
+
+
+
 //########################################TELEMETRIA
 void telemetria(){
   HTTPClient https;
@@ -59,6 +133,7 @@ void telemetria(){
     postData += "&usuarios=" + usuario;
     postData += "&versao=" + GRANAVERSION;
     postData += "&ping=" + String(Ping.averageTime());
+//    postData += "&estado=" + estado;
 
     int httpCode = https.POST(postData);
     Serial.println(postData);

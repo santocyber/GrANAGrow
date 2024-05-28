@@ -47,98 +47,6 @@ const TickType_t xDelay = intervalo_millis / portTICK_PERIOD_MS;
 
 
 
-//##############VOID TELEGRAM
-
-void TELE(void*p){
-//portVALID_STACK_MEM(pxStackBuffer); 
-    
-    configASSERT( ( uint32_t ) p == 1UL );
-    
-  // Block for 500ms.
-const TickType_t xDelay = 60000 / portTICK_PERIOD_MS;
-
-  for( ;; )
-  {
-
-  readTel();
-  
-  
-#if (TELA == 1)
-  verificasqltela();
-#endif
-
-  
-      vTaskDelay( xDelay );
-
-
-      
-  }
-
-  }
-
-
-
-
-
-
-  void readTel(){
-
-
-
-   Serial.print("Task TELE running on core ");
-   Serial.println(xPortGetCoreID());
-
-    // Se nao conectar,avisa
-    if (WiFi.status() != WL_CONNECTED) {
-        Serial.println("Falha ao reconectar ao Wi-Fi.");
-        
-        WiFi.reconnect();
-
-    } else {
-        Serial.println("Conexao bem-sucedida, iniciar envio telemetria.");
-
-            // Exibe info sobre os servidores DNS
-    IPAddress dns1 = WiFi.dnsIP(0); // Primeiro servidor DNS
-    IPAddress dns2 = WiFi.dnsIP(1); // Segundo servidor DNS
-    Serial.print("Servidor DNS prim��rio: ");
-    Serial.println(dns1);
-    Serial.print("Servidor DNS secund��rio: ");
-    Serial.println(dns2);
-    
-        StateUpdate = "ativo";
-    }
-
-    
-    if (StateUpdate == "ativo") {
-
-    telemetria();
-    pingando();
-    delay(500);
-    verifyActionAndExecute();
-
-
-  }
-
-
-    funcaoestado();
-
-
-    loadTime(hrliga, hrdesliga, timerautomatico, timerfoto, timerfotostatus);
-    controlarRelayPeloTimer(timerautomatico, hrdesliga, hrliga, relayPin3);
-   
-    
- 
-
-
-esp_task_wdt_reset();
-esp_get_free_heap_size();
- 
-//  vTaskDelete(NULL);
-       //   vTaskDelete(teletask);
-   // vTaskSuspend(NULL);
-
-}
-
 
 
 
@@ -247,25 +155,24 @@ else{
 
 void botaoreset(){
 
-buttonState = digitalRead(buttonPin); // L�� o estado atual do bot��o
+buttonState = digitalRead(buttonPin); 
 
-  // Se o estado do bot��o mudou
   if (buttonState != lastButtonState) {
-    // Se o bot��o foi pressionado
     if (buttonState == LOW) {
       startTime = millis(); // Armazena o tempo atual
+      Serial.println("BOTAO RESET PRESSIONADO");
+
     }
-    // Se o bot��o foi solto
     else {
-      unsigned long pressDuration = millis() - startTime; // Calcula a dura����o do pressionamento
-      // Se a dura����o do pressionamento for maior ou igual �� dura����o do longo pressionamento
+      unsigned long pressDuration = millis() - startTime; 
       if (pressDuration >= longPressDuration) {
-        deletewififile(); // Chama a fun����o deletewififile
+        Serial.println("WIFI APAGADO PELO BOTAO RESET");
+        deletewififile(); 
       }
     }
   }
 
-  lastButtonState = buttonState; // Atualiza o estado anterior do bot��o
+  lastButtonState = buttonState; 
   delay(10); // Pequeno atraso para estabilidade
     
     
@@ -279,43 +186,42 @@ void funcaoestado() {
     Serial.println("INICIA FUNCAO ESTADO LOOP");
     loadfile(estado, telastatus, mensagemstatus, mensagem);
     estado.trim();
-    
-        if (estado == "liga") {
+    timerautomatico.trim();
+
+      // Verifica se o modo automático está ativado
+  if (timerautomatico == "1") {
+    Serial.println("Modo automático ativado NAO EXECUTA LOOP ESTADO");
+       
+
+        } else {
+
+           if (estado == "liga") {
             //neopixelWrite(RGB_BUILTIN, 0, 255, 0);
             Serial.println("ligado pela função estado salvo na ROM");
-            digitalWrite(relayPin3, HIGH);
+            digitalWrite(RELAY1_PIN, HIGH);
         }
 
         if (estado == "desliga") {
            // neopixelWrite(RGB_BUILTIN, 255, 0, 0);
             Serial.println("desligado pela função estado salvo na ROM");
-            digitalWrite(relayPin3, LOW);
+            digitalWrite(RELAY1_PIN, LOW);
         }
+        
+    Serial.println("EXECUTANDO LOOP ESTADO");
+  }
+
+  Serial.println("Saindo da função LOOP ESTADO");
+  
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void controlarRelayPeloTimer(String timerautomatico, String hrdesliga, String hrliga, int relayPin3) {
+void controlarRelayPeloTimer(String timerautomatico, String hrdesliga, String hrliga, int relayPin) {
   timerautomatico.trim();
 
   // Verifica se o modo automático está ativado
   if (timerautomatico == "1") {
     Serial.println("Modo automático ativado");
+
 
     // Obter a hora atual
     time_t now = time(nullptr);
@@ -332,39 +238,21 @@ void controlarRelayPeloTimer(String timerautomatico, String hrdesliga, String hr
     int horaLiga = hrliga.substring(0, 2).toInt();
     int minutoLiga = hrliga.substring(3).toInt();
 
-/**
-
-    // Comparar hora e minuto com a hora atual
-    if (currentHour == horaLiga && currentMinute >= minutoLiga) {
-      Serial.println("LIGANDO pelo TIMER");
-      estado = "liga";
-      digitalWrite(relayPin3, HIGH);
-      //digitalWrite(RGB_BUILTIN, HIGH);
-      neopixelWrite(RGB_BUILTIN, 0, 0, 255);
-    } else if (currentHour == horaDesliga && currentMinute >= minutoDesliga) {
-      Serial.println("DESLIGANDO pelo TIMER");
-      estado = "desliga";
-      digitalWrite(relayPin3, LOW);
-      digitalWrite(RGB_BUILTIN, LOW);
-    }
-
-
-
-    **/
-
 
 
     // Comparar hora e minuto com a hora atual
 if ((currentHour > horaDesliga) || (currentHour == horaDesliga && currentMinute >= minutoDesliga)) {
   Serial.println("DESLIGANDO pelo TIMER");
   estado = "desliga";
-  digitalWrite(relayPin3, LOW);
+  savefile(estado, telastatus, mensagemstatus, mensagem);
+  digitalWrite(RELAY1_PIN, LOW);
   //digitalWrite(RGB_BUILTIN, LOW);
 }
  else if ((currentHour > horaLiga) || (currentHour == horaLiga && currentMinute >= minutoLiga)) {
   Serial.println("LIGANDO pelo TIMER");
   estado = "liga";
-  digitalWrite(relayPin3, HIGH);
+  savefile(estado, telastatus, mensagemstatus, mensagem);
+  digitalWrite(RELAY1_PIN, HIGH);
   //neopixelWrite(RGB_BUILTIN, 0, 0, 255);
 }
 

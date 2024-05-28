@@ -20,15 +20,18 @@ void configwifi(){
   tft.setCursor(10, 10);  // Posição do cursor na tela
   tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
   tft.println("Config robo GrANA");
+  tft.print("Versao GrANA:");
+  tft.println(GRANAVERSION);
   tft.setTextColor(TFT_RED, TFT_BLACK); // Change the font colour and the background colour
   tft.println(ssid);
   tft.setTextColor(TFT_WHITE, TFT_BLACK); // Change the font colour and the background colour
   tft.println(usuario);
+  tft.println(nomedobot);
   tft.setTextColor(TFT_GREEN, TFT_BLACK);
   tft.println(WiFi.localIP().toString());
   tft.setTextColor(TFT_CYAN, TFT_BLACK);
   tft.println(WiFi.dnsIP(0));
-  delay(4000);
+  delay(6000);
 
 }
 
@@ -215,15 +218,14 @@ rowIndex = constrain(rowIndex, 0, 4);
 
 
             // Ação para caracteres de texto
-            if (rowIndex != 0 && inputText.length() < 20) { // Limite de 20 caracteres
+            if (inputText.length() < 30) { // Limite de 20 caracteres
                 inputText += key;
             }
             // Ação para botões especiais
             else {
                 if (key == '<') { // Botão de apagar
-                    if (!inputText.isEmpty()) {
                         inputText.remove(inputText.length() - 1); // Remove o último caractere digitado
-                    }
+                    
                     
                 }
 

@@ -5,9 +5,6 @@
 //###
 
 
-//########################VERSAO do FIRMWARE
-const char GRANAVERSION = 0.13;
-
 
 //###CONFIG INCIAIS ATIVACAO DE MODULOS
 
@@ -16,17 +13,36 @@ const char GRANAVERSION = 0.13;
 #define TELA 1
 
 
+//#Bibliotecas 
+
 //#Bibliotecas REDE
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <HTTPClient.h>
 #include <ESPping.h>
+#include <WiFiClientSecure.h>
+
 
 //#Biblioteca WEBSERVER
 #include <WebServer.h>
 
 // Cria um objeto WebServer
 WebServer server(80);
+
+//#Biblioteca SISTEMAS
+#include <esp_task_wdt.h>
+#include "time.h"
+#include "esp_sntp.h"
+#include <ArduinoJson.h>
+#include <SPIFFS.h>
+#include <stdbool.h>
+#include <stdint.h>
+
+
+#include <SPI.h>
+#include <TFT_eSPI.h>
+TFT_eSPI tft = TFT_eSPI();
+
 
 //#Biblioteca SENSORES
 #if (SENSORES == 1)
@@ -45,14 +61,8 @@ Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
 
 #endif
 
-//#define I2C_MASTER_SCL1 18
-//#define I2C_MASTER_SDA1 17
-
 #define I2C_MASTER_SCL1 25
 #define I2C_MASTER_SDA1 26
-
-//#define I2C_MASTER_SCL1 22
-//#define I2C_MASTER_SDA1 21
 
 //#define I2C_MASTER_SCL2 5 // Exemplo de pino para a segunda porta I2C
 //#define I2C_MASTER_SDA2 4 // Exemplo de pino para a segunda porta I2C
@@ -60,6 +70,9 @@ Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
 
 
 
+//###################################GRANA VERSION
+
+String GRANAVERSION = "0.15";
 
 
 //##################### Configura IP
@@ -78,7 +91,6 @@ IPAddress primaryDNS(9, 9, 9, 9); //nao nao eh opcional nao, eh obrigatorio demo
 //IPAddress primaryDNS(65, 19, 143, 3); //nao nao eh opcional nao, eh obrigatorio demorei mt tempo pra perceber q o relogio e o telegram n tava funcionando por causa do dns
 
 
-#include <WiFiClientSecure.h>
 
 WiFiClientSecure client;
 
@@ -141,39 +153,16 @@ StackType_t xStack_TELE[STACK_SIZE], xStack_CAM[STACK_SIZE];
 
 
 
-//#Bibliotecas 
-
-//#Biblioteca SISTEMAS
-#include <esp_task_wdt.h>
-#include "time.h"
-#include "esp_sntp.h"
-#include <ArduinoJson.h>
-#include <SPIFFS.h>
-#include <stdbool.h>
-#include <stdint.h>
-
-
-#include <SPI.h>
-#include <TFT_eSPI.h>
-TFT_eSPI tft = TFT_eSPI();
-
-
-
 //###################################CONFIGURA VARIAVIS
 
-
 //###########################CONFIGURACAO DAS PINAGENS
+#define RELAY1_PIN 27
+#define RELAY2_PIN 33
+#define RELAY3_PIN 25
+#define phpin 32
 
-#define phpin 33
-
-      int Button1 = 0;  // Pino do bot         o
-      int Button2 = 0;  // Pino do bot         o
-      int obj1 = 0;  // Pino do bot         o
-const int ledPin = 0;     // Pino do LED
-const int relayPin = 0; // Pino GPIO para o rel         
-const int relayPin2 = 0; // Pino GPIO para o rel         
-const int relayPin3 = 0; // Pino GPIO para o rel         
-
+const int Button1 = 0;  
+const int ledPin = 0;    
 
 const char* host = "santocyber.helioho.st";
 String site =        "http://santocyber.helioho.st/";
@@ -183,6 +172,9 @@ String urlverifica = "http://santocyber.helioho.st/granagw/verificaacao.php";
 String qrdoa =        "00020101021226900014BR.GOV.BCB.PIX2568pix-qr.mercadopago.com/instore/p/v2/dbb558faf3c14a7a98e7e8fb805f6c1643530016com.mercadolibre0129https://mpago.la/pos/162635835204000053039865802BR5922Cooperativa mirako org6009SAO PAULO62070503***6304C530";
 String urlchat =        "http://santocyber.helioho.st/granagw/lermsgchat.php";
 String urlbolsa =        "http://santocyber.helioho.st/money/indexesp.php";
+String urlfototft =        "http://santocyber.helioho.st/granagw/fototft.php";
+
+const String rss_feed_url = "https://feeds.bbci.co.uk/portuguese/rss.xml";
 
 
 bool wifiConnected = false;
@@ -263,6 +255,7 @@ bool Executed = true;
 bool buttonsCreated = false; // Variável para controlar se os botões foram criados
 bool stopFetching = true;
 bool boolpix = true;
+bool boolbotao = true;
 bool boololhos = true;
 
 int sensorValue = 0;
@@ -302,11 +295,12 @@ unsigned long lastExecutionTime = 0;
 
 
 //##################BOTAO RESET
-const int buttonPin = 0; // Defina o pino do bot��o
-bool buttonState = false; // Estado atual do bot��o
-bool lastButtonState = false; // Estado anterior do bot��o
-unsigned long startTime = 0; // Vari��vel para armazenar o tempo inicial
-const unsigned long longPressDuration = 10000; // Dura����o do longo pressionamento em milissegundos
+
+const int buttonPin = 0; 
+bool buttonState = false; 
+bool lastButtonState = false; 
+unsigned long startTime = 0; 
+const unsigned long longPressDuration = 10000; 
 
 
 
@@ -366,6 +360,23 @@ void setup() {
 
   
    Serial.println("Dispositivo GRANA iniciado");
+   
+  // Configurar o pino do PH
+  pinMode(phpin, INPUT); // Define o pino do bot como entrada
+
+    // Configurando os pinos dos relés como saída
+  pinMode(RELAY1_PIN, OUTPUT);
+  pinMode(RELAY2_PIN, OUTPUT);
+  pinMode(RELAY3_PIN, OUTPUT);
+
+  // Inicializando os relés desligados
+  digitalWrite(RELAY1_PIN, HIGH);
+  digitalWrite(RELAY2_PIN, HIGH);
+  digitalWrite(RELAY3_PIN, HIGH);
+  
+
+  pinMode(buttonPin, INPUT_PULLUP);
+  
 
 
 
@@ -378,7 +389,7 @@ void setup() {
     Wire.begin(I2C_MASTER_SDA1, I2C_MASTER_SCL1); // Inicialize a primeira porta I2C
  //   Wire.begin(I2C_MASTER_SDA2, I2C_MASTER_SCL2); // Inicialize a primeira porta I2C
  // Wire.setClock(100000); 
-
+configfototft();
    if (aht.begin()) {
     
    Serial.println("AHT inicializado com sucesso!");
@@ -421,17 +432,12 @@ void setup() {
 
 
 
-  
-  // Configurar o pino do 
-  pinMode(phpin, INPUT); // Define o pino do bot como entrada
-
-  pinMode(buttonPin, INPUT_PULLUP);
 
 
 if (!SPIFFS.begin(true)) {
-    Serial.println("An error has occurred while mounting SPIFFS");
+    Serial.println("ERRO NO SPIFFS");
   }
-  Serial.println("SPIFFS mounted successfully");
+  Serial.println("SPIFFS MONTADO");
 
   last_id = read_nvs_data();
 
@@ -445,7 +451,6 @@ nomedobot.trim();
 Serial.println("SSID: " + ssid);
 Serial.println("Password: " + password);
 Serial.println("Nome do bot: " + nomedobot);
-Serial.println("Geolocalização: " + geo);
 Serial.println("Usuário: " + usuario);
 
 // Verifica se tanto o SSID quanto a senha não estão vazios
@@ -461,15 +466,12 @@ if (ssid.length() > 0 && password.length() > 0) {
     while (WiFi.status() != WL_CONNECTED && millis() - startTime < 10000) {
         delay(500);
     }
-
     // Se não conectar, iniciar o modo AP
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("Falha ao reconectar ao Wi-Fi.");
         startAPMode();
-#if (TELA == 1)
-        scanWiFiNetworks();
-#endif
-
+        delay(500);
+       
     } else {
         Serial.println("Conexão bem-sucedida, iniciar o servidor web e o update ativo");
 
@@ -480,9 +482,6 @@ if (ssid.length() > 0 && password.length() > 0) {
 } else {
     // Se as credenciais estiverem vazias, iniciar o modo AP
     startAPMode();
-#if (TELA == 1)
-    scanWiFiNetworks();
-#endif
 
 }
 
@@ -499,18 +498,18 @@ if (ssid.length() > 0 && password.length() > 0) {
 
      // Se não conectar, iniciar o modo AP
     if (WiFi.status() != WL_CONNECTED) {
-        Serial.println("Falha ao reconectar ao Wi-Fi.");
   tft.fillScreen(TFT_RED);
   tft.setTextSize(5);
   tft.setCursor(0, 0); // Set cursor at top left of screen
   tft.setCursor(10, 10);  // Posição do cursor na tela
   tft.setTextColor(TFT_YELLOW, TFT_BLACK); // Change the font colour and the background colour
-  tft.println("Nao conectado");
+  tft.println("SEM CONEXAO");
   delay(2000);
+  scanWiFiNetworks();
+
 
         
     } else {
-        Serial.println("Conexão bem-sucedida, iniciar o servidor web e o update ativo");
         configwifi();
     }
     
@@ -560,7 +559,7 @@ xHandle_TELE = xTaskCreateStaticPinnedToCore(
     "TELE",          // Text name for the task.
     STACK_SIZE,      // Stack size in bytes, not words.
     (void *)1,       // Parameter passed into the task. (void *)1
-    2,               // Priority at which the task is created.
+    4,               // Priority at which the task is created.
     xStack_TELE,     // Array to use as the task's stack.
     &xTaskBuffer_TELE, // Variable to hold the task's data structure.
     1                // Core number to which the task should be pinned.
@@ -626,22 +625,18 @@ if (currentMillis - previousMillis3 >= 1000) {
 
 
 
+// Verificar se passaram 30 segundos
+if (currentMillis - previousMillis >= 60000) {
+    previousMillis = currentMillis;
 
-/*
+    //  telemetria();
+    //  verifyActionAndExecute();
 
-    tft.fillScreen(TFT_BLACK);
-    tft.setCursor(0, 0); // Set cursor at top left of screen
+    }
 
-    tft.println("pH Monitor");
-    tft.println(sensorValue);
-    tft.println(ph());
-    tft.println(analogRead(phpin));
 
-     Serial.println(ph());
-      Serial.println(analogRead(phpin));
-      delay(800);
-*/
-     
+
+
 }
 
 
