@@ -1,8 +1,8 @@
 
 
-float phshow;
 
 float ph() {
+float phshow;
 
    sensorValue = analogRead(phpin);
 
@@ -28,14 +28,8 @@ float ph() {
 
 
 
-
 //############################################CONFIG SENSOR TEMPERATURA PRESSAO
 #if (SENSORES == 1)
-
-
-
-
-
 
 
 

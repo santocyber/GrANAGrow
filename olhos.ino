@@ -1,3 +1,7 @@
+
+#if (TELA == 1)
+
+
 #include "defaultEye.h"      // Standard human-ish hazel eye -OR-
 
 
@@ -609,3 +613,4 @@ void split( // Subdivides motion path into two sub-paths w/randimization
   }
 }
 #endif // !LIGHT_PIN
+#endif

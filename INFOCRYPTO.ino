@@ -1,4 +1,5 @@
 
+ #if (TELA == 1)
 
 
 
@@ -108,3 +109,6 @@ String getCurrencyPrice(String url) {
 
   return "N/A";
 }
+
+
+#endif

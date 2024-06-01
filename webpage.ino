@@ -20,6 +20,8 @@ void startAPMode() {
 void startWebServer() {
     // Configura o certificado CA
  //   client.setCACert(caCert);
+    // WiFi.config(IPAddress(), dns1, dns2);
+
     setClock();
 
     // Inicializa o servidor web
@@ -28,13 +30,16 @@ void startWebServer() {
     server.on("/deletewifi", deletewififile);
     server.begin();
     Serial.println("Servidor web iniciado");
-
-    IPAddress dns1 = WiFi.dnsIP(0); // Primeiro servidor DNS
-    IPAddress dns2 = WiFi.dnsIP(1); // Segundo servidor DNS
+    
     Serial.print("Servidor DNS 1:");
-    Serial.println(dns1);
+    Serial.println(WiFi.dnsIP(0));
     Serial.print("Servidor DNS 2:");
-    Serial.println(dns2);
+    Serial.println(WiFi.dnsIP(1));
+    Serial.print("LocalIP:");
+    Serial.println(WiFi.localIP().toString());
+
+    
+    
 }
 
 

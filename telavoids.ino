@@ -354,9 +354,7 @@ if (statetela == "bolsa") {
   }
   
 
-
-#if (SENSORES == 1)
-
+#if (PH == 1)
 
 
 if (statetela == "ph") {
@@ -370,6 +368,12 @@ if (statetela == "ph") {
     phtela();
     functionExecuted = true;  // Marca a função como executada
   }
+
+
+#endif
+
+#if (SENSORES == 1)
+
 
 
 
@@ -653,6 +657,9 @@ void telegram(){
 }
 
 
+
+#if (SENSORES == 1)
+
 //clima tela
 
 void clima(){
@@ -701,48 +708,6 @@ tft.setRotation(rotate);
 
     }
 }
-
-//phtela
-void phtela(){
-
-    tft.setRotation(rotate);
-    tft.setTextWrap(true, true); // Wrap on width and height
-    tft.fillScreen(TFT_BLACK);
-    tft.setTextSize(4);
-    tft.setCursor(0, 0); // Set cursor at top left of screen
-    tft.setTextColor(TFT_CYAN, TFT_BLACK);
-    tft.println("pH Monitor");
-    tft.print(sensorValue);
-
-    drawBarGraph(ph(), "pH", 0, 250, TFT_GREEN);
-    Serial.println(ph());
-
-/*
-
-  sensors_event_t temp;
-  aht_temp->getEvent(&temp);
-  float t = temp.temperature;
-  
-  sensors_event_t humidity;
-  aht_humidity->getEvent(&humidity);
-  float h = humidity.relative_humidity;
-
-
-  float vpd = calcularVPD(t, h);
-
-
-  String fase = determinarFaseDeCrescimento(vpd);
-
-  
-  exibirInformacoesNaTela(vpd, fase);
-
-*/
-
-}
-
-
-
-
 
 float calcularVPD(float t, float h) {
   // Cálculo do VPD
@@ -805,19 +770,8 @@ void exibirInformacoesNaTela(float vpd, String fase) {
     tft.print("Ajuste a temperatura!");
   }
 
-
-
-
-
-
-
-
-
-
-
-
-  
 }
+
 
 // #########################################################################
 //  Desenha o medidor analógico na tela
@@ -867,16 +821,53 @@ void drawBarGraph(float value, String label, int x, int y, uint16_t color) {
   tft.print(status);
 }
 
+#endif
+
+
+#if (PH == 1)
+//phtela
+void phtela(){
+
+    tft.setRotation(rotate);
+    tft.setTextWrap(true, true); // Wrap on width and height
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextSize(4);
+    tft.setCursor(0, 0); // Set cursor at top left of screen
+    tft.setTextColor(TFT_CYAN, TFT_BLACK);
+    tft.println("pH Monitor");
+    tft.print(sensorValue);
+
+    drawBarGraph(ph(), "pH", 0, 250, TFT_GREEN);
+    Serial.println(ph());
+
+/*
+
+  sensors_event_t temp;
+  aht_temp->getEvent(&temp);
+  float t = temp.temperature;
+  
+  sensors_event_t humidity;
+  aht_humidity->getEvent(&humidity);
+  float h = humidity.relative_humidity;
+
+
+  float vpd = calcularVPD(t, h);
+
+
+  String fase = determinarFaseDeCrescimento(vpd);
+
+  
+  exibirInformacoesNaTela(vpd, fase);
+
+*/
+
+}
 
 
 
 
 
-
-
-
-
-
+#endif
 
 
 

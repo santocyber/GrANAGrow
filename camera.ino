@@ -18,6 +18,50 @@
 #include "esp_heap_caps.h"
 
 
+
+
+
+//#######################SENSOR PIR
+
+#if (PIR == 1)
+
+void pir(){
+  
+    //  Serial.println(digitalRead(PIR_PIN));
+ // Verificar se o sensor PIR detectou movimento
+  if (digitalRead(PIR_PIN) == HIGH) {
+    Serial.println("Movimento detectado!");
+    sendPhotoToAPI();
+
+    // Capturar uma foto
+    camera_fb_t * fb = esp_camera_fb_get();
+    if (!fb) {
+      Serial.println("Falha ao capturar a foto");
+      return;
+    }
+
+    // Salvar a foto em um arquivo (por exemplo, no SPIFFS ou enviar pela rede)
+    // Aqui, apenas vamos imprimir o tamanho da foto capturada
+    Serial.printf("Foto capturada: %d bytes\n", fb->len);
+
+    // Libere o frame buffer
+    esp_camera_fb_return(fb);
+
+    // Adicionar um pequeno atraso para evitar múltiplas capturas contínuas
+    delay(5000);
+  }
+
+  delay(100); // Pequeno atraso para evitar leitura excessiva do PIR
+
+
+}
+
+
+#endif
+
+
+//#########################CAMERA
+
 // Configurao da cera
 camera_fb_t * fb = NULL;
 
@@ -108,7 +152,7 @@ bool setupCamera()
   memtmp = NULL;
 
 
-  sensor_t * s = esp_camera_sensor_get();
+  sensor_t1 * s = esp_camera_sensor_get();
   //  drop down frame size for higher initial frame rate
   s->set_framesize(s, (framesize_t)framesize);
   s->set_quality(s, quality);
@@ -127,15 +171,25 @@ bool setupCamera()
 //###############################################TIRA FOTO ENVIA
 
 void capturaimagem() {
-    Serial.println("INICIA FUNCAO CAMERA");
+    Serial.println("INICIA FUNCAO AUTO CAMERA");
 
-  
     timerfotostatus.trim();
 
     if (timerfotostatus == "1") {
     Serial.println("Modo FOTO automático ativado");
+    capturaimagemenviabd();
+ 
+}else{
+      Serial.println("Modo FOTO automático desativado");
 
-    // Obt o frame buffer da cmera
+  }
+
+}
+
+
+void capturaimagemenviabd() {
+
+   // Obt o frame buffer da cmera
     camera_fb_t* fb = esp_camera_fb_get();
 
     if (!fb) {
@@ -173,12 +227,6 @@ void capturaimagem() {
     Serial.println(F("Desconectando."));
     http.end();
     esp_camera_fb_return(fb);
-}else{
-      Serial.println("Modo FOTO automático desativado");
-
-  }
-
 }
-
 
 #endif

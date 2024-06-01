@@ -9,19 +9,23 @@
 //###CONFIG INCIAIS ATIVACAO DE MODULOS
 
 #define SENSORES 1
-#define CAMERA 0
-#define TELA 1
+#define PH 0
+#define CAMERA 1
+#define PIR 1
+#define TELA 0
+#define SDCARD 0
+#define RELES 0
+
 
 
 //#Bibliotecas 
 
 //#Bibliotecas REDE
 #include <WiFi.h>
-#include <ESPmDNS.h>
+//#include <ESPmDNS.h>
 #include <HTTPClient.h>
 #include <ESPping.h>
-#include <WiFiClientSecure.h>
-
+//#include <WiFiClientSecure.h>
 
 //#Biblioteca WEBSERVER
 #include <WebServer.h>
@@ -37,19 +41,21 @@ WebServer server(80);
 #include <SPIFFS.h>
 #include <stdbool.h>
 #include <stdint.h>
-
-
 #include <SPI.h>
+#include "Arduino.h"
+
+#if (TELA == 1)
+
 #include <TFT_eSPI.h>
 TFT_eSPI tft = TFT_eSPI();
 
+#endif
 
 //#Biblioteca SENSORES
 #if (SENSORES == 1)
 
 #include <Adafruit_BMP280.h>  
 #include <Adafruit_AHTX0.h> 
-#include "Arduino.h"
 
 Adafruit_BMP280 bmp;  // Objeto do sensor BMP280
 Adafruit_AHTX0 aht;   // Objeto do sensor AHTX0
@@ -61,76 +67,48 @@ Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
 
 #endif
 
-#define I2C_MASTER_SCL1 25
-#define I2C_MASTER_SDA1 26
-
-//#define I2C_MASTER_SCL2 5 // Exemplo de pino para a segunda porta I2C
-//#define I2C_MASTER_SDA2 4 // Exemplo de pino para a segunda porta I2C
-
-
-
 
 //###################################GRANA VERSION
 
 String GRANAVERSION = "0.15";
 
-
 //##################### Configura IP
+//WiFiClientSecure client;
 
 IPAddress localIP;
-//IPAddress localIP(192, 168, 1, 200); // hardcoded
-
-// Set your Gateway IP address
 IPAddress localGateway;
+
+//IPAddress localIP(192, 168, 1, 200); // hardcoded
 //IPAddress localGateway(192, 168, 1, 1); //hardcoded
+
 IPAddress subnet(255, 255, 255, 0);
-//IPAddress primaryDNS(8, 8, 8, 8); //nao nao eh opcional nao, eh obrigatorio demorei mt tempo pra perceber q o relogio e o telegram n tava funcionando por causa do dns
-IPAddress primaryDNS(9, 9, 9, 9); //nao nao eh opcional nao, eh obrigatorio demorei mt tempo pra perceber q o relogio e o telegram n tava funcionando por causa do dns
-
+IPAddress dns1(8, 8, 8, 8); //nao nao eh opcional nao, eh obrigatorio demorei mt tempo pra perceber q o relogio e o telegram n tava funcionando por causa do dns meu roteador nao estava liberando o dns
+IPAddress dns2(9, 9, 9, 9); 
+//IPAddress dns2(65, 19, 143, 3); 
 //heliohost dns ip 65.19.143.3
-//IPAddress primaryDNS(65, 19, 143, 3); //nao nao eh opcional nao, eh obrigatorio demorei mt tempo pra perceber q o relogio e o telegram n tava funcionando por causa do dns
-
-
-
-WiFiClientSecure client;
-
 
 // Configuração do certificado CA (Certificado de Autoridade) para confiar no servidor remoto
 const char* caCert = \
-"-----BEGIN CERTIFICATE-----\n" \
-"MIIF6TCCA9GgAwIBAgIQBeTcO5Q4qzuFl8umoZhQ4zANBgkqhkiG9w0BAQwFADCB\n" \
-"iDELMAkGA1UEBhMCVVMxEzARBgNVBAgTCk5ldyBKZXJzZXkxFDASBgNVBAcTC0pl\n" \
-"cnNleSBDaXR5MR4wHAYDVQQKExVUaGUgVVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNV\n" \
-"BAMTJVVTRVJUcnVzdCBSU0EgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMTQw\n" \
-"OTEyMDAwMDAwWhcNMjQwOTExMjM1OTU5WjBfMQswCQYDVQQGEwJGUjEOMAwGA1UE\n" \
-"CBMFUGFyaXMxDjAMBgNVBAcTBVBhcmlzMQ4wDAYDVQQKEwVHYW5kaTEgMB4GA1UE\n" \
-"AxMXR2FuZGkgU3RhbmRhcmQgU1NMIENBIDIwggEiMA0GCSqGSIb3DQEBAQUAA4IB\n" \
-"DwAwggEKAoIBAQCUBC2meZV0/9UAPPWu2JSxKXzAjwsLibmCg5duNyj1ohrP0pIL\n" \
-"m6jTh5RzhBCf3DXLwi2SrCG5yzv8QMHBgyHwv/j2nPqcghDA0I5O5Q1MsJFckLSk\n" \
-"QFEW2uSEEi0FXKEfFxkkUap66uEHG4aNAXLy59SDIzme4OFMH2sio7QQZrDtgpbX\n" \
-"bmq08j+1QvzdirWrui0dOnWbMdw+naxb00ENbLAb9Tr1eeohovj0M1JLJC0epJmx\n" \
-"bUi8uBL+cnB89/sCdfSN3tbawKAyGlLfOGsuRTg/PwSWAP2h9KK71RfWJ3wbWFmV\n" \
-"XooS/ZyrgT5SKEhRhWvzkbKGPym1bgNi7tYFAgMBAAGjggF1MIIBcTAfBgNVHSME\n" \
-"GDAWgBRTeb9aqitKz1SA4dibwJ3ysgNmyzAdBgNVHQ4EFgQUs5Cn2MmvTs1hPJ98\n" \
-"rV1/Qf1pMOowDgYDVR0PAQH/BAQDAgGGMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYD\n" \
-"VR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMCIGA1UdIAQbMBkwDQYLKwYBBAGy\n" \
-"MQECAhowCAYGZ4EMAQIBMFAGA1UdHwRJMEcwRaBDoEGGP2h0dHA6Ly9jcmwudXNl\n" \
-"cnRydXN0LmNvbS9VU0VSVHJ1c3RSU0FDZXJ0aWZpY2F0aW9uQXV0aG9yaXR5LmNy\n" \
-"bDB2BggrBgEFBQcBAQRqMGgwPwYIKwYBBQUHMAKGM2h0dHA6Ly9jcnQudXNlcnRy\n" \
-"dXN0LmNvbS9VU0VSVHJ1c3RSU0FBZGRUcnVzdENBLmNydDAlBggrBgEFBQcwAYYZ\n" \
-"aHR0cDovL29jc3AudXNlcnRydXN0LmNvbTANBgkqhkiG9w0BAQwFAAOCAgEAWGf9\n" \
-"crJq13xhlhl+2UNG0SZ9yFP6ZrBrLafTqlb3OojQO3LJUP33WbKqaPWMcwO7lWUX\n" \
-"zi8c3ZgTopHJ7qFAbjyY1lzzsiI8Le4bpOHeICQW8owRc5E69vrOJAKHypPstLbI\n" \
-"FhfFcvwnQPYT/pOmnVHvPCvYd1ebjGU6NSU2t7WKY28HJ5OxYI2A25bUeo8tqxyI\n" \
-"yW5+1mUfr13KFj8oRtygNeX56eXVlogMT8a3d2dIhCe2H7Bo26y/d7CQuKLJHDJd\n" \
-"ArolQ4FCR7vY4Y8MDEZf7kYzawMUgtN+zY+vkNaOJH1AQrRqahfGlZfh8jjNp+20\n" \
-"J0CT33KpuMZmYzc4ZCIwojvxuch7yPspOqsactIGEk72gtQjbz7Dk+XYtsDe3CMW\n" \
-"1hMwt6CaDixVBgBwAc/qOR2A24j3pSC4W/0xJmmPLQphgzpHphNULB7j7UTKvGof\n" \
-"KA5R2d4On3XNDgOVyvnFqSot/kGkoUeuDcL5OWYzSlvhhChZbH2UF3bkRYKtcCD9\n" \
-"0m9jqNf6oDP6N8v3smWe2lBvP+Sn845dWDKXcCMu5/3EFZucJ48y7RetWIExKREa\n" \
-"m9T8bJUox04FB6b9HbwZ4ui3uRGKLXASUoWNjDNKD/yZkuBjcNqllEdjB+dYxzFf\n" \
-"BT02Vf6Dsuimrdfp5gJ0iHRc2jTbkNJtUQoj1iM=\n" \
-"-----END CERTIFICATE-----\n";
+     "-----BEGIN CERTIFICATE-----\n" \
+     "MIIDSjCCAjKgAwIBAgIQRK+wgNajJ7qJMDmGLvhAazANBgkqhkiG9w0BAQUFADA/\n" \
+     "MSQwIgYDVQQKExtEaWdpdGFsIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMT\n" \
+     "DkRTVCBSb290IENBIFgzMB4XDTAwMDkzMDIxMTIxOVoXDTIxMDkzMDE0MDExNVow\n" \
+     "PzEkMCIGA1UEChMbRGlnaXRhbCBTaWduYXR1cmUgVHJ1c3QgQ28uMRcwFQYDVQQD\n" \
+     "Ew5EU1QgUm9vdCBDQSBYMzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB\n" \
+     "AN+v6ZdQCINXtMxiZfaQguzH0yxrMMpb7NnDfcdAwRgUi+DoM3ZJKuM/IUmTrE4O\n" \
+     "rz5Iy2Xu/NMhD2XSKtkyj4zl93ewEnu1lcCJo6m67XMuegwGMoOifooUMM0RoOEq\n" \
+     "OLl5CjH9UL2AZd+3UWODyOKIYepLYYHsUmu5ouJLGiifSKOeDNoJjj4XLh7dIN9b\n" \
+     "xiqKqy69cK3FCxolkHRyxXtqqzTWMIn/5WgTe1QLyNau7Fqckh49ZLOMxt+/yUFw\n" \
+     "7BZy1SbsOFU5Q9D8/RhcQPGX69Wam40dutolucbY38EVAjqr2m7xPi71XAicPNaD\n" \
+     "aeQQmxkqtilX4+U9m5/wAl0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNV\n" \
+     "HQ8BAf8EBAMCAQYwHQYDVR0OBBYEFMSnsaR7LHH62+FLkHX/xBVghYkQMA0GCSqG\n" \
+     "SIb3DQEBBQUAA4IBAQCjGiybFwBcqR7uKGY3Or+Dxz9LwwmglSBd49lZRNI+DT69\n" \
+     "ikugdB/OEIKcdBodfpga3csTS7MgROSR6cz8faXbauX+5v3gTt23ADq1cEmv8uXr\n" \
+     "AvHRAosZy5Q6XkjEGB5YGV8eAlrwDPGxrancWYaLbumR9YbK+rlmM6pZW87ipxZz\n" \
+     "R8srzJmwN0jP41ZL9c8PDHIyh8bwRLtTcm1D9SZImlJnt1ir/md2cXjbDaJWFBM5\n" \
+     "JDGFoqgCWjBH4d1QB7wCCZAA62RjYJsWvIjJEubSfZGL+T0yjWW06XyxV3bqxbYo\n" \
+     "Ob8VZRzI9neWagqNdwvYkQsEjgfbKbYK7p2CNTUQ\n" \
+     "-----END CERTIFICATE-----\n";
 
 
 
@@ -143,15 +121,9 @@ const char* caCert = \
 TaskHandle_t xHandle_TELE = NULL;
 TaskHandle_t xHandle_CAM = NULL;
 
-
 // Define os buffers e pilhas de tarefa estáticos.
 StaticTask_t xTaskBuffer_TELE, xTaskBuffer_CAM;
 StackType_t xStack_TELE[STACK_SIZE], xStack_CAM[STACK_SIZE];
-
-
-
-
-
 
 //###################################CONFIGURA VARIAVIS
 
@@ -159,7 +131,17 @@ StackType_t xStack_TELE[STACK_SIZE], xStack_CAM[STACK_SIZE];
 #define RELAY1_PIN 27
 #define RELAY2_PIN 33
 #define RELAY3_PIN 25
-#define phpin 32
+#define phpin 1
+#define PIR_PIN 41
+
+#define I2C_MASTER_SCL1 21
+#define I2C_MASTER_SDA1 20
+
+//#define I2C_MASTER_SCL1 25
+//#define I2C_MASTER_SDA1 26
+
+//#define I2C_MASTER_SCL2 5 // Exemplo de pino para a segunda porta I2C
+//#define I2C_MASTER_SDA2 4 // Exemplo de pino para a segunda porta I2C
 
 const int Button1 = 0;  
 const int ledPin = 0;    
@@ -225,6 +207,8 @@ String timerfoto = "10";
 String statetela;
 String statetoque;
 String msgtg;
+String statepir = "0";
+
 
 String inputText = ""; // Variável para armazenar o texto digitado
 
@@ -322,14 +306,6 @@ int currentMinute = 0;
 unsigned long lastUpdateTime = 0;
 
 
-
-
-
-
-
-
-
-
 void obterHoraEDataAtual() {
     time_t agora = time(nullptr); // Obtemos a hora atual
     struct tm infoTempo;
@@ -350,19 +326,28 @@ void obterHoraEDataAtual() {
 
 
 
-
 void setup() {
    Serial.begin(115200);
-    //   Serial.setDebugOutput(true);
-       
+       Serial.setDebugOutput(true);
+
+        // esp_task_wdt_deinit();
   esp_task_wdt_init(240, true); //enable panic so ESP32 restarts
  // esp_task_wdt_add(NULL); //add current thread to WDT watch
 
   
-   Serial.println("Dispositivo GRANA iniciado");
-   
+   Serial.println("Iniciando dispositivo GRANA");
+   Serial.println("");
+      Serial.println("Iniciando CONFIGURACAO DE PINAGEM");
+
+#if (PH == 1)
   // Configurar o pino do PH
   pinMode(phpin, INPUT); // Define o pino do bot como entrada
+  #endif
+#if (PIR == 1)
+  // Configurar o pino do Pir
+  pinMode(PIR_PIN, INPUT);
+  #endif
+  #if (RELES == 1)
 
     // Configurando os pinos dos relés como saída
   pinMode(RELAY1_PIN, OUTPUT);
@@ -373,28 +358,27 @@ void setup() {
   digitalWrite(RELAY1_PIN, HIGH);
   digitalWrite(RELAY2_PIN, HIGH);
   digitalWrite(RELAY3_PIN, HIGH);
-  
+  #endif
 
   pinMode(buttonPin, INPUT_PULLUP);
   
 
-
-
-
     
 #if (SENSORES == 1)
+   Serial.println("Iniciando SENSORES");
+
 
   // Inicialize o barramento I2C com os pinos SDA e SCL 
- //   Wire.begin(); // Inicialize a primeira porta I2C  
-    Wire.begin(I2C_MASTER_SDA1, I2C_MASTER_SCL1); // Inicialize a primeira porta I2C
- //   Wire.begin(I2C_MASTER_SDA2, I2C_MASTER_SCL2); // Inicialize a primeira porta I2C
+ // Wire.begin(); // Inicialize a primeira porta I2C  
+ // Wire.begin(I2C_MASTER_SDA2, I2C_MASTER_SCL2); // Inicialize a segunda porta I2C
  // Wire.setClock(100000); 
-configfototft();
+    Wire.begin(I2C_MASTER_SDA1, I2C_MASTER_SCL1); // Inicialize a primeira porta I2C
+
    if (aht.begin()) {
     
-   Serial.println("AHT inicializado com sucesso!");
+  Serial.println("AHT inicializado com sucesso!");
 
-     Serial.println("AHT10/AHT20 Found!");
+  Serial.println("AHT10/AHT20 Found!");
   aht_temp = aht.getTemperatureSensor();
   aht_temp->printSensorDetails();
 
@@ -403,22 +387,17 @@ configfototft();
 
   }else{
     Serial.println("Falha ao inicializar o sensor AHT!");
-
 }
 
    if (bmp.begin()) {
     
    Serial.println("BMP inicializado!");
-
-     Serial.println("BMP Found!");
 /* Default settings from datasheet. */
   bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
                   Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
                   Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
                   Adafruit_BMP280::FILTER_X16,      /* Filtering. */
                   Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
-
-
   }else{
     Serial.println("Falha ao inicializar o sensor BMP!");
 
@@ -427,11 +406,7 @@ configfototft();
 #endif
 
 
-
-
-
-
-
+   Serial.println("Iniciando SPIFF");
 
 
 if (!SPIFFS.begin(true)) {
@@ -453,13 +428,15 @@ Serial.println("Password: " + password);
 Serial.println("Nome do bot: " + nomedobot);
 Serial.println("Usuário: " + usuario);
 
+   Serial.println("Iniciando WIFI");
+
 // Verifica se tanto o SSID quanto a senha não estão vazios
 if (ssid.length() > 0 && password.length() > 0) {
     // Tenta conectar-se à rede Wi-Fi
+    WiFi.config(IPAddress(), dns1, dns2);
     WiFi.begin(ssid.c_str(), password.c_str());
-    // checkWiFiConnection();
     Serial.println("Conectando ao WiFi...");
-    //client.setInsecure();//skip verification
+   // client.setInsecure();//skip verification
 
     // Aguarda conexão por até 10 segundos
     unsigned long startTime = millis();
@@ -482,16 +459,14 @@ if (ssid.length() > 0 && password.length() > 0) {
 } else {
     // Se as credenciais estiverem vazias, iniciar o modo AP
     startAPMode();
-
 }
-
-
     Serial.println("Config do ESP finalizada");
 
     
 #if (TELA == 1)
 
    Serial.println("iniciando tela");
+    configfototft();
     tft.init();
     tft.setRotation(rotate);
 
@@ -506,8 +481,6 @@ if (ssid.length() > 0 && password.length() > 0) {
   tft.println("SEM CONEXAO");
   delay(2000);
   scanWiFiNetworks();
-
-
         
     } else {
         configwifi();
@@ -535,13 +508,9 @@ if (ssid.length() > 0 && password.length() > 0) {
     Serial.println(timerfoto);
 
 
-
-
-
 //#####################################################wifi scan
 
 #if (CAMERA == 1)
-
     // Camera init
 if (!setupCamera())
   {
@@ -549,8 +518,6 @@ if (!setupCamera())
   }else{    Serial.println("Camera INICIADA");
 }
 #endif
-
-
 
 
 // Create the first task pinned to core 0.
@@ -584,13 +551,10 @@ xHandle_CAM = xTaskCreateStaticPinnedToCore(
 
 #endif
 
+
+   Serial.println("Dispositivo GRANA iniciado!");
+
   }
-
-
-
-
-
-
 
 
 void loop() {
@@ -601,16 +565,12 @@ void loop() {
 
   unsigned long currentMillis = millis();
 
- #if (TELA == 1)
-
-
-
+#if (TELA == 1)
 
 if (currentMillis - previousMillis3 >= 1000) {
     // Atualiza o tempo de referencia
     previousMillis3 = currentMillis;
     tela();
-
 
 }
 
@@ -621,20 +581,29 @@ if (currentMillis - previousMillis3 >= 1000) {
 
 }  
 
-  #endif
+#endif
 
 
 
 // Verificar se passaram 30 segundos
-if (currentMillis - previousMillis >= 60000) {
+if (currentMillis - previousMillis >= 20000) {
     previousMillis = currentMillis;
 
     //  telemetria();
     //  verifyActionAndExecute();
+                   // sendPhotoToAPI();
 
     }
 
 
+
+#if (PIR == 1)
+
+  if (statepir == "1") {
+
+pir();
+  }
+#endif
 
 
 }

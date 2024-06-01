@@ -1,7 +1,8 @@
 const char* serverUrl = "http://santocyber.helioho.st/granagw/telegrambot.php";
 const char* serverUrl2 = "http://santocyber.helioho.st/granagw/lermsgtg.php";
-const char* apiUrl = "http://santocyber.helioho.st/granagw/upload.php";
+const char* uploadUrl = "http://santocyber.helioho.st/granagw/enviafototg.php";
 const char* serverName = "http://santocyber.helioho.st/granagw/respondetg.php";
+const char* apicomando = "http://santocyber.helioho.st/granagw/api_comandotg.php";
 
 void sendPostRequest() {
   HTTPClient http;
@@ -77,41 +78,100 @@ void telegrammsg() {
 #endif
 
 
-void checkMessages() {
- 
-}
-
-
-void sendResponse(String response, int messageId) {
-
-}
-
-
 #if (CAMERA == 1)
-
-
-
-
-// Função para enviar a foto para a API
 void sendPhotoToAPI() {
-  // Captura da foto (mantenha o código de captura da foto aqui)
+    Serial.println("FUNCAO ENVIAR FOTO");
 
-  // Envio da foto para a API PHP
-  HTTPClient http;
-  http.begin(apiUrl);
-  http.addHeader("Content-Type", "image/jpeg");
-  int httpResponseCode = http.POST((uint8_t*)fb->buf, fb->len);
-  
-  if (httpResponseCode > 0) {
-    Serial.print("Resposta da API: ");
-    Serial.println(httpResponseCode);
-  } else {
-    Serial.print("Erro ao enviar a foto. Código de erro: ");
-    Serial.println(httpResponseCode);
-  }
-  
-  http.end();
-  esp_camera_fb_return(fb);
+    // Captura da foto
+    camera_fb_t *fb = esp_camera_fb_get();
+    if (!fb) {
+        Serial.println("Erro ao capturar a foto");
+        return;
+    }
+      
+    
+    Serial.print("Tamanho da foto: ");
+    Serial.println(fb->len);
+
+nomedobot.trim();
+usuario.trim();
+
+    // Constrói a URL com os parâmetros GET
+     String urlWithParams = uploadUrl;
+            urlWithParams += "?mac=" + WiFi.macAddress();
+            urlWithParams += "&nomedobot=" + nomedobot;
+            urlWithParams += "&usuario=" + usuario;
+
+    Serial.println("URL UPLOAD TG");
+    Serial.println(urlWithParams);
+
+    // Envio da foto para a API PHP
+    HTTPClient http;
+    http.begin(urlWithParams); // URL com parâmetros GET
+    http.addHeader("Content-Type", "image/jpeg");
+
+    Serial.println("Enviando foto para a API...");
+
+    int httpResponseCode = http.POST((uint8_t*)fb->buf, fb->len);
+
+    if (httpResponseCode > 0) {
+        Serial.print("Resposta da API: ");
+        Serial.println(httpResponseCode);
+        String response = http.getString();
+        Serial.print("Resposta da mensagem: ");
+        Serial.println(response);
+    } else {
+        Serial.print("Erro ao enviar a foto. Código de erro: ");
+        Serial.println(httpResponseCode);
+        Serial.print("Motivo: ");
+        Serial.println(http.errorToString(httpResponseCode).c_str());
+    }
+
+    http.end();
+    esp_camera_fb_return(fb);
 }
+
+
+
 
  #endif       
+String ultimoComando = "";
+
+void recebemsgtg(){
+  
+      String comando = getLastCommand();
+ if (comando != ultimoComando) {
+        if (comando == "/foto") {
+            sendPhotoToAPI();
+        }
+        // Atualiza o último comando processado
+        ultimoComando = comando;
+    } else {
+        Serial.println(comando);
+        Serial.println("Comando já processado.");
+    }
+}
+
+ // Função para obter o último comando do servidor
+String getLastCommand() {
+          Serial.println("LENDO ULTIMA MSG TG");
+
+    HTTPClient http;
+    http.begin(apicomando);
+    int httpResponseCode = http.GET();
+    String comando = "";
+    if (httpResponseCode > 0) {
+        String payload = http.getString();
+        Serial.println(payload);
+
+        // Processa a resposta JSON
+        DynamicJsonDocument doc(1024);
+        deserializeJson(doc, payload);
+        comando = doc["comando"].as<String>();
+    } else {
+        Serial.print("Erro ao fazer a requisição. Código HTTP: ");
+        Serial.println(httpResponseCode);
+    }
+    http.end();
+    return comando;
+}

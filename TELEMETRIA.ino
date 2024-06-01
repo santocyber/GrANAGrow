@@ -37,12 +37,14 @@ const TickType_t xDelay = 60000 / portTICK_PERIOD_MS;
         Serial.println("Conexao bem-sucedida, iniciar envio telemetria.");
 
             // Exibe info sobre os servidores DNS
-    IPAddress dns1 = WiFi.dnsIP(0); // Primeiro servidor DNS
-    IPAddress dns2 = WiFi.dnsIP(1); // Segundo servidor DNS
-    Serial.print("Servidor DNS 1: ");
+   // IPAddress dns1 = WiFi.dnsIP(0); // Primeiro servidor DNS
+   // IPAddress dns2 = WiFi.dnsIP(1); // Segundo servidor DNS
+    Serial.print("Servidor DNS 1:");
     Serial.println(dns1);
-    Serial.print("Servidor DNS 2: ");
+    Serial.print("Servidor DNS 2:");
     Serial.println(dns2);
+    Serial.print("LocalIP:");
+    Serial.println(WiFi.localIP().toString());
     StateUpdate = "ativo";
     
     }
@@ -50,15 +52,22 @@ const TickType_t xDelay = 60000 / portTICK_PERIOD_MS;
     if (StateUpdate == "ativo") {
 
     telemetria();
+    delay(700);
     pingando();
-    delay(500);
+    delay(700);
     verifyActionAndExecute();
+    delay(700);
+    recebemsgtg();
   }
 
 
+
+
+      #if (RELES == 1)
     loadTime(hrliga, hrdesliga, timerautomatico, timerfoto, timerfotostatus);
     controlarRelayPeloTimer(timerautomatico, hrdesliga, hrliga, RELAY1_PIN);
     funcaoestado();
+    #endif
 
     #if (TELA == 1)
     verificasqltela();
@@ -86,16 +95,16 @@ void telemetria(){
     // Construa o corpo da solicitação POST
     String postData = "mac=" + WiFi.macAddress();
     postData += "&iplocal=" + WiFi.localIP().toString();
+
+
+#if (PH == 1)
+      Serial.println(ph());
+      Serial.println(analogRead(phpin));
+#endif
   
     // Verifica se os sensores devem ser lidos ou não
     #if (SENSORES == 1)
-
-
-      Serial.println(ph());
-      Serial.println(analogRead(phpin));
-
-
-    
+  
     if (aht.begin()) {
       Serial.println("AHT inicializado com sucesso!");
       Serial.println("DADOS SENSORES ");
@@ -108,6 +117,7 @@ void telemetria(){
       postData += "&umidade=" + String(readDHTHumidity());
       postData += "&pressao=" + String(readDHTPressao());
       postData += "&ph=" + String(ph(), 3);
+      
     } else {
       Serial.println("Falha ao inicializar o sensor AHT!");
     

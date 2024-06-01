@@ -1,6 +1,6 @@
 
-#include <stdbool.h>
-#include <stdint.h>
+#if (TELA == 1)
+
 #include "qrcodegen.h"
 
 //char buffer[300];
@@ -374,3 +374,5 @@ void displayValue() {
   //tft.println("Valor: ");
   tft.drawString(String(ordervalue), 60, 100); // Exibindo o valor no centro da tela
 }
+
+#endif

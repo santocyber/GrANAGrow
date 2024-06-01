@@ -8,6 +8,8 @@ const int otaPort = 80; // Porta do servidor PHP
 
 void updateFirmware() {
   Serial.println("Iniciando atualização de firmware...");
+  #if (TELA == 1)
+
  tft.fillScreen(TFT_BLACK);
   tft.setTextSize(4);
   tft.setCursor(0, 0); // Set cursor at top left of screen
@@ -17,7 +19,7 @@ void updateFirmware() {
   tft.setTextColor(TFT_RED, TFT_BLACK); // Change the font colour and the background colour
   tft.println("VERSAO ANTIGA");
   tft.println(GRANAVERSION);
-
+#endif
   
   HTTPClient http;
   http.begin(otaServer); // Combina o endereço IP do servidor e o caminho do arquivo OTA
@@ -27,6 +29,8 @@ void updateFirmware() {
     WiFiClient *stream = http.getStreamPtr();
     if (Update.begin(http.getSize(), U_FLASH)) { // Especifica o tipo de memória onde o firmware será gravado (neste caso, U_FLASH)
       Serial.println("Gravando firmware...");
+      #if (TELA == 1)
+
  tft.fillScreen(TFT_BLACK);
   tft.setTextSize(4);
   tft.setCursor(0, 0); // Set cursor at top left of screen
@@ -36,6 +40,7 @@ void updateFirmware() {
   tft.setTextColor(TFT_RED, TFT_BLACK); // Change the font colour and the background colour
   tft.println("VERSAO ANTIGA");
   tft.println(GRANAVERSION);
+  #endif
       size_t written = Update.writeStream(*stream);
       if (written == http.getSize()) {
         Serial.println("Atualização bem-sucedida!");
@@ -46,6 +51,8 @@ void updateFirmware() {
       if (Update.end(true)) {
         Serial.println("Firmware atualizado com sucesso!");
         Serial.println(GRANAVERSION);
+        #if (TELA == 1)
+
         tft.setTextWrap(true, true); // Wrap on width and height
 
   tft.fillScreen(TFT_BLACK);
@@ -58,7 +65,7 @@ void updateFirmware() {
   tft.println("VERSAO ANTIGA");
   tft.println(GRANAVERSION);
   tft.println("REINICIE O ROBO");
-
+#endif
   delay(5000);
           touchCount++; 
 

@@ -61,20 +61,17 @@ uint32_t ConnectedCounter = 0;
 
 void checkWiFiConnection() {
     if (WiFi.status() != WL_CONNECTED) {
-        Serial.println("Conex��o Wi-Fi perdida. Tentando reconectar...");
+        Serial.println("Conexao Wi-Fi perdida. Tentando reconectar...");
         WiFi.reconnect();
         unsigned long startTime = millis();
         while (WiFi.status() != WL_CONNECTED) {
-            // Obtenha as configura����es DNS atualmente em uso
-  IPAddress dns1 = WiFi.dnsIP(0); // Primeiro servidor DNS
-  IPAddress dns2 = WiFi.dnsIP(1); // Segundo servidor DNS
 
-  Serial.print("Servidor DNS prim��rio: ");
+  Serial.print("Servidor DNS1:");
   Serial.println(dns1);
-  Serial.print("Servidor DNS secund��rio: ");
+  Serial.print("Servidor DNS2:");
   Serial.println(dns2);
   setClock();
-            // Aguarda a reconex��o por at�� 10 segundos
+            // Aguarda a reconexao por 10 segundos
             if (millis() - startTime > 10000) {
                 Serial.println("Falha ao reconectar ao Wi-Fi.");
                 break;
