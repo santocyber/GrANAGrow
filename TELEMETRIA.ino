@@ -52,12 +52,16 @@ const TickType_t xDelay = 60000 / portTICK_PERIOD_MS;
     if (StateUpdate == "ativo") {
 
     telemetria();
-    delay(700);
+    delay(400);
     pingando();
-    delay(700);
+    delay(400);
     verifyActionAndExecute();
-    delay(700);
+    delay(400);
+
+    if (statetg == "1") {
     recebemsgtg();
+  }
+  
   }
 
 
@@ -69,9 +73,10 @@ const TickType_t xDelay = 60000 / portTICK_PERIOD_MS;
     funcaoestado();
     #endif
 
-    #if (TELA == 1)
+     #if (TELA == 1)
     verificasqltela();
     #endif
+ 
 
     esp_task_wdt_reset();
     esp_get_free_heap_size();
@@ -100,6 +105,8 @@ void telemetria(){
 #if (PH == 1)
       Serial.println(ph());
       Serial.println(analogRead(phpin));
+      postData += "&ph=" + String(ph(), 3);
+
 #endif
   
     // Verifica se os sensores devem ser lidos ou não
@@ -116,7 +123,6 @@ void telemetria(){
       postData += "&temperatura=" + String(readDHTTemperature());
       postData += "&umidade=" + String(readDHTHumidity());
       postData += "&pressao=" + String(readDHTPressao());
-      postData += "&ph=" + String(ph(), 3);
       
     } else {
       Serial.println("Falha ao inicializar o sensor AHT!");
@@ -196,20 +202,20 @@ void verifyActionAndExecute() {
     JsonDocument doc;
     deserializeJson(doc, payload);
 
-    String acoes = doc["acoes"].as<String>();
-    String estado = doc["estado"].as<String>();
+           estado = doc["estado"].as<String>();
     String mensagem = doc["mensagem"].as<String>();
     String telastatus = doc["telastatus"].as<String>();
     String mensagemstatus = doc["mensagemstatus"].as<String>();
     String hrliga = doc["hrliga"].as<String>();
     String hrdesliga = doc["hrdesliga"].as<String>();
     String timerautomatico = doc["timerautomatico"].as<String>();
-    String timerfoto = doc["timerfoto"].as<String>();
-    String timerfotostatus = doc["timerfotostatus"].as<String>();
+           timerfoto = doc["timerfoto"].as<String>();
+           timerfotostatus = doc["timerfotostatus"].as<String>();
+           statepir = doc["statepir"].as<String>();
+           statetg = doc["telegramstatus"].as<String>();
 
     Serial.println("SALVANDO NA ROM");
     Serial.println(estado);
-    Serial.println(acoes);
     Serial.println(mensagem);
     Serial.println(telastatus);
     Serial.println(mensagemstatus);
@@ -218,19 +224,11 @@ void verifyActionAndExecute() {
     Serial.println(timerautomatico);
     Serial.println(timerfotostatus);
     Serial.println(timerfoto);
+    Serial.println(statepir);
+    Serial.println(statetg);
 
     savefile(estado, telastatus, mensagemstatus, mensagem);
     saveTime(hrliga, hrdesliga, timerautomatico, timerfoto, timerfotostatus);
-    Serial.println("LENDO ROM");
-    acoes.trim();
-    estado.trim();
-    mensagem.trim();
-    telastatus.trim();
-    mensagemstatus.trim();
-    hrliga.trim();
-    hrdesliga.trim();
-
-
 
     
   } else {

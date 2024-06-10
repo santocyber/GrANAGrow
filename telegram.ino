@@ -77,40 +77,59 @@ void telegrammsg() {
 
 #endif
 
-
 #if (CAMERA == 1)
 void sendPhotoToAPI() {
     Serial.println("FUNCAO ENVIAR FOTO");
 
-    // Captura da foto
+
+
+    nomedobot.trim();
+    usuario.trim();
+
+    // Constrói a URL com os parâmetros GET
+    String urlWithParams = uploadUrl;
+    urlWithParams += "?mac=" + WiFi.macAddress();
+    urlWithParams += "&nomedobot=" + nomedobot;
+    urlWithParams += "&usuario=" + usuario;
+    urlWithParams += "&chat_id=" + chat_id;
+
+    Serial.println("URL UPLOAD TG");
+    Serial.println(urlWithParams);
+
+    // Limpa o buffer da câmera antes de enviar a foto para a API
+    esp_camera_fb_return(fb);
+
+        // Captura da foto
     camera_fb_t *fb = esp_camera_fb_get();
     if (!fb) {
         Serial.println("Erro ao capturar a foto");
         return;
     }
-      
     
+delay(400);
+
+        // Limpa o buffer da câmera antes de enviar a foto para a API
+    esp_camera_fb_return(fb);
+
+        // Captura da foto
+    esp_camera_fb_get();
+    if (!fb) {
+        Serial.println("Erro ao capturar a foto");
+        return;
+    }
+
+    // Exibe o tamanho da foto capturada
     Serial.print("Tamanho da foto: ");
     Serial.println(fb->len);
-
-nomedobot.trim();
-usuario.trim();
-
-    // Constrói a URL com os parâmetros GET
-     String urlWithParams = uploadUrl;
-            urlWithParams += "?mac=" + WiFi.macAddress();
-            urlWithParams += "&nomedobot=" + nomedobot;
-            urlWithParams += "&usuario=" + usuario;
-
-    Serial.println("URL UPLOAD TG");
-    Serial.println(urlWithParams);
+    
 
     // Envio da foto para a API PHP
     HTTPClient http;
     http.begin(urlWithParams); // URL com parâmetros GET
     http.addHeader("Content-Type", "image/jpeg");
 
-    Serial.println("Enviando foto para a API...");
+    Serial.println("Enviando foto para a API TG...");
+    
 
     int httpResponseCode = http.POST((uint8_t*)fb->buf, fb->len);
 
@@ -127,34 +146,45 @@ usuario.trim();
         Serial.println(http.errorToString(httpResponseCode).c_str());
     }
 
-    http.end();
+    // Limpa o buffer da câmera após o envio da foto para a API
     esp_camera_fb_return(fb);
+    http.end();
 }
-
-
 
 
  #endif       
 String ultimoComando = "";
+void recebemsgtg() {
+    String comando = getLastCommand();
+       comando.toLowerCase();
 
-void recebemsgtg(){
-  
-      String comando = getLastCommand();
- if (comando != ultimoComando) {
-        if (comando == "/foto") {
+    if (comando != ultimoComando) {
+        // Normalize o comando para minúsculas
+
+        // Use uma estrutura de dados mais eficiente para comparar comandos
+        if (comando == "foto" || comando == "/foto") {
+          #if (CAMERA == 1)
             sendPhotoToAPI();
+            #endif
+        } 
+        
+        if (comando == "oi") {
+            Serial.println("Comando OI");
         }
+
         // Atualiza o último comando processado
         ultimoComando = comando;
     } else {
+        Serial.println(chat_id);
         Serial.println(comando);
         Serial.println("Comando já processado.");
     }
 }
 
- // Função para obter o último comando do servidor
+
+// Função para obter o último comando do servidor
 String getLastCommand() {
-          Serial.println("LENDO ULTIMA MSG TG");
+    Serial.println("LENDO ULTIMA MSG TG");
 
     HTTPClient http;
     http.begin(apicomando);
@@ -168,6 +198,14 @@ String getLastCommand() {
         DynamicJsonDocument doc(1024);
         deserializeJson(doc, payload);
         comando = doc["comando"].as<String>();
+        
+        // Encontra a posição do caractere '@'
+        int pos = comando.indexOf('@');
+        if (pos != -1) { // Se o caractere '@' foi encontrado
+            comando = comando.substring(0, pos); // Obtém a substring até '@'
+        }
+        
+        chat_id = doc["chat_id"].as<String>();
     } else {
         Serial.print("Erro ao fazer a requisição. Código HTTP: ");
         Serial.println(httpResponseCode);

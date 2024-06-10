@@ -176,6 +176,7 @@ buttonState = digitalRead(buttonPin);
     
     }
 
+#if (RELES == 1)
 
 
 void funcaoestado() {
@@ -264,6 +265,7 @@ if ((currentHour > horaDesliga) || (currentHour == horaDesliga && currentMinute 
 
 
 
+#endif
 
 
 

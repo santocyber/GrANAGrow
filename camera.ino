@@ -1,3 +1,4 @@
+
 #if (CAMERA == 1)
 //####################CONFIG CAMERA
 
@@ -9,7 +10,6 @@
 #include <nvs_flash.h>
 #include "esp_camera.h"
 
-
 #include <stdio.h>
 #include <driver/gpio.h>
 #include <freertos/FreeRTOS.h>
@@ -17,59 +17,23 @@
 #include <esp_attr.h>
 #include "esp_heap_caps.h"
 
-
-
-
-
-//#######################SENSOR PIR
-
-#if (PIR == 1)
-
-void pir(){
-  
-    //  Serial.println(digitalRead(PIR_PIN));
- // Verificar se o sensor PIR detectou movimento
-  if (digitalRead(PIR_PIN) == HIGH) {
-    Serial.println("Movimento detectado!");
-    sendPhotoToAPI();
-
-    // Capturar uma foto
-    camera_fb_t * fb = esp_camera_fb_get();
-    if (!fb) {
-      Serial.println("Falha ao capturar a foto");
-      return;
-    }
-
-    // Salvar a foto em um arquivo (por exemplo, no SPIFFS ou enviar pela rede)
-    // Aqui, apenas vamos imprimir o tamanho da foto capturada
-    Serial.printf("Foto capturada: %d bytes\n", fb->len);
-
-    // Libere o frame buffer
-    esp_camera_fb_return(fb);
-
-    // Adicionar um pequeno atraso para evitar múltiplas capturas contínuas
-    delay(5000);
-  }
-
-  delay(100); // Pequeno atraso para evitar leitura excessiva do PIR
-
-
-}
-
-
-#endif
-
-
 //#########################CAMERA
 
 // Configurao da cera
 camera_fb_t * fb = NULL;
 
-framesize_t configframesize = FRAMESIZE_VGA; // FRAMESIZE_ + QVGA|CIF|VGA|SVGA|XGA|SXGA|UXGA
-int framesize = FRAMESIZE_VGA; //FRAMESIZE_HD;
+framesize_t configframesize = FRAMESIZE_SXGA; // FRAMESIZE_ + QVGA|CIF|VGA|SVGA|XGA|SXGA|UXGA
+int framesize = FRAMESIZE_HD; //FRAMESIZE_HD;
 int quality = 8;
 int qualityconfig = 4;
 
+
+#define ESP32S3 1
+#define ESP32W  0
+
+
+
+#if (ESP32S3 == 1)
 
 /// defined(CAMERA_MODEL_ESP32S3_EYE)
 #define PWDN_GPIO_NUM -1
@@ -90,6 +54,31 @@ int qualityconfig = 4;
 #define VSYNC_GPIO_NUM 6
 #define HREF_GPIO_NUM 7
 #define PCLK_GPIO_NUM 13
+
+#endif
+
+#if (ESP32W == 1)
+
+//#if defined(CAMERA_MODEL_WROVER_KIT)
+#define PWDN_GPIO_NUM    -1
+#define RESET_GPIO_NUM   -1
+#define XCLK_GPIO_NUM    21
+#define SIOD_GPIO_NUM    26
+#define SIOC_GPIO_NUM    27
+
+#define Y9_GPIO_NUM      35
+#define Y8_GPIO_NUM      34
+#define Y7_GPIO_NUM      39
+#define Y6_GPIO_NUM      36
+#define Y5_GPIO_NUM      19
+#define Y4_GPIO_NUM      18
+#define Y3_GPIO_NUM       5
+#define Y2_GPIO_NUM       4
+#define VSYNC_GPIO_NUM   25
+#define HREF_GPIO_NUM    23
+#define PCLK_GPIO_NUM    22
+#endif
+
 
 
 bool setupCamera()
@@ -119,8 +108,8 @@ bool setupCamera()
   //config.pixel_format = PIXFORMAT_RGB565; // for face detection/recognition
   config.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
   config.fb_location = CAMERA_FB_IN_PSRAM;
-//  config.jpeg_quality = 12;
-//  config.fb_count = 1;
+  //config.jpeg_quality = 12;
+  //config.fb_count = 1;
   
   //init with high specs to pre-allocate larger buffers
   if (psramFound()) {
@@ -188,13 +177,28 @@ void capturaimagem() {
 
 
 void capturaimagemenviabd() {
+            Serial.println("TIRANDO FOTO");
 
-   // Obt o frame buffer da cmera
-    camera_fb_t* fb = esp_camera_fb_get();
+    // Limpa o buffer da câmera antes de enviar a foto para a API
+    esp_camera_fb_return(fb);
 
+        // Captura da foto
+    camera_fb_t *fb = esp_camera_fb_get();
     if (!fb) {
-        Serial.println("Erro ao capturar a imagem");
-        return; // Saia da fuo se a captura da imagem falhar
+        Serial.println("Erro ao capturar a foto");
+        return;
+    }
+    
+delay(400);
+
+        // Limpa o buffer da câmera antes de enviar a foto para a API
+    esp_camera_fb_return(fb);
+
+        // Captura da foto
+    esp_camera_fb_get();
+    if (!fb) {
+        Serial.println("Erro ao capturar a foto");
+        return;
     }
 
     // Certifique-se de que o valor do MAC seja fornecido corretamente
@@ -204,29 +208,29 @@ void capturaimagemenviabd() {
     HTTPClient http;
    // http.begin(client,urlx);
     http.begin(urlx);
-
-    // Configurar o cabealho Content-Type para indicar que voos (imagem)
     http.addHeader("Content-Type", "image/jpeg");
 
-    // Envia os dados binrios da imagem para o servidor PHP
-            Serial.println("TIRANDO FOTO");
+    Serial.println("Enviando foto para a API BD...");
+    
 
-    int httpResponseCode = http.POST(fb->buf, fb->len);
+    int httpResponseCode = http.POST((uint8_t*)fb->buf, fb->len);
 
     if (httpResponseCode > 0) {
-        Serial.printf("[HTTP] POST request done with status code %d\n", httpResponseCode);
-        // Obtenha a resposta do servidor como uma string
+        Serial.print("Resposta da API: ");
+        Serial.println(httpResponseCode);
         String response = http.getString();
-        Serial.println("Resposta do servidor: " + response);
+        Serial.print("Resposta da mensagem: ");
+        Serial.println(response);
     } else {
-        Serial.printf("[HTTP] POST request failed, error: %s\n", http.errorToString(httpResponseCode).c_str());
+        Serial.print("Erro ao enviar a foto. Código de erro: ");
+        Serial.println(httpResponseCode);
+        Serial.print("Motivo: ");
+        Serial.println(http.errorToString(httpResponseCode).c_str());
     }
 
-
-    Serial.println("");
-    Serial.println(F("Desconectando."));
-    http.end();
+    // Limpa o buffer da câmera após o envio da foto para a API
     esp_camera_fb_return(fb);
+    http.end();
 }
 
 #endif

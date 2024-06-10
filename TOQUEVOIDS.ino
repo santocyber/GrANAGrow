@@ -41,11 +41,14 @@ void toque() {
   
   } 
 
+#if (RELES == 1)
+
    if (statetela == "botaorelay") {
         Serial.println("FUNCAO botaorelay");   
         botaorelay();      
   } 
-  
+
+#endif
   
   if (statetela == "telegram") {
         Serial.println("FUNCAO TELEGRAM");
@@ -110,58 +113,58 @@ void toque() {
             statetela = "clock";
             break;
         case 2:
-            statetela = "hora";
-            break;
-        case 3:
             statetela = "clima";
             break;
-        case 4:
-            statetela = "ph";
+        case 3:
+            statetela = "site";
             break;
-        case 5:
+        case 4:
             statetela = "news";
             break;
-        case 6:
-            statetela = "telegram";
+        case 5:
+            statetela = "hora";
             break;
-        case 7:
-            statetela = "lermsgtg";
-            break; 
-        case 8:
+        case 6:
             statetela = "scrolling";
             break;
+        case 7:
+            statetela = "crypto";
+            break; 
+        case 8:
+            statetela = "bolsa";
+            break;
         case 9:
-            statetela = "horiz";
+            statetela = "mensagem";
             break;
         case 10:
             statetela = "horax";
             break; 
         case 11:
-            statetela = "mensagem";
+            statetela = "horiz";
             break; 
         case 12:
-            statetela = "site";
+            statetela = "doa";
             break;  
          case 13:
-            statetela = "vert";
+            statetela = "donate";
             break;  
          case 14:
             statetela = "menu";
             break;  
          case 15:
-            statetela = "bolsa";
+            statetela = "lermsgtg";
             break;  
          case 16:
-            statetela = "crypto";
+            statetela = "olhos";
             break;  
          case 17:
-            statetela = "doa";
+            statetela = "ph";
             break;  
         case 18:
-            statetela = "donate";
+            statetela = "vert";
             break;
         case 19:
-            statetela = "olhos";
+            statetela = "telegram";
             break;
             delay(2000);
 
@@ -329,7 +332,11 @@ void verificasqltela(){
      if (mensagemstatus == "13") {
           Serial.println("BOTAO RELAY pelo SQL");
           functionExecuted = false;  // Marca a função como executada
+          #if (RELES == 1)
+
           drawButtonsrelay();
+
+          #endif
           delay(300);
           statetela = "botaorelay";
           boolbotao = true;
@@ -480,6 +487,7 @@ colIndex = constrain(colIndex, 0, 10);
     }
 }
 
+#if (RELES == 1)
 
 
 // Definindo as áreas dos botões
@@ -577,7 +585,7 @@ if (estado == "liga") {
   Serial.println(estado);
 
 }
-
+#endif
   
 
 

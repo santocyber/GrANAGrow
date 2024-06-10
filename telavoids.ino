@@ -317,7 +317,8 @@ if (statetela == "bolsa") {
   }}
 
 
-  
+  #if (RELES == 1)
+
 
     if (statetela == "botaorelay") {
 
@@ -331,7 +332,7 @@ if (statetela == "bolsa") {
   }}
   
 
-  
+  #endif
 
   
 
@@ -1104,7 +1105,7 @@ bool fetchAndPrintRSS(String rss_feed_url) {
           startPos = payload.indexOf("<item>", endPos); // Encontra o início de um item
           endPos = payload.indexOf("</item>", startPos); // Encontra o fim do item
 
-          if (itemCount >= 6) { // Se não houver mais itens ou 2 itens foram exibidos
+          if (itemCount >= 10) { // Se não houver mais itens ou 2 itens foram exibidos
             startPos = 0; // Reinicia a exibição do primeiro item
             endPos = 0;
             itemCount = 0; // Reinicia o contador de itens exibidos
@@ -1128,7 +1129,7 @@ bool fetchAndPrintRSS(String rss_feed_url) {
           int spaceCount = 0;
           for (int i = 0; i < title.length(); i++) {
             if (title[i] == ' ') spaceCount++;
-            if (spaceCount == 15) {
+            if (spaceCount == 35) {
               title = title.substring(0, i);
               break;
             }
@@ -1151,7 +1152,7 @@ bool fetchAndPrintRSS(String rss_feed_url) {
           spaceCount = 0;
           for (int i = 0; i < description.length(); i++) {
             if (description[i] == ' ') spaceCount++;
-            if (spaceCount == 85) {
+            if (spaceCount == 90) {
               description = description.substring(0, i);
               break;
             }
@@ -1176,7 +1177,7 @@ bool fetchAndPrintRSS(String rss_feed_url) {
    
           tft.setTextColor(TFT_WHITE);
           tft.setTextSize(2);
-          tft.setCursor(10, 70);
+          tft.setCursor(10, 90);
           tft.println(description);
 
           itemCount++;

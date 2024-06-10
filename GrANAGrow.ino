@@ -10,9 +10,9 @@
 
 #define SENSORES 1
 #define PH 0
-#define CAMERA 1
-#define PIR 1
-#define TELA 0
+#define CAMERA 0
+#define PIR 0
+#define TELA 1
 #define SDCARD 0
 #define RELES 0
 
@@ -70,7 +70,7 @@ Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
 
 //###################################GRANA VERSION
 
-String GRANAVERSION = "0.15";
+String GRANAVERSION = "0.16";
 
 //##################### Configura IP
 //WiFiClientSecure client;
@@ -128,17 +128,37 @@ StackType_t xStack_TELE[STACK_SIZE], xStack_CAM[STACK_SIZE];
 //###################################CONFIGURA VARIAVIS
 
 //###########################CONFIGURACAO DAS PINAGENS
+
+
+#if (PH == 1)
+
+#define phpin 1
+
+#endif
+#if (PIR == 1)
+
+#define PIR_PIN 42
+
+#endif
+#if (RELES == 1)
+
 #define RELAY1_PIN 27
 #define RELAY2_PIN 33
 #define RELAY3_PIN 25
-#define phpin 1
-#define PIR_PIN 41
 
-#define I2C_MASTER_SCL1 21
-#define I2C_MASTER_SDA1 20
+#endif
 
-//#define I2C_MASTER_SCL1 25
-//#define I2C_MASTER_SDA1 26
+#if (SENSORES == 1)
+
+//#define I2C_MASTER_SDA1 20
+//#define I2C_MASTER_SCL1 21
+
+#define I2C_MASTER_SCL1 25
+#define I2C_MASTER_SDA1 26
+
+#endif
+
+
 
 //#define I2C_MASTER_SCL2 5 // Exemplo de pino para a segunda porta I2C
 //#define I2C_MASTER_SDA2 4 // Exemplo de pino para a segunda porta I2C
@@ -208,6 +228,8 @@ String statetela;
 String statetoque;
 String msgtg;
 String statepir = "0";
+String statetg = "0";
+String chat_id;
 
 
 String inputText = ""; // Variável para armazenar o texto digitado
@@ -331,7 +353,7 @@ void setup() {
        Serial.setDebugOutput(true);
 
         // esp_task_wdt_deinit();
-  esp_task_wdt_init(240, true); //enable panic so ESP32 restarts
+//  esp_task_wdt_init(240, true); //enable panic so ESP32 restarts
  // esp_task_wdt_add(NULL); //add current thread to WDT watch
 
   
@@ -346,6 +368,7 @@ void setup() {
 #if (PIR == 1)
   // Configurar o pino do Pir
   pinMode(PIR_PIN, INPUT);
+
   #endif
   #if (RELES == 1)
 
@@ -512,10 +535,12 @@ if (ssid.length() > 0 && password.length() > 0) {
 
 #if (CAMERA == 1)
     // Camera init
+
+    Serial.println("Iniciando config CAM");
 if (!setupCamera())
   {
     Serial.println("Camera Setup Failed!");
-  }else{    Serial.println("Camera INICIADA");
+  }else{    Serial.println("Camera INICIADA!");
 }
 #endif
 
@@ -586,24 +611,44 @@ if (currentMillis - previousMillis3 >= 1000) {
 
 
 // Verificar se passaram 30 segundos
-if (currentMillis - previousMillis >= 20000) {
+if (currentMillis - previousMillis >= 500) {
     previousMillis = currentMillis;
 
     //  telemetria();
     //  verifyActionAndExecute();
                    // sendPhotoToAPI();
 
-    }
 
 
+/*
+
+
+                      Serial.println("PH");
+   Serial.println(digitalRead(phpin));
+   Serial.println(analogRead(phpin));
+
+   
+   Serial.println("PIR");
+   Serial.println(digitalRead(PIR_PIN));
+   Serial.println(analogRead(PIR_PIN));
+   */
+
+   
 
 #if (PIR == 1)
 
-  if (statepir == "1") {
+ if (statepir == "1") {
+
 
 pir();
   }
 #endif
+
+    }
+
+
+
+
 
 
 }

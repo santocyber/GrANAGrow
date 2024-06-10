@@ -1,6 +1,50 @@
 
 
 
+//#######################SENSOR PIR
+
+#if (PIR == 1)
+// Variável para contar o número de movimentos detectados
+int movimentoContagem = 0;
+
+// Variável para armazenar o tempo da última detecção de movimento
+unsigned long ultimoMovimentoMillis = 0;
+
+// Tempo de espera em milissegundos
+const unsigned long esperaMovimento = 60000; // 10 segundos
+
+void pir() {
+  // Verificar se o sensor PIR detectou movimento
+  if (digitalRead(PIR_PIN) == HIGH) {
+    Serial.println("Movimento detectado!");
+    movimentoContagem++;
+    digitalWrite(PIR_PIN, LOW);
+
+    if (movimentoContagem = 3) {
+      ultimoMovimentoMillis = millis(); // Atualizar o tempo da última detecção de movimento
+      Serial.println(movimentoContagem);
+      Serial.println("Movimentos detectados! Acionando a captura.");
+      sendPhotoToAPI();
+      capturaimagemenviabd();
+
+    }
+  }
+  
+    // Verificar se já se passaram 10 segundos desde a última detecção de movimento
+    if (millis() - ultimoMovimentoMillis >= esperaMovimento) {
+      // Resetar a contagem se não houver movimento por 30 segundos
+      movimentoContagem = 0;
+
+    }
+  
+
+  delay(100); // Pequeno atraso para evitar leitura excessiva do PIR
+}
+
+#endif
+
+#if (PH == 1)
+
 float ph() {
 float phshow;
 
@@ -24,6 +68,7 @@ float phshow;
 }
 
 
+#endif
 
 
 
