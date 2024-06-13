@@ -8,11 +8,11 @@
 
 //###CONFIG INCIAIS ATIVACAO DE MODULOS
 
-#define SENSORES 1
+#define SENSORES 0
 #define PH 0
-#define CAMERA 0
+#define CAMERA 1
 #define PIR 0
-#define TELA 1
+#define TELA 0
 #define SDCARD 0
 #define RELES 0
 
@@ -353,8 +353,9 @@ void setup() {
        Serial.setDebugOutput(true);
 
         // esp_task_wdt_deinit();
-//  esp_task_wdt_init(240, true); //enable panic so ESP32 restarts
- // esp_task_wdt_add(NULL); //add current thread to WDT watch
+ // esp_task_wdt_init(240, true); //enable panic so ESP32 restarts
+  esp_task_wdt_init(); //enable panic so ESP32 restarts
+  esp_task_wdt_add(NULL); //add current thread to WDT watch
 
   
    Serial.println("Iniciando dispositivo GRANA");
