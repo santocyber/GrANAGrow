@@ -1,7 +1,19 @@
+#include <Wire.h>
+#include <Adafruit_BMP280.h>  // Biblioteca BMP280
+#include <Adafruit_AHTX0.h>   // Biblioteca AHT10
+#include <TFT_eSPI.h>         // Biblioteca para o display TFT
+#include <SPI.h>
 #include <ph4502c_sensor.h>
-#include <TFT_eSPI.h>
 #include "FS.h"
 #include "FFat.h"
+
+// Definindo os pinos I2C para os SENSORES
+#define SDA_PIN 21
+#define SCL_PIN 47
+
+Adafruit_BMP280 bmp;          // Instância do sensor BMP280
+Adafruit_AHTX0 aht;           // Instância do sensor AHT10
+
 
 #define PH4502C_TEMPERATURE_PIN 47
 #define PH4502C_PH_PIN 14
@@ -33,11 +45,15 @@ PH4502C_Sensor ph4502c(
 );
 
 float voltage;
-float temperature = 25.0;  
-float humidity = 50.0;     
-float pressure = 1013.0;   
+float temperature;  
+float humidity;     
+float pressure;   
+float adjusted_ph_level;
+float phBruto;  // pH bruto
 
 void setupPH() {
+    Wire.begin(SDA_PIN, SCL_PIN);
+
   // Inicializa o display TFT
   tft.init();
   tft.setRotation(rotate);  
@@ -52,6 +68,22 @@ void setupPH() {
   ph4502c.init();
   pinMode(PH4502C_PH_PIN, INPUT);
 
+
+
+  // Inicializa o sensor AHT10 (umidade e temperatura)
+  if (!aht.begin()) {
+    Serial.println("Erro ao inicializar o sensor AHT10");
+  } else {
+    Serial.println("Sensor AHT10 inicializado.");
+  }
+
+  // Inicializa o sensor BMP280 (pressão e temperatura)
+  if (!bmp.begin()) {  // Endereço padrão do BMP280
+    Serial.println("Erro ao inicializar o sensor BMP280");
+  } else {
+    Serial.println("Sensor BMP280 inicializado.");
+  }
+  
   // Inicializa o sistema de arquivos FATFS
   if (!FFat.begin()) {
     Serial.println("Erro ao inicializar o FATFS");
@@ -64,17 +96,29 @@ void setupPH() {
   // Calcular a slope e o offset usando as leituras de pH 4 e pH 10
   calculateSlopeAndOffset();
 
+
   delay(500);  
 }
 
 void loopPH() {
+  phBruto = ph4502c.read_ph_level();  // pH bruto
+
+  // Leitura da temperatura e umidade do AHT10
+  sensors_event_t humidity_event, temp_event;
+  aht.getEvent(&humidity_event, &temp_event);
+  humidity = humidity_event.relative_humidity;
+  temperature = temp_event.temperature;
+
+  // Leitura da pressão e temperatura do BMP280
+  pressure = bmp.readPressure() / 100.0F;  // Conversão para hPa
+
   if (calibrationState == IDLE) {
     // Leitura analógica do sensor de pH
     int analogValue = analogRead(PH4502C_PH_PIN);
     voltage = analogValue * (3.3 / ADC_RESOLUTION);
 
     // Cálculo do pH ajustado usando slope e offset
-    float adjusted_ph_level = slope * voltage + offset;
+    adjusted_ph_level = slope * voltage + offset;
 
     // Exibe os valores no Serial Monitor
     Serial.print("Analog Value: ");
@@ -84,7 +128,6 @@ void loopPH() {
     Serial.print(" | pH Ajustado: ");
     Serial.println(adjusted_ph_level);
 
-        
     // Exibe os valores na tela
     tft.fillScreen(TFT_BLACK);
     tft.setCursor(0, 0);
@@ -93,14 +136,12 @@ void loopPH() {
     tft.println("GrANAGrow");
     tft.println("");
 
-
     // Exibe pH
     tft.setTextColor(TFT_YELLOW, TFT_BLACK);
     tft.setTextSize(7);
     tft.print("pH: ");
     tft.println(adjusted_ph_level);  
     tft.println("");
-
 
     // Exibe voltagem
     tft.setTextSize(2);

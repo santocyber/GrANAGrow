@@ -1,46 +1,47 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 
-
 // API endpoint
 const char* serverName = "http://52.54.32.237/granagrow/ph/update_data.php";
 
-
-
+// Função para enviar os dados ao servidor
 void sendDataToServer() {
-  if (WiFi.status() == WL_CONNECTED) { // Check WiFi connection status
+  if (WiFi.status() == WL_CONNECTED) { // Verifica a conexão WiFi
 
     HTTPClient http;
 
     // Obtenha o endereço MAC
     String macAddress = WiFi.macAddress();
 
-    // Defina o endpoint da API
+    // Define o endpoint da API
     http.begin(serverName);
 
-    // Especifique o tipo de conteúdo (JSON)
+    // Especifica o tipo de conteúdo (JSON)
     http.addHeader("Content-Type", "application/json");
 
-    // Crie um objeto JSON para enviar os dados
-    String jsonData = "{\"phValue\": " + String(ph4502c.read_ph_level()) + ", \"temperature\": " + String(temperature) + 
-                      ", \"humidity\": " + String(humidity) + ", \"pressure\": " + String(pressure) +
+    // Cria um objeto JSON para enviar os dados
+    String jsonData = "{\"phAjustado\": " + String(adjusted_ph_level) + 
+                      ", \"phBruto\": " + String(phBruto) + 
+                      ", \"temperature\": " + String(temperature) + 
+                      ", \"humidity\": " + String(humidity) + 
+                      ", \"pressure\": " + String(pressure) +
                       ", \"macAddress\": \"" + macAddress + "\"}";
 
-    // Envie a solicitação POST
+    // Envia a solicitação POST
     int httpResponseCode = http.POST(jsonData);
 
-    // Verifique a resposta do servidor
+    // Verifica a resposta do servidor
     if (httpResponseCode > 0) {
       String response = http.getString();
-      Serial.println("HTTP Response code: " + String(httpResponseCode));
-      Serial.println("Server response: " + response);
+      Serial.println("Código de resposta HTTP: " + String(httpResponseCode));
+      Serial.println("Resposta do servidor: " + response);
     } else {
-      Serial.println("Error on sending POST: " + String(httpResponseCode));
+      Serial.println("Erro ao enviar POST: " + String(httpResponseCode));
     }
 
     // Fecha a conexão
     http.end();
   } else {
-    Serial.println("WiFi Disconnected");
+    Serial.println("WiFi desconectado");
   }
 }

@@ -1,192 +1,289 @@
+#include <WiFi.h>
+#include <FFat.h> // Biblioteca para FATFS
+#include <WebServer.h>
+#include <ArduinoJson.h> // Biblioteca para manipulação de JSON
+#include <WiFiMulti.h>
 
-// Função para conectar-se ao Wi-Fi
-void connectToWiFi() {
-  WiFi.disconnect(true);
-  delay(1000);
-  WiFi.mode(WIFI_STA); // Garantir que estamos em modo STA (cliente)
-  WiFi.begin(ssid, password);
-  WiFi.setSleep(false); // Desativar o modo de economia de energia, caso esteja ativado.
-  WiFi.setHostname("GrANAGrowPH"); 
-  Serial.println("Tentando conectar ao Wi-Fi...");
-  Serial.println("SSID: " + String(ssid));
-  Serial.println("Password: " + String(password));
+WiFiMulti wifiMulti;
 
-  tft.setTextColor(TFT_WHITE);
-  tft.setTextSize(2);
-  tft.setCursor(10, 50);
-  tft.println("Tentando conectar ao Wi-Fi...");
+#define CONFIG_FILE "/wifi_config.txt"
 
-  int max_attempts = 20;
-  while (WiFi.status() != WL_CONNECTED && max_attempts-- > 0) {
-    delay(500);
-    Serial.print(".");
-    
-  tft.setTextColor(TFT_WHITE);
-  tft.setTextSize(2);
-  tft.print(".");
+String networksList;
+bool loopweb = false;
 
+void scanNetworks() {
+  Serial.println("Scanning WiFi networks");
+  loopweb = true;
+  WiFi.disconnect(true); // Desativa a reconexão automática
+
+  int n = WiFi.scanNetworks();
+  DynamicJsonDocument jsonBuffer(1000);
+  JsonArray networks = jsonBuffer.createNestedArray("networks");
+
+  for (int i = 0; i < n && i < 5; i++){
+    JsonObject network = networks.createNestedObject();
+    network["ssid"] = WiFi.SSID(i);
+    network["rssi"] = WiFi.RSSI(i);
   }
 
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("");
-    Serial.println("Wi-Fi conectado!");
-    Serial.print("Endereço IP: ");
-    Serial.println(WiFi.localIP());
+  networksList = "";
+  serializeJson(jsonBuffer, networksList);
+  Serial.println(networksList);
+  WiFi.disconnect(true); // Desativa a reconexão automática
+}
 
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_GREEN);
-  tft.setTextSize(4);
-  tft.setCursor(0, 100);
-  tft.println("Wi-Fi conectado!");
-  tft.println("Endereco IP: ");
-  tft.println(WiFi.localIP());
-  delay(1000); // Pequeno atraso para estabilizar
+void setupWEB() {
+  Serial.println("INICIANDO CONFIG WiFi");
+    WiFi.mode(WIFI_STA);
+    WiFi.setSleep(false); // Desativa o modo de economia de energia
 
+
+  loadCredentials();
+  ssid = "InternetSA";  
+  password = "cadebabaca";
   
-  } else {
-    Serial.println("");
-    Serial.println("Falha ao conectar-se ao Wi-Fi.");
-  }
-}
-void startAccessPoint() {
-  WiFi.disconnect(true); // Desconectar qualquer conexão Wi-Fi anterior
-  delay(1000); // Pequeno atraso para estabilizar
-  WiFi.mode(WIFI_AP_STA); // Modo AP (ponto de acesso)
-  delay(500); // Atraso para garantir a estabilidade do AP
+  WiFi.disconnect(true); // Desativa a reconexão automática
+  delay(100);
 
-  WiFi.softAP("GrANAGrowAP", "12345678"); // Definir senha do AP como '12345678'
+  int reconnectAttempts = 0;
+  const int maxReconnectAttempts = 3;
+  while (reconnectAttempts < maxReconnectAttempts) {
+    if (ssid.length() > 0) {
+      Serial.println("SSID PASS: ");
+      Serial.println(ssid.c_str());
+      Serial.println(password.c_str());
+      
+      WiFi.begin(ssid, password);
+      unsigned long startAttemptTime = millis();
+      const unsigned long wifiTimeout = 15000; // Tempo limite para tentar conectar ao WiFi (10 segundos)
+      Serial.println("TENTANDO CONECTAR ");
+      Serial.println(reconnectAttempts);
 
-  Serial.println("Access Point iniciado.");
-  Serial.print("Endereço IP: ");
-  Serial.println(WiFi.softAPIP());
+      while (WiFi.status() != WL_CONNECTED && (millis() - startAttemptTime) < wifiTimeout) {
+        delay(500);
+        Serial.print(".");
+      }
 
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_RED);
-  tft.setTextSize(4);
-  tft.setCursor(0, 100);
-  tft.println("Access Point");
-  tft.println("Endereco IP: ");
-  tft.println(WiFi.softAPIP());
-  delay(1000); // Pequeno atraso para estabilizar
-
-  apActive = true;
-
-  server.on("/", []() {
-    String html = "<html><head><style>";
-    html += "body { font-family: Arial, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; padding: 20px; }";
-    html += "h2 { color: #bb86fc; }";
-    html += "button { background-color: #bb86fc; color: #121212; padding: 10px 20px; border: none; cursor: pointer; margin-bottom: 20px; }";
-    html += "table { width: 100%; border-collapse: collapse; }";
-    html += "th, td { text-align: left; padding: 10px; }";
-    html += "th { background-color: #1f1f1f; color: #bb86fc; }";
-    html += "tr:nth-child(even) { background-color: #2a2a2a; }";
-    html += "tr:hover { background-color: #383838; }";
-    html += "input[type='radio'] { margin-right: 10px; }";
-    html += "</style></head><body>";
-    html += "<h2>Config Wi-Fi GrANAGrow</h2>";
-    html += "<button onclick='scanNetworks()'>Escanear Redes</button>";
-    html += "<form action='/save' method='post'>";
-    html += "<table id='wifiTable'><thead><tr><th>Selecionar</th><th>SSID</th><th>Sinal (dBm)</th></tr></thead><tbody></tbody></table><br>";
-    html += "Password: <input type='text' name='password' required><br><br>";
-    html += "<input type='submit' value='Salvar'>";
-    html += "</form>";
-    html += "<button onclick='clearCredentials()'>Limpar Credenciais Wi-Fi</button>";
-    html += "<script>";
-    html += "function scanNetworks() {";
-    html += "fetch('/scan').then(response => response.json()).then(data => {";
-    html += "let tableBody = document.getElementById('wifiTable').getElementsByTagName('tbody')[0];";
-    html += "tableBody.innerHTML = '';";
-    html += "data.forEach(network => {";
-    html += "let row = tableBody.insertRow();";
-    html += "let selectCell = row.insertCell(0);";
-    html += "let ssidCell = row.insertCell(1);";
-    html += "let signalCell = row.insertCell(2);";
-    html += "selectCell.innerHTML = `<input type='radio' name='ssid' value='${network.ssid}' required>`;";
-    html += "ssidCell.textContent = network.ssid;";
-    html += "signalCell.textContent = network.signal;";
-    html += "});";
-    html += "});";
-    html += "}";
-    html += "function clearCredentials() {";
-    html += "fetch('/clear').then(() => {";
-    html += "alert('Credenciais Wi-Fi limpas. Por favor, configure novamente.');";
-    html += "location.reload();";
-    html += "});";
-    html += "}";
-    html += "</script></body></html>";
-    server.send(200, "text/html", html);
-  });
-
-  server.on("/scan", []() {
-    int n = WiFi.scanNetworks();
-    String json = "[";
-    for (int i = 0; i < n; i++) {
-      if (i > 0) json += ",";
-      int signal = WiFi.RSSI(i);
-      json += "{\"ssid\":\"" + WiFi.SSID(i) + "\",\"signal\":" + String(signal) + "}";
+      if (WiFi.status() == WL_CONNECTED) {
+        Serial.println("CONECTADO AO WIFI");
+        Serial.print("IP Address: ");
+        Serial.println(WiFi.localIP());
+        conectadoweb = true;
+        loopweb = true;
+        return; // Conexão bem-sucedida, sai da função
+      } else {
+        Serial.println("\nFailed to connect to WiFi");
+        conectadoweb = false;
+        loopweb = true;
+      }
+    } else {
+      Serial.println("No WiFi credentials saved");
+      conectadoweb = false;
+      loopweb = true;
     }
-    json += "]";
-    server.send(200, "application/json", json);
-  });
+    reconnectAttempts++;
+  }
 
-  server.on("/save", []() {
-    String ssid = server.arg("ssid");
-    String password = server.arg("password");
+  if (reconnectAttempts >= maxReconnectAttempts) {
+    Serial.println("Exceeded maximum reconnect attempts.");
+    setupAP();
+    conectadoweb = false;
+    loopweb = true;
+  }
 
-    saveWiFiCredentials(ssid.c_str(), password.c_str());
-    server.send(200, "text/html", "<html><body><h2>Credenciais salvas. Reiniciando o dispositivo.</h2></body></html>");
-    delay(1000);
-    ESP.restart();
-  });
-
-  server.on("/clear", []() {
-    FFat.remove("/wifi.txt"); // Remove o arquivo contendo as credenciais Wi-Fi
-    server.send(200, "text/html", "<html><body><h2>Credenciais Wi-Fi foram limpas.</h2></body></html>");
-    delay(1000);
-    ESP.restart(); // Reinicia o ESP32 após limpar as credenciais
-  });
-
-  server.begin();
-}
-
-
-// Função para iniciar o FATFS
-void startFATFS() {
+  // Inicializa o FATFS
   if (!FFat.begin(true)) {
-    Serial.println("Erro ao montar o sistema de arquivos!");
+    Serial.println("An error has occurred while mounting FATFS");
     return;
   }
 }
 
-// Função para carregar as credenciais do Wi-Fi do arquivo
-bool loadWiFiCredentials() {
-  File file = FFat.open("/wifi.txt", "r");
-  if (!file) {
-    Serial.println("Credenciais de Wi-Fi não encontradas.");
-    return false;
-  }
+void setupAP() {
+  WiFi.mode(WIFI_AP_STA);
+  delay(200);
+  WiFi.disconnect(true); // Desativa a reconexão automática
 
-  String ssidStr = file.readStringUntil('\n');
-  String passStr = file.readStringUntil('\n');
-  ssidStr.trim();
-  passStr.trim();
-  ssidStr.toCharArray(ssid, 32);
-  passStr.toCharArray(password, 64);
-  
-  file.close();
 
-  return true;
+  WiFi.softAP("GrANAGROWAP");
+  IPAddress apIP = WiFi.softAPIP();
+  Serial.print("AP IP address: ");
+  Serial.println(apIP);
+
+  scanNetworks();
+
+  setupWebServer();
+  loopweb = true;
 }
 
-// Função para salvar as credenciais de Wi-Fi no arquivo
-void saveWiFiCredentials(const char* ssid, const char* password) {
-  File file = FFat.open("/wifi.txt", "w");
-  if (file) {
-    file.println(ssid);
-    file.println(password);
-    file.close();
-    Serial.println("Credenciais de Wi-Fi salvas com sucesso.");
+void setupWebServer() {
+  server.on("/", HTTP_GET, handleRoot);
+  server.on("/save", HTTP_POST, handleSave);
+  server.on("/delete", HTTP_GET, handleDeleteCredentials);
+  server.on("/restart", HTTP_GET, restartEsp); 
+  server.on("/scan", HTTP_GET, scanNetworks);
+  server.begin();
+}
+
+void loopWEB() {
+  if (loopweb) {
+    server.handleClient();
+  }
+
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= 300000) {
+    previousMillis = currentMillis;
+
+    if (WiFi.status() == WL_CONNECTED) {
+      Serial.println("\nConnected to WiFi");
+      Serial.print("IP Address: ");
+      Serial.println(WiFi.localIP());
+      conectadoweb = true;
+      loopweb = false;
+    } else {
+      Serial.println("\nFailed to connect to WiFi");
+      conectadoweb = false;
+      loopweb = true;
+    }
+  }
+}
+
+void loadCredentials() {
+  if (!FFat.begin(true)) {
+    Serial.println("An error has occurred while mounting FATFS");
+    return;
+  }
+
+  File file = FFat.open(CONFIG_FILE, FILE_READ);
+  if (!file) {
+    Serial.println("Failed to open config file for reading");
+    return;
+  }
+
+  ssid = file.readStringUntil('\n');
+  password = file.readStringUntil('\n');
+  username = file.readStringUntil('\n');
+  botname = file.readStringUntil('\n');
+
+  ssid.trim();
+  password.trim();
+  username.trim();
+  botname.trim();
+
+  file.close();
+}
+
+void saveCredentials(const char* ssid, const char* password, const char* username, const char* botname) {
+  File file = FFat.open(CONFIG_FILE, FILE_WRITE);
+  if (!file) {
+    Serial.println("Failed to open config file for writing");
+    return;
+  }
+
+  file.println(ssid);
+  file.println(password);
+  file.println(username);
+  file.println(botname);
+  file.close();
+}
+
+void deleteCredentials() {
+  if (FFat.remove(CONFIG_FILE)) {
+    Serial.println("WiFi credentials deleted");
   } else {
-    Serial.println("Falha ao salvar credenciais de Wi-Fi.");
+    Serial.println("Failed to delete WiFi credentials");
+  }
+}
+
+void restartEsp() {
+  server.send(200, "text/plain", "restarting...");
+  delay(1000);
+  ESP.restart();
+}
+
+void handleRoot() {
+  String html = "<!DOCTYPE html>"
+                "<html>"
+                "<head>"
+                "<title> WiFi Config</title>"
+                "<style>"
+                "body { font-family: Arial, sans-serif; text-align: center; background-color: black; color: white; }"
+                "input[type='checkbox'], input[type='password'], input[type='text'] { width: 50%; padding: 10px; margin: 10px 0; }"
+                "button { padding: 5px 10px; font-size: 10px; margin: 10px 5px; }"
+                "table { margin: 20px auto; border-collapse: collapse; width: 60%; }"
+                "th, td { border: 1px solid white; padding: 10px; }"
+                "th { background-color: #333; }"
+                "</style>"
+                "</head>"
+                "<body>"
+                "<h1>WiFi Config</h1>"
+                "<table>"
+                "<thead>"
+                "<tr>"
+                "<th>Select</th>"
+                "<th>SSID</th>"
+                "<th>Signal Strength</th>"
+                "</tr>"
+                "</thead>"
+                "<tbody>";
+  html += "<form method='post' action='/save'>";
+
+  DynamicJsonDocument jsonBuffer(1000);
+  deserializeJson(jsonBuffer, networksList);
+  JsonArray networks = jsonBuffer["networks"].as<JsonArray>();
+  int n = 5; // Limitar a 5 redes
+
+  for (int i = 0; i < n && i < networks.size(); i++) {
+    html += "<tr>";
+    html += "<td><input type='checkbox' name='ssid' value='" + networks[i]["ssid"].as<String>() + "'></td>";
+    html += "<td>" + networks[i]["ssid"].as<String>() + "</td>";
+    html += "<td>" + String(networks[i]["rssi"].as<int>()) + " dBm</td>";
+    html += "</tr>";
+  }
+  html += "</tbody>"
+          "</table>";
+  html += "<label for='password'>Password:</label><input type='text' name='password'><br>";
+  html += "<label for='nomedobot'>NomeDoBOT:</label><input type='text' name='nomedobot'><br>";
+  html += "<label for='usuario'>Usuario:</label><input type='text' name='usuario'><br>";
+  html += "<input type='submit' value='CONECTAR'>";
+  html += "</form>";
+  html += "<a href='/delete'><button>Delete WiFi</button></a>"
+          "<a href='/restart'><button>Restart</button></a>"
+          "<a href='/scan'><button>Scan</button></a>"
+          "</body>"
+          "</html>";
+
+  server.send(200, "text/html", html);
+}
+
+void handleSave() {
+  ssid = server.arg("ssid");
+  password = server.arg("password");
+  username = server.arg("username");
+  botname = server.arg("botname");
+
+  ssid.trim();
+  password.trim();
+  username.trim();
+  botname.trim();
+
+  saveCredentials(ssid.c_str(), password.c_str(), username.c_str(), botname.c_str());
+
+  Serial.println(ssid.c_str());
+  Serial.println(password.c_str());
+  Serial.println(username.c_str());
+  Serial.println(botname.c_str());
+
+  server.send(200, "text/plain", "Credentials saved, restarting...");
+  delay(1000);
+  ESP.restart();
+}
+
+void handleDeleteCredentials() {
+  if (FFat.remove(CONFIG_FILE)) {
+    server.send(200, "text/plain", "WiFi credentials deleted, restarting...");
+    delay(1000);
+    ESP.restart();
+  } else {
+    server.send(500, "text/plain", "Failed to delete WiFi credentials");
   }
 }

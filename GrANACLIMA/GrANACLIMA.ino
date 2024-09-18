@@ -37,7 +37,7 @@ uint8_t z;
 unsigned long previousMillis = 0;
 unsigned long previousMillis2 = 0;
 const long interval = 1500; // Intervalo de 1500 milissegundos
-const long interval2 = 15000; // Intervalo de 1500 milissegundos
+const long interval2 = 60000; // Intervalo de 1500 milissegundos
 
 float temperature, humidity, pressure;
 
@@ -59,16 +59,8 @@ void setup() {
   // Mostrar logo na inicialização
   showLogo();
 
-
-
-
 setupWEB();
-
-
-
 setupCLIMA();
-
-  
 
   
 }
@@ -76,7 +68,6 @@ setupCLIMA();
 void loop() {
   
   loopWEB();
-
 
   unsigned long currentMillis = millis();
 

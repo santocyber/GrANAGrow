@@ -9,14 +9,13 @@
 //###                                 #
 //#####################################
 //BIBLIOTECAS
-
+#include <Wire.h>
+#include <Adafruit_BMP280.h>  // Biblioteca BMP280
+#include <Adafruit_AHTX0.h>   // Biblioteca AHT10
 #include <WiFi.h>
 #include <FFat.h>
 #include <WebServer.h>
 #include <ArduinoJson.h>
-
-
-
 #include "User_Setup.h"
 #include <TFT_eSPI.h>
 TFT_eSPI tft = TFT_eSPI();
@@ -25,9 +24,9 @@ TFT_eSPI tft = TFT_eSPI();
 //#####################################
 //WIFI
 WebServer server(80);
-char ssid[32];
-char password[64];
-bool apActive = false;
+String ssid, password, username,botname;
+bool conectadoweb = false;
+
 
 //TELA
 int rotate = 3;
@@ -37,8 +36,8 @@ uint8_t z;
 
 unsigned long previousMillis = 0;
 unsigned long previousMillis2 = 0;
-const long interval = 1500; // Intervalo de 1500 milissegundos
-const long interval2 = 15000; // Intervalo de 1500 milissegundos
+const long interval = 2500; // Intervalo de 1500 milissegundos
+const long interval2 = 60000; // Intervalo de 1500 milissegundos
 
 
 
@@ -46,48 +45,16 @@ const long interval2 = 15000; // Intervalo de 1500 milissegundos
 
 void setup() {
   Serial.begin(115200);
-  startFATFS();
-
-
-
-
-  // Iniciar o display
-  tft.init();
-  tft.setRotation(rotate);
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextWrap(true);
 
   // Mostrar logo na inicialização
-  showLogo();
-
-
-
-
-
-  if (loadWiFiCredentials()) {
-    connectToWiFi();
-    if (WiFi.status() != WL_CONNECTED) {
-      startAccessPoint();
-    }
-  } else {
-    startAccessPoint();
-  }
-
-
-
-
+ // showLogo();
 setupPH();
 
-  
-
-  
+setupWEB();
 }
 
 void loop() {
-  
-  if (apActive) {
-    server.handleClient();
-  }
+    loopWEB();
 
   unsigned long currentMillis = millis();
 
