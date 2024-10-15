@@ -1,0 +1,243 @@
+2024-10-14 09:19:22.335 [main] INFO  Freerouting v1.6.5 (build-date: 2023-01-03)
+2024-10-14 09:19:22.338 [main] DEBUG  Version: 1.6.5,2023-01-03
+2024-10-14 09:19:22.339 [main] DEBUG  Command line arguments: ''
+2024-10-14 09:19:22.339 [main] DEBUG  Architecture: Linux,amd64,6.8.0-45-generic
+2024-10-14 09:19:22.341 [main] DEBUG  Java: 21.0.4,Ubuntu
+2024-10-14 09:19:22.342 [main] DEBUG  System Language: en,en_US
+2024-10-14 09:19:22.347 [main] DEBUG  Hardware: 12 CPU cores,3838 MB RAM
+2024-10-14 09:19:22.350 [main] DEBUG  UTC Time: 2024-10-14T12:19:22.348476305Z
+2024-10-14 09:19:22.355 [main] DEBUG  GUI Language: en_US
+2024-10-14 09:19:22.625 [main] TRACE Method 'MainApplication.main()' was performed in 1.21 seconds.
+2024-10-14 09:19:38.910 [AWT-EventQueue-0] INFO  Opening 'GRANAPCBESP32S3V1.dsn'...
+2024-10-14 09:22:44.605 [AWT-EventQueue-0] ERROR Java heap space: failed reallocation of scalar replaced objects
+java.lang.OutOfMemoryError: Java heap space: failed reallocation of scalar replaced objects
+	at app.freerouting.designforms.specctra.SpecctraDsnFileReader.next_string(SpecctraDsnFileReader.java:1689) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.SpecctraDsnFileReader.next_string_list(SpecctraDsnFileReader.java:1743) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.Rule.read_clearance_rule(Rule.java:225) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.Rule.read_scope(Rule.java:39) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.Structure.read_scope(Structure.java:834) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.ScopeKeyword.read_scope(ScopeKeyword.java:62) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.DsnFile.read(DsnFile.java:51) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.interactive.BoardHandling.import_design(BoardHandling.java:819) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.BoardFrame.read(BoardFrame.java:230) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication.create_board_frame(MainApplication.java:416) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication.open_board_design_action(MainApplication.java:488) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication.lambda$new$2(MainApplication.java:149) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication$$Lambda/0x000076c8c81cdd00.actionPerformed(Unknown Source) ~[?:?]
+	at javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1972) ~[?:?]
+	at javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2314) ~[?:?]
+	at javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:407) ~[?:?]
+	at javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:262) ~[?:?]
+	at javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:279) ~[?:?]
+	at java.awt.AWTEventMulticaster.mouseReleased(AWTEventMulticaster.java:297) ~[?:?]
+	at java.awt.Component.processMouseEvent(Component.java:6621) ~[?:?]
+	at javax.swing.JComponent.processMouseEvent(JComponent.java:3398) ~[?:?]
+	at java.awt.Component.processEvent(Component.java:6386) ~[?:?]
+	at java.awt.Container.processEvent(Container.java:2266) ~[?:?]
+	at java.awt.Component.dispatchEventImpl(Component.java:4996) ~[?:?]
+	at java.awt.Container.dispatchEventImpl(Container.java:2324) ~[?:?]
+	at java.awt.Component.dispatchEvent(Component.java:4828) ~[?:?]
+	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4948) ~[?:?]
+	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4575) ~[?:?]
+	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4516) ~[?:?]
+	at java.awt.Container.dispatchEventImpl(Container.java:2310) ~[?:?]
+	at java.awt.Window.dispatchEventImpl(Window.java:2780) ~[?:?]
+	at java.awt.Component.dispatchEvent(Component.java:4828) ~[?:?]
+2024-10-14 09:23:54.188 [main] INFO  Freerouting v1.6.5 (build-date: 2023-01-03)
+2024-10-14 09:23:54.192 [main] DEBUG  Version: 1.6.5,2023-01-03
+2024-10-14 09:23:54.193 [main] DEBUG  Command line arguments: ''
+2024-10-14 09:23:54.193 [main] DEBUG  Architecture: Linux,amd64,6.8.0-45-generic
+2024-10-14 09:23:54.194 [main] DEBUG  Java: 21.0.4,Ubuntu
+2024-10-14 09:23:54.194 [main] DEBUG  System Language: en,en_US
+2024-10-14 09:23:54.201 [main] DEBUG  Hardware: 12 CPU cores,3838 MB RAM
+2024-10-14 09:23:54.205 [main] DEBUG  UTC Time: 2024-10-14T12:23:54.201543593Z
+2024-10-14 09:23:54.209 [main] DEBUG  GUI Language: en_US
+2024-10-14 09:23:54.497 [main] TRACE Method 'MainApplication.main()' was performed in 0.80 seconds.
+2024-10-14 09:24:10.069 [AWT-EventQueue-0] INFO  Opening 'GRANAPCBESP32S3V1.dsn'...
+2024-10-14 09:27:29.266 [AWT-EventQueue-0] ERROR Java heap space: failed reallocation of scalar replaced objects
+java.lang.OutOfMemoryError: Java heap space: failed reallocation of scalar replaced objects
+	at java.util.Arrays.copyOf(Arrays.java:3482) ~[?:?]
+	at java.util.ArrayList.grow(ArrayList.java:237) ~[?:?]
+	at java.util.ArrayList.grow(ArrayList.java:244) ~[?:?]
+	at java.util.ArrayList.add(ArrayList.java:483) ~[?:?]
+	at java.util.ArrayList.add(ArrayList.java:496) ~[?:?]
+	at app.freerouting.designforms.specctra.SpecctraDsnFileReader.next_string(SpecctraDsnFileReader.java:1689) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.SpecctraDsnFileReader.next_string_list(SpecctraDsnFileReader.java:1743) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.Rule.read_clearance_rule(Rule.java:225) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.Rule.read_scope(Rule.java:39) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.Structure.read_scope(Structure.java:834) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.ScopeKeyword.read_scope(ScopeKeyword.java:62) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.DsnFile.read(DsnFile.java:51) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.interactive.BoardHandling.import_design(BoardHandling.java:819) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.BoardFrame.read(BoardFrame.java:230) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication.create_board_frame(MainApplication.java:416) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication.open_board_design_action(MainApplication.java:488) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication.lambda$new$2(MainApplication.java:149) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication$$Lambda/0x00007bfad41cdd00.actionPerformed(Unknown Source) ~[?:?]
+	at javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1972) ~[?:?]
+	at javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2314) ~[?:?]
+	at javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:407) ~[?:?]
+	at javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:262) ~[?:?]
+	at javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:279) ~[?:?]
+	at java.awt.AWTEventMulticaster.mouseReleased(AWTEventMulticaster.java:297) ~[?:?]
+	at java.awt.Component.processMouseEvent(Component.java:6621) ~[?:?]
+	at javax.swing.JComponent.processMouseEvent(JComponent.java:3398) ~[?:?]
+	at java.awt.Component.processEvent(Component.java:6386) ~[?:?]
+	at java.awt.Container.processEvent(Container.java:2266) ~[?:?]
+	at java.awt.Component.dispatchEventImpl(Component.java:4996) ~[?:?]
+	at java.awt.Container.dispatchEventImpl(Container.java:2324) ~[?:?]
+	at java.awt.Component.dispatchEvent(Component.java:4828) ~[?:?]
+	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4948) ~[?:?]
+2024-10-14 09:30:24.408 [main] INFO  Freerouting v1.6.5 (build-date: 2023-01-03)
+2024-10-14 09:30:24.411 [main] DEBUG  Version: 1.6.5,2023-01-03
+2024-10-14 09:30:24.412 [main] DEBUG  Command line arguments: ''
+2024-10-14 09:30:24.412 [main] DEBUG  Architecture: Linux,amd64,6.8.0-45-generic
+2024-10-14 09:30:24.413 [main] DEBUG  Java: 21.0.4,Ubuntu
+2024-10-14 09:30:24.413 [main] DEBUG  System Language: en,en_US
+2024-10-14 09:30:24.418 [main] DEBUG  Hardware: 12 CPU cores,4096 MB RAM
+2024-10-14 09:30:24.422 [main] DEBUG  UTC Time: 2024-10-14T12:30:24.418935452Z
+2024-10-14 09:30:24.425 [main] DEBUG  GUI Language: en_US
+2024-10-14 09:30:24.640 [main] TRACE Method 'MainApplication.main()' was performed in 0.69 seconds.
+2024-10-14 09:30:35.804 [AWT-EventQueue-0] INFO  Opening 'GRANAPCBESP32S3V1.dsn'...
+2024-10-14 09:34:34.370 [AWT-EventQueue-0] ERROR Java heap space: failed reallocation of scalar replaced objects
+java.lang.OutOfMemoryError: Java heap space: failed reallocation of scalar replaced objects
+2024-10-14 09:35:04.889 [main] INFO  Freerouting v1.6.5 (build-date: 2023-01-03)
+2024-10-14 09:35:04.892 [main] DEBUG  Version: 1.6.5,2023-01-03
+2024-10-14 09:35:04.893 [main] DEBUG  Command line arguments: ''
+2024-10-14 09:35:04.894 [main] DEBUG  Architecture: Linux,amd64,6.8.0-45-generic
+2024-10-14 09:35:04.895 [main] DEBUG  Java: 21.0.4,Ubuntu
+2024-10-14 09:35:04.896 [main] DEBUG  System Language: en,en_US
+2024-10-14 09:35:04.901 [main] DEBUG  Hardware: 12 CPU cores,6144 MB RAM
+2024-10-14 09:35:04.905 [main] DEBUG  UTC Time: 2024-10-14T12:35:04.902030832Z
+2024-10-14 09:35:04.908 [main] DEBUG  GUI Language: en_US
+2024-10-14 09:35:05.094 [main] TRACE Method 'MainApplication.main()' was performed in 0.59 seconds.
+2024-10-14 09:35:13.579 [AWT-EventQueue-0] INFO  Opening 'GRANAPCBESP32S3V1.dsn'...
+2024-10-14 09:40:31.801 [AWT-EventQueue-0] ERROR Java heap space: failed reallocation of scalar replaced objects
+java.lang.OutOfMemoryError: Java heap space: failed reallocation of scalar replaced objects
+	at java.util.ArrayList.<init>(ArrayList.java:186) ~[?:?]
+	at app.freerouting.designforms.specctra.SpecctraDsnFileReader.next_string(SpecctraDsnFileReader.java:1703) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.SpecctraDsnFileReader.next_string_list(SpecctraDsnFileReader.java:1743) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.Rule.read_clearance_rule(Rule.java:225) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.Rule.read_scope(Rule.java:39) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.Structure.read_scope(Structure.java:834) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.ScopeKeyword.read_scope(ScopeKeyword.java:62) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.DsnFile.read(DsnFile.java:51) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.interactive.BoardHandling.import_design(BoardHandling.java:819) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.BoardFrame.read(BoardFrame.java:230) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication.create_board_frame(MainApplication.java:416) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication.open_board_design_action(MainApplication.java:488) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication.lambda$new$2(MainApplication.java:149) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication$$Lambda/0x0000736eec1cdd00.actionPerformed(Unknown Source) ~[?:?]
+	at javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1972) ~[?:?]
+	at javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2314) ~[?:?]
+	at javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:407) ~[?:?]
+	at javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:262) ~[?:?]
+	at javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:279) ~[?:?]
+	at java.awt.AWTEventMulticaster.mouseReleased(AWTEventMulticaster.java:297) ~[?:?]
+	at java.awt.Component.processMouseEvent(Component.java:6621) ~[?:?]
+	at javax.swing.JComponent.processMouseEvent(JComponent.java:3398) ~[?:?]
+	at java.awt.Component.processEvent(Component.java:6386) ~[?:?]
+	at java.awt.Container.processEvent(Container.java:2266) ~[?:?]
+	at java.awt.Component.dispatchEventImpl(Component.java:4996) ~[?:?]
+	at java.awt.Container.dispatchEventImpl(Container.java:2324) ~[?:?]
+	at java.awt.Component.dispatchEvent(Component.java:4828) ~[?:?]
+	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4948) ~[?:?]
+	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4575) ~[?:?]
+	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4516) ~[?:?]
+	at java.awt.Container.dispatchEventImpl(Container.java:2310) ~[?:?]
+	at java.awt.Window.dispatchEventImpl(Window.java:2780) ~[?:?]
+2024-10-14 09:42:03.196 [main] INFO  Freerouting v1.6.5 (build-date: 2023-01-03)
+2024-10-14 09:42:03.198 [main] DEBUG  Version: 1.6.5,2023-01-03
+2024-10-14 09:42:03.199 [main] DEBUG  Command line arguments: ''
+2024-10-14 09:42:03.200 [main] DEBUG  Architecture: Linux,amd64,6.8.0-45-generic
+2024-10-14 09:42:03.200 [main] DEBUG  Java: 21.0.4,Ubuntu
+2024-10-14 09:42:03.201 [main] DEBUG  System Language: en,en_US
+2024-10-14 09:42:03.206 [main] DEBUG  Hardware: 12 CPU cores,8192 MB RAM
+2024-10-14 09:42:03.210 [main] DEBUG  UTC Time: 2024-10-14T12:42:03.206843864Z
+2024-10-14 09:42:03.214 [main] DEBUG  GUI Language: en_US
+2024-10-14 09:42:03.407 [main] TRACE Method 'MainApplication.main()' was performed in 0.60 seconds.
+2024-10-14 09:43:27.409 [AWT-EventQueue-0] INFO  Opening 'GRANAPCBESP32S3V1.dsn'...
+2024-10-14 09:51:40.851 [AWT-EventQueue-0] ERROR Java heap space: failed reallocation of scalar replaced objects
+java.lang.OutOfMemoryError: Java heap space: failed reallocation of scalar replaced objects
+2024-10-14 09:52:42.700 [main] INFO  Freerouting v1.6.5 (build-date: 2023-01-03)
+2024-10-14 09:52:42.703 [main] DEBUG  Version: 1.6.5,2023-01-03
+2024-10-14 09:52:42.703 [main] DEBUG  Command line arguments: ''
+2024-10-14 09:52:42.704 [main] DEBUG  Architecture: Linux,amd64,6.8.0-45-generic
+2024-10-14 09:52:42.705 [main] DEBUG  Java: 21.0.4,Ubuntu
+2024-10-14 09:52:42.705 [main] DEBUG  System Language: en,en_US
+2024-10-14 09:52:42.709 [main] DEBUG  Hardware: 12 CPU cores,10240 MB RAM
+2024-10-14 09:52:42.712 [main] DEBUG  UTC Time: 2024-10-14T12:52:42.710052436Z
+2024-10-14 09:52:42.716 [main] DEBUG  GUI Language: en_US
+2024-10-14 09:52:42.936 [main] TRACE Method 'MainApplication.main()' was performed in 1.41 seconds.
+2024-10-14 09:52:53.492 [AWT-EventQueue-0] INFO  Opening 'GRANAPCBESP32S3V1.dsn'...
+2024-10-14 09:55:10.519 [main] INFO  Freerouting v1.6.5 (build-date: 2023-01-03)
+2024-10-14 09:55:10.522 [main] DEBUG  Version: 1.6.5,2023-01-03
+2024-10-14 09:55:10.523 [main] DEBUG  Command line arguments: ''
+2024-10-14 09:55:10.523 [main] DEBUG  Architecture: Linux,amd64,6.8.0-45-generic
+2024-10-14 09:55:10.524 [main] DEBUG  Java: 21.0.4,Ubuntu
+2024-10-14 09:55:10.524 [main] DEBUG  System Language: en,en_US
+2024-10-14 09:55:10.528 [main] DEBUG  Hardware: 12 CPU cores,10240 MB RAM
+2024-10-14 09:55:10.532 [main] DEBUG  UTC Time: 2024-10-14T12:55:10.528781037Z
+2024-10-14 09:55:10.536 [main] DEBUG  GUI Language: en_US
+2024-10-14 09:55:10.777 [main] TRACE Method 'MainApplication.main()' was performed in 1.45 seconds.
+2024-10-14 09:55:18.261 [AWT-EventQueue-0] INFO  Opening 'GRANAPCBESP32S3V1.dsn'...
+2024-10-14 10:05:41.988 [AWT-EventQueue-0] ERROR Java heap space: failed reallocation of scalar replaced objects
+java.lang.OutOfMemoryError: Java heap space: failed reallocation of scalar replaced objects
+2024-10-14 10:08:07.529 [main] INFO  Freerouting v1.6.5 (build-date: 2023-01-03)
+2024-10-14 10:08:07.532 [main] DEBUG  Version: 1.6.5,2023-01-03
+2024-10-14 10:08:07.533 [main] DEBUG  Command line arguments: ''
+2024-10-14 10:08:07.533 [main] DEBUG  Architecture: Linux,amd64,6.8.0-45-generic
+2024-10-14 10:08:07.534 [main] DEBUG  Java: 21.0.4,Ubuntu
+2024-10-14 10:08:07.535 [main] DEBUG  System Language: en,en_US
+2024-10-14 10:08:07.539 [main] DEBUG  Hardware: 12 CPU cores,4096 MB RAM
+2024-10-14 10:08:07.543 [main] DEBUG  UTC Time: 2024-10-14T13:08:07.540221869Z
+2024-10-14 10:08:07.548 [main] DEBUG  GUI Language: en_US
+2024-10-14 10:08:07.776 [main] TRACE Method 'MainApplication.main()' was performed in 0.75 seconds.
+2024-10-14 10:09:04.323 [AWT-EventQueue-0] INFO  Opening 'GRANAPCBESP32S3V1.dsn'...
+2024-10-14 10:12:24.247 [AWT-EventQueue-0] ERROR Java heap space
+java.lang.OutOfMemoryError: Java heap space
+	at java.util.Arrays.copyOfRangeByte(Arrays.java:3863) ~[?:?]
+	at java.util.Arrays.copyOfRange(Arrays.java:3854) ~[?:?]
+	at java.lang.String.<init>(String.java:4788) ~[?:?]
+	at java.lang.StringBuffer.toString(StringBuffer.java:739) ~[?:?]
+	at app.freerouting.designforms.specctra.SpecctraDsnFileReader.next_string(SpecctraDsnFileReader.java:1732) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.SpecctraDsnFileReader.next_string_list(SpecctraDsnFileReader.java:1743) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.Rule.read_clearance_rule(Rule.java:225) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.Rule.read_scope(Rule.java:39) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.Structure.read_scope(Structure.java:834) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.ScopeKeyword.read_scope(ScopeKeyword.java:62) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.designforms.specctra.DsnFile.read(DsnFile.java:51) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.interactive.BoardHandling.import_design(BoardHandling.java:819) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.BoardFrame.read(BoardFrame.java:230) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication.create_board_frame(MainApplication.java:416) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication.open_board_design_action(MainApplication.java:488) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication.lambda$new$2(MainApplication.java:149) ~[freerouting-executable.jar:unspecified]
+	at app.freerouting.gui.MainApplication$$Lambda/0x00007ba03c1cdd00.actionPerformed(Unknown Source) ~[?:?]
+	at javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1972) ~[?:?]
+	at javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2314) ~[?:?]
+	at javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:407) ~[?:?]
+	at javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:262) ~[?:?]
+	at javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:279) ~[?:?]
+	at java.awt.AWTEventMulticaster.mouseReleased(AWTEventMulticaster.java:297) ~[?:?]
+	at java.awt.Component.processMouseEvent(Component.java:6621) ~[?:?]
+	at javax.swing.JComponent.processMouseEvent(JComponent.java:3398) ~[?:?]
+	at java.awt.Component.processEvent(Component.java:6386) ~[?:?]
+	at java.awt.Container.processEvent(Container.java:2266) ~[?:?]
+	at java.awt.Component.dispatchEventImpl(Component.java:4996) ~[?:?]
+	at java.awt.Container.dispatchEventImpl(Container.java:2324) ~[?:?]
+	at java.awt.Component.dispatchEvent(Component.java:4828) ~[?:?]
+	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4948) ~[?:?]
+	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4575) ~[?:?]
+2024-10-14 10:24:43.135 [main] INFO  Freerouting v1.6.5 (build-date: 2023-01-03)
+2024-10-14 10:24:43.137 [main] DEBUG  Version: 1.6.5,2023-01-03
+2024-10-14 10:24:43.138 [main] DEBUG  Command line arguments: ''
+2024-10-14 10:24:43.138 [main] DEBUG  Architecture: Linux,amd64,6.8.0-45-generic
+2024-10-14 10:24:43.139 [main] DEBUG  Java: 21.0.4,Ubuntu
+2024-10-14 10:24:43.139 [main] DEBUG  System Language: en,en_US
+2024-10-14 10:24:43.143 [main] DEBUG  Hardware: 12 CPU cores,4096 MB RAM
+2024-10-14 10:24:43.146 [main] DEBUG  UTC Time: 2024-10-14T13:24:43.143627011Z
+2024-10-14 10:24:43.149 [main] DEBUG  GUI Language: en_US
+2024-10-14 10:24:43.337 [main] TRACE Method 'MainApplication.main()' was performed in 0.63 seconds.
+2024-10-14 10:24:54.088 [AWT-EventQueue-0] INFO  Opening 'GRANAPCBESP32S3V1.dsn'...
+2024-10-14 10:29:03.479 [AWT-EventQueue-0] ERROR Java heap space: failed reallocation of scalar replaced objects
+java.lang.OutOfMemoryError: Java heap space: failed reallocation of scalar replaced objects
