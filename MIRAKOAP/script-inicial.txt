@@ -147,28 +147,12 @@ EOF
 
 
 
-# --- Criar e montar a "partição" Samba de 100MB ---
-SAMBAMOUNT="/mnt/samba"
-SAMBafile="/samba.img"
+# --- Criar o diretório /samba e configurar permissões ---
+SAMBA_DIR="/samba"
+mkdir -p "$SAMBA_DIR"
+chmod -R 0777 "$SAMBA_DIR"
 
-if [ ! -f "$SAMBafile" ]; then
-    echo "Criando arquivo de imagem de 100MB para o Samba..."
-    dd if=/dev/zero of="$SAMBafile" bs=1M count=100
-    echo "Formatando a imagem com ext4..."
-    mkfs.ext4 -q "$SAMBafile"
-fi
 
-if [ ! -d "$SAMBAMOUNT" ]; then
-    mkdir -p "$SAMBAMOUNT"
-fi
-
-if ! mountpoint -q "$SAMBAMOUNT"; then
-    echo "Montando a imagem em $SAMBAMOUNT..."
-    mount -o loop "$SAMBafile" "$SAMBAMOUNT"
-fi
-
-# Adiciona ao fstab para montagem automática caso não esteja definido
-grep -qF "$SAMBafile" /etc/fstab || echo "$SAMBafile  $SAMBAMOUNT  ext4  loop  0 0" >> /etc/fstab
 
 # --- Configurar o Samba para compartilhar esse diretório ---
 SMB_CONF="/etc/samba/smb.conf"
@@ -191,7 +175,7 @@ cat << EOF > "$SMB_CONF"
 
 [sambashare]
    comment = Compartilhamento Samba de 100MB
-   path = /mnt/samba
+   path = /samba
    browseable = yes
    writable = yes
    guest ok = yes
@@ -199,7 +183,7 @@ cat << EOF > "$SMB_CONF"
    directory mask = 0777
 EOF
 
-# Se desejar, sobrescreva também o smb.conf.template:
+# Sobrescreve o smb.conf.template:
 cat << EOF > "$SMB_TEMPLATE"
 [global]
    netbios name = MirakoRouter
@@ -216,22 +200,24 @@ cat << EOF > "$SMB_TEMPLATE"
 
 [sambashare]
    comment = Compartilhamento Samba de 100MB
-   path = /mnt/samba
+   path = /samba
    browseable = yes
    writable = yes
    guest ok = yes
    create mask = 0777
    directory mask = 0777
 EOF
-    fi
-    echo "Reiniciando o serviço Samba..."
 
-    /etc/init.d/samba4 restart
-else
-    echo "Atenção: $SMB_CONF não encontrado. Verifique se o caminho do arquivo de configuração do Samba está correto."
-fi
+echo "Reiniciando o serviço Samba..."
+/etc/init.d/samba4 restart  # Verifique se o serviço é 'samba4' ou 'samba'
 
-    chmod -R 0777 /mnt/samba
+# --- Configurar permissão samba ---
+
+# Aplica permissões imediatamente (após montagem)
+chmod -R 0777 /samba
+
+
+
 
 
 
@@ -245,13 +231,10 @@ src/gz openwrt_base http://downloads.openwrt.org/releases/22.03.5/packages/arm_c
 src/gz openwrt_luci http://downloads.openwrt.org/releases/22.03.5/packages/arm_cortex-a53/luci
 src/gz openwrt_packages http://downloads.openwrt.org/releases/22.03.5/packages/arm_cortex-a53/packages
 src/gz openwrt_routing http://downloads.openwrt.org/releases/22.03.5/packages/arm_cortex-a53/routing
+
 EOF
 
 echo "Feeds do opkg configurados em $CUSTOM_FEEDS_CONF"
-
-
-
-
 
 
 
